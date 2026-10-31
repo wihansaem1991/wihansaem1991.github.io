@@ -84,10 +84,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">9 pull requests and 2 vulnerability reports · 2 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">12 pull requests and 2 vulnerability reports · 2 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">11</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">14</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">5</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">6</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -147,6 +147,17 @@
       <dl><dt>Problem</dt><dd>The ML-DSA Wycheproof verification test skipped every case with a context string, so deleting the check that rejects contexts longer than 255 bytes left all tests passing.</dd><dt>Background</dt><dd>FIPS 204: ML-DSA signing and verification reject a context string longer than 255 bytes. The C2SP Wycheproof vectors test exactly that with 7-, 255- and 256-byte contexts.</dd><dt>How it was found</dt><dd>Running the Wycheproof ML-DSA vectors against the crate, then mutation testing: removing the length check went unnoticed by every existing test.</dd><dt>Fix</dt><dd>Run the context cases through <code>verify_with_context()</code>. With the length check removed, the ML-DSA-44, -65 and -87 tests now fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">Pull request #1493 ↗</a> · <a href="https://github.com/RustCrypto/signatures/pull/1493/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="Mbed-TLS-TF-PSA-Crypto-960" data-group="review">
+    <summary>
+      <span class="line1"><b>TF-PSA-Crypto</b> <span class="badge review" data-pr="Mbed-TLS/TF-PSA-Crypto#960">Awaiting review</span></span>
+      <span class="line2">Zeroize the temporary buffer in mbedtls_mpi_gcd_modinv_odd()</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="ok">✓1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">Mbed-TLS/TF-PSA-Crypto #960 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>The modular inverse routine freed its work buffer without clearing it. After <code>mbedtls_mpi_inv_mod()</code> the inverse stayed in freed heap memory, and after 2048-bit RSA key generation the private CRT coefficient QP did.</dd><dt>Background</dt><dd>Cryptographic module validation: critical security parameters must be zeroized when no longer needed (ISO/IEC 19790 and its Korean counterpart used in KCMVP), and RSA-CRT private keys include QP = q^-1 mod p.</dd><dt>How it was found</dt><dd>Measurement on aarch64 Linux: <code>free()</code> was intercepted and every freed block searched for the known values, with a control build that disables zeroization to prove the harness finds them.</dd><dt>Fix</dt><dd>Release the buffer with <code>mbedtls_mpi_zeroize_and_free()</code>, as the modular exponentiation code already does. Both measurements drop to 0; the <code>bignum</code> and <code>rsa</code> test suites pass.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">Pull request #960 ↗</a> · <a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-openssl-33426" data-group="ci">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33426">Awaiting CI approval</span></span>
@@ -189,6 +200,28 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · Test coverage ↗</a></div>
       <dl><dt>Problem</dt><dd>liboqs&#x27;s test harness rejected ML-DSA signatures of the wrong length, and contexts longer than 255 bytes, before calling the library, and the runner counted that as a pass. The Wycheproof <code>IncorrectSignatureLength</code> and <code>InvalidContext</code> vectors never reached liboqs: disabling the signature-length check in liboqs&#x27;s ML-DSA glue code left every test passing.</dd><dt>Background</dt><dd>FIPS 204 fixes the ML-DSA signature length for each parameter set. liboqs wraps the mldsa-native implementation in its own glue code, and that glue is what has to enforce the length at the public API.</dd><dt>How it was found</dt><dd>A sweep of the Wycheproof test harnesses of nine cryptography libraries for vectors that are skipped, followed by mutation testing on liboqs.</dd><dt>Fix</dt><dd>For ML-DSA, reject only malformed hex input, as the neighbouring SLH-DSA branch already does, so the vectors exercise the library&#x27;s own checks. Disabling the glue check now fails the Wycheproof tests for all three parameter sets.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">Pull request #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="ci">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge ci_approval" data-pr="openssl-projects/pkcs11-provider#814">Awaiting CI approval</span></span>
+      <span class="line2">Cancel the signing operation after CKR_BUFFER_TOO_SMALL</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="wait">⏸11</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #814 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>One signature into a buffer that was too small left the signing operation active on a pooled PKCS#11 session. Every later signature that picked up that session failed with <code>CKR_OPERATION_ACTIVE</code>: with NSS softokn, one 255-byte buffer for a 2048-bit RSA key broke all RSA, RSA-PSS, ECDSA and DigestSign signatures for the rest of the process.</dd><dt>Background</dt><dd>PKCS#11 session semantics: <code>C_Sign()</code> returning <code>CKR_BUFFER_TOO_SMALL</code> keeps the operation active so the caller can retry with a larger buffer, so a provider that pools sessions has to end the operation before handing the session back.</dd><dt>How it was found</dt><dd>A buffer-size sweep: every signature, derivation and decryption path of pkcs11-provider was run with buffers smaller and larger than needed, then followed by a normal call to see whether the session was still usable.</dd><dt>Fix</dt><dd>Move the existing cleanup for a hanging operation into a helper and call it on <code>CKR_BUFFER_TOO_SMALL</code> before the session is returned. The new <code>sigbuf</code> test fails without the change and passes with it.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">Pull request #814 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-815" data-group="ci">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge ci_approval" data-pr="openssl-projects/pkcs11-provider#815">Awaiting CI approval</span></span>
+      <span class="line2">Check raw RSA sign data against the modulus, not the buffer size</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="wait">⏸11</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #815 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>Raw RSA signing (<code>RSA_NO_PADDING</code>) on a token key failed whenever the output buffer was larger than the modulus, although the input was correct; the default provider signs the same input into the same buffer and returns the modulus size.</dd><dt>Background</dt><dd>RSA and OpenSSL provider API: <code>EVP_PKEY_sign()</code> takes the buffer size in <code>*siglen</code>, and raw RSA requires the input to be exactly as long as the modulus (<code>CKM_RSA_X_509</code> in PKCS#11).</dd><dt>How it was found</dt><dd>The same buffer-size sweep, comparing pkcs11-provider with OpenSSL&#x27;s default provider: buffers of 257, 512 and 8448 bytes failed on the token and succeeded on the default provider.</dd><dt>Fix</dt><dd>Compare the input length with the key&#x27;s modulus size instead of the caller&#x27;s buffer size. The new <code>rsaraw</code> test checks both providers, recovers the data from the token signature, and still refuses input shorter than the modulus.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">Pull request #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="VR-1" data-group="cve">
