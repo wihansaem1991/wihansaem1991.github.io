@@ -94,7 +94,8 @@ def main():
     missing = []
     for p in gh("search", "prs", "--author", owner, "--limit", "100", "--json", "repository,number"):
         key = (p["repository"]["nameWithOwner"], int(p["number"]))
-        if key in known:
+        # pull requests to the owner's own repositories (this site, for one) are not contributions
+        if key in known or key[0].split("/")[0] == owner:
             continue
         status, date, title = pr_state(*key)
         if status in ("merged", "approved"):
