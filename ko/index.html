@@ -62,6 +62,7 @@
   .badge.approved, .badge.v-fixed { color:var(--ok); border-color:var(--ok); }
   .badge.merged, .badge.v-published { color:var(--merged); border-color:var(--merged); }
   .badge.changes { color:var(--bad); border-color:var(--bad); }
+  .badge.vuln { color:var(--bad); border-color:var(--bad); }
   .badge.rereview, .badge.ci_approval, .badge.v-triage, .badge.v-accepted { color:var(--warn); border-color:var(--warn); }
   dl { margin:0; display:grid; grid-template-columns: 120px 1fr; gap:8px 16px; font-size:15px; }
   dt { color:var(--muted); font-size:14px; }
@@ -83,10 +84,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 9건 · 메인테이너 응답 2건 · CVE 0건</div>
+  <div class="summary">제출 PR 9건 · 취약점 보고 1건 · 메인테이너 응답 2건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">9</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">1</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">10</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">1</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -190,16 +191,15 @@
       <dl><dt>문제</dt><dd>liboqs 시험 하네스가 길이가 틀린 ML-DSA 서명과 255바이트를 넘는 context를 라이브러리 호출 전에 걸렀고, 실행기는 이를 통과로 셌습니다. 그래서 Wycheproof <code>IncorrectSignatureLength</code>·<code>InvalidContext</code> 벡터가 liboqs에 닿지 않았고, liboqs ML-DSA 연결 코드의 서명 길이 검사를 꺼도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 매개변수 집합마다 서명 길이를 고정합니다. liboqs는 mldsa-native 구현을 자체 연결 코드로 감싸므로, 공개 API에서 이 길이를 지키는 책임이 그 연결 코드에 있습니다.</dd><dt>찾은 방법</dt><dd>암호 라이브러리 9곳의 Wycheproof 시험 하네스에서 건너뛰는 벡터를 훑은 뒤, liboqs에서 변이 시험으로 확인했습니다.</dd><dt>수정</dt><dd>ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결 코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">PR 원문 #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="VR-1" data-group="cve">
+    <summary>
+      <span class="line1"><b>취약점 보고 VR-1</b> <span class="badge vuln">취약점</span> <span class="badge v-triage">분류 중</span></span>
+      <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
+      <span class="line3">제출 2026-10-31 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
+    </summary>
+    <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
+  </details>
     <p class="empty" id="empty" hidden>지금은 해당 항목이 없습니다.</p>
-  </section>
-
-  <section class="panel" id="panel-cve">
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>보고</th><th>제출</th><th>경로</th><th>단계</th><th>CVE</th><th>내용</th></tr></thead>
-        <tbody><tr><td>VR-1</td><td>2026-10-31</td><td>GitHub 비공개 취약점 보고</td><td><span class="badge v-triage">분류 중</span></td><td><span class="none">—</span></td><td><span class="none">공개 전까지 프로젝트·내용 비공개</span></td></tr></tbody>
-      </table>
-    </div>
   </section>
 
   <footer>2026-10-31 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
@@ -215,15 +215,13 @@
   function show(name) {
     if (!tabs.some((t) => t.dataset.tab === name && !t.hidden)) name = "all";
     for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.tab === name));
-    document.getElementById("panel-cve").hidden = name !== "cve";
-    document.getElementById("panel-prs").hidden = name === "cve";
     let shown = 0;
     for (const e of entries()) {
       const on = name === "all" || e.dataset.group === name;
       e.classList.toggle("off", !on);
       if (on) shown++;
     }
-    document.getElementById("empty").hidden = shown > 0 || name === "cve";
+    document.getElementById("empty").hidden = shown > 0;
   }
   function count() {
     const n = { done: 0, review: 0, ci: 0, closed: 0 };
