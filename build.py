@@ -32,7 +32,9 @@ UI = {
         "switch": '<a href="ko/" hreflang="ko">한국어</a>',
         "tabs": {"all": "All", "done": "Approved / merged", "review": "In review", "ci": "Awaiting CI approval",
                  "closed": "Closed", "cve": "CVE challenge"},
-        "summary": "{prs} pull requests · {replied} with a maintainer reply · {cves} CVEs",
+        "summary": "{prs} pull requests and {vulns} vulnerability reports · {replied} with a maintainer reply · {cves} CVEs",
+        "vuln": "Vulnerability report",
+        "private_body": "Reported through the project's private channel. Details follow once the project publishes a fix.",
         "hint": "Open an entry to read its briefing.",
         "cve_cols": ["Report", "Submitted", "Channel", "Stage", "CVE", "Details"],
         "days": "{n} days", "first": "first reply {d}", "no_reply": "no reply yet", "ci": "CI",
@@ -63,7 +65,9 @@ UI = {
         "switch": '<a href="../" hreflang="en">English</a>',
         "tabs": {"all": "전체", "done": "승인·머지", "review": "리뷰 중", "ci": "CI 허가 대기", "closed": "닫힘",
                  "cve": "CVE 도전"},
-        "summary": "제출 PR {prs}건 · 메인테이너 응답 {replied}건 · CVE {cves}건",
+        "summary": "제출 PR {prs}건 · 취약점 보고 {vulns}건 · 메인테이너 응답 {replied}건 · CVE {cves}건",
+        "vuln": "취약점 보고",
+        "private_body": "프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.",
         "hint": "항목을 누르면 브리핑이 펼쳐집니다.",
         "cve_cols": ["보고", "제출", "경로", "단계", "CVE", "내용"],
         "days": "{n}일째", "first": "첫 응답 {d}", "no_reply": "응답 아직", "ci": "CI",
@@ -211,19 +215,36 @@ def entry(e, lang, ev, today):
   </details>"""
 
 
-def vuln_row(v, lang):
+def vuln_entry(v, lang):
+    """A vulnerability report, in the same list as the pull requests. Until the project discloses
+    it, only the label, date, channel and stage are shown."""
     t = UI[lang]
-    stage = f'<span class="badge v-{html.escape(v.get("status", ""))}">{t["vstages"].get(v.get("status"), v.get("status"))}</span>'
+    status = v.get("status", "")
+    stage = f'<span class="badge v-{html.escape(status)}">{t["vstages"].get(status, status)}</span>'
+    facts = [f'{t["submitted"]} {v.get("submitted")}', text(pick(v.get("channel"), lang)),
+             f'CVE {v["cve"]}' if v.get("cve") else f'CVE {t["none_yet"]}']
     if v.get("public"):
+        head = f'{text(v.get("project"))}'
         title = text(pick(v.get("title"), lang))
-        if v.get("advisory"):
-            title = ext(v["advisory"], f'{text(v.get("project"))} — {title}')
-        detail = title
+        keys = ["defect", "background", "found_by", "fix"]
+        dl = "".join(f'<dt>{t["dt"][k]}</dt><dd>{text(pick(v[k], lang))}</dd>' for k in keys if v.get(k))
+        links = [ext(v["advisory"], "Advisory")] if v.get("advisory") else []
+        if v.get("cve"):
+            links.append(cve_cell(v["cve"], v.get("cvss")))
+        body = f'<dl>{dl}<dt>{t["dt"]["evidence"]}</dt><dd class="evidence">{" · ".join(links) or "—"}</dd></dl>'
     else:
-        detail = f'<span class="none">{t["private"]}</span>'
-    return (f"<tr><td>{html.escape(v['label'])}</td><td>{v.get('submitted')}</td>"
-            f"<td>{text(pick(v.get('channel'), lang))}</td><td>{stage}</td>"
-            f"<td>{cve_cell(v.get('cve'), v.get('cvss'))}</td><td>{detail}</td></tr>")
+        head = f'{t["vuln"]} {html.escape(v["label"])}'
+        title = t["private"]
+        body = f'<p class="none">{t["private_body"]}</p>'
+    return f"""
+  <details class="entry" id="{html.escape(v['label'])}" data-group="cve">
+    <summary>
+      <span class="line1"><b>{head}</b> <span class="badge vuln">{t["types"]["vulnerability"]}</span> {stage}</span>
+      <span class="line2">{title}</span>
+      <span class="line3">{' · '.join(facts)}</span>
+    </summary>
+    <div class="body">{body}</div>
+  </details>"""
 
 
 def render(data, lang, tmpl, ev, today):
@@ -234,7 +255,7 @@ def render(data, lang, tmpl, ev, today):
     vulns = list(data.get("vulnerabilities") or [])
     groups = [GROUP.get(stage_of(e, ev), "review") for e in entries]
     counts = {g: groups.count(g) for g in TABS}
-    counts["all"] = len(entries)
+    counts["all"] = len(entries) + len(vulns)
     counts["cve"] = len(vulns)
     tabs = "".join(
         f'<button type="button" role="tab" class="tab" data-tab="{g}"{" hidden" if g == "closed" and not counts[g] else ""}>'
@@ -248,14 +269,12 @@ def render(data, lang, tmpl, ev, today):
         "html_lang": t["html_lang"], "name": html.escape(owner["name"]),
         "title_suffix": t["title_suffix"], "tagline": html.escape(pick(owner["tagline"], lang)),
         "switch": t["switch"], "loading": t["loading"], "hint": t["hint"], "empty_tab": t["empty_tab"],
-        "summary": html.escape(t["summary"].format(prs=len(entries), replied=replied, cves=cves)),
+        "summary": html.escape(t["summary"].format(prs=len(entries), vulns=len(vulns), replied=replied, cves=cves)),
         "tags": "".join(f"<li>{html.escape(a)}</li>" for a in pick(owner["areas"], lang)),
         "tabs": tabs,
         "entries": "".join(entry(e, lang, ev, today) for e in entries)
+        + "".join(vuln_entry(v, lang) for v in vulns)
         or f'<p class="none">{t["empty"]}</p>',
-        "cve_head": "".join(f"<th>{c}</th>" for c in t["cve_cols"]),
-        "cve_rows": "".join(vuln_row(v, lang) for v in vulns)
-        or f'<tr><td colspan="6" class="none">{t["no_cve"]}</td></tr>',
         "labels": json.dumps(labels, ensure_ascii=False).replace("</", "<\\/"),
         "footer": html.escape(t["footer"].format(d=today.isoformat())),
     }

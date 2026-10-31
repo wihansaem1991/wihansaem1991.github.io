@@ -62,6 +62,7 @@
   .badge.approved, .badge.v-fixed { color:var(--ok); border-color:var(--ok); }
   .badge.merged, .badge.v-published { color:var(--merged); border-color:var(--merged); }
   .badge.changes { color:var(--bad); border-color:var(--bad); }
+  .badge.vuln { color:var(--bad); border-color:var(--bad); }
   .badge.rereview, .badge.ci_approval, .badge.v-triage, .badge.v-accepted { color:var(--warn); border-color:var(--warn); }
   dl { margin:0; display:grid; grid-template-columns: 120px 1fr; gap:8px 16px; font-size:15px; }
   dt { color:var(--muted); font-size:14px; }
@@ -83,10 +84,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">9 pull requests · 2 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">9 pull requests and 1 vulnerability reports · 2 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">9</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">1</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">10</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">1</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -190,16 +191,15 @@
       <dl><dt>Problem</dt><dd>liboqs&#x27;s test harness rejected ML-DSA signatures of the wrong length, and contexts longer than 255 bytes, before calling the library, and the runner counted that as a pass. The Wycheproof <code>IncorrectSignatureLength</code> and <code>InvalidContext</code> vectors never reached liboqs: disabling the signature-length check in liboqs&#x27;s ML-DSA glue code left every test passing.</dd><dt>Background</dt><dd>FIPS 204 fixes the ML-DSA signature length for each parameter set. liboqs wraps the mldsa-native implementation in its own glue code, and that glue is what has to enforce the length at the public API.</dd><dt>How it was found</dt><dd>A sweep of the Wycheproof test harnesses of nine cryptography libraries for vectors that are skipped, followed by mutation testing on liboqs.</dd><dt>Fix</dt><dd>For ML-DSA, reject only malformed hex input, as the neighbouring SLH-DSA branch already does, so the vectors exercise the library&#x27;s own checks. Disabling the glue check now fails the Wycheproof tests for all three parameter sets.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">Pull request #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="VR-1" data-group="cve">
+    <summary>
+      <span class="line1"><b>Vulnerability report VR-1</b> <span class="badge vuln">Vulnerability</span> <span class="badge v-triage">Under triage</span></span>
+      <span class="line2">Project and details withheld until disclosure</span>
+      <span class="line3">submitted 2026-10-31 · GitHub private vulnerability report · CVE none yet</span>
+    </summary>
+    <div class="body"><p class="none">Reported through the project's private channel. Details follow once the project publishes a fix.</p></div>
+  </details>
     <p class="empty" id="empty" hidden>Nothing here right now.</p>
-  </section>
-
-  <section class="panel" id="panel-cve">
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Report</th><th>Submitted</th><th>Channel</th><th>Stage</th><th>CVE</th><th>Details</th></tr></thead>
-        <tbody><tr><td>VR-1</td><td>2026-10-31</td><td>GitHub private vulnerability report</td><td><span class="badge v-triage">Under triage</span></td><td><span class="none">—</span></td><td><span class="none">Project and details withheld until disclosure</span></td></tr></tbody>
-      </table>
-    </div>
   </section>
 
   <footer>Updated 2026-10-31; refreshed from GitHub every hour, and merged, closed and approved stages are re-read on every page load. Private vulnerability reports show only their stage until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
@@ -215,15 +215,13 @@
   function show(name) {
     if (!tabs.some((t) => t.dataset.tab === name && !t.hidden)) name = "all";
     for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.tab === name));
-    document.getElementById("panel-cve").hidden = name !== "cve";
-    document.getElementById("panel-prs").hidden = name === "cve";
     let shown = 0;
     for (const e of entries()) {
       const on = name === "all" || e.dataset.group === name;
       e.classList.toggle("off", !on);
       if (on) shown++;
     }
-    document.getElementById("empty").hidden = shown > 0 || name === "cve";
+    document.getElementById("empty").hidden = shown > 0;
   }
   function count() {
     const n = { done: 0, review: 0, ci: 0, closed: 0 };
