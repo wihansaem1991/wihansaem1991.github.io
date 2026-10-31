@@ -1,0 +1,59 @@
+# Portfolio data. build.py renders only entries whose status is approved or merged,
+# once in English (index.html) and once in Korean (ko/index.html).
+# type: hardening | bugfix | vulnerability   (vulnerability entries carry a CVE id once assigned)
+# Text fields are {en, ko} and accept `code` spans. Reviewer quotes stay in the original language;
+# quote_ko is a marked translation.
+
+owner:
+  name: Hansaem Wi
+  tagline:
+    en: Security fixes for open-source cryptography — found by measurement, verified by tests.
+    ko: 오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고, 시험으로 검증해 고칩니다.
+  areas:
+    en: [Post-quantum cryptography, KCMVP module validation, VPN, HSM / PKCS#11, AI systems]
+    ko: [양자내성암호(PQC), KCMVP 암호모듈 검증, VPN, HSM / PKCS#11, AI 시스템]
+  github: wihansaem1991
+
+entries:
+  - project: OpenSSL
+    repo: openssl/openssl
+    pr: 33444
+    title:
+      en: Clear the PBKDF1 derived key in `kdf_pbkdf1_derive_skey()`
+      ko: "`kdf_pbkdf1_derive_skey()`에서 PBKDF1 파생 키를 지우고 해제"
+    type: hardening
+    cve: null
+    cvss: null
+    status: approved
+    submitted: 2026-10-29
+    decided: 2026-10-30
+    branches: [master, "3.6", "4.0", "4.1"]
+    defect:
+      en: >-
+        The derived key was imported as an `EVP_SKEY` and its temporary buffer freed with
+        `OPENSSL_free()`, leaving the whole key in released heap memory.
+      ko: >-
+        파생 키를 `EVP_SKEY`로 가져온 뒤 임시 버퍼를 `OPENSSL_free()`로 해제해서, 키 전체가 해제된 힙
+        메모리에 그대로 남았습니다.
+    found_by:
+      en: >-
+        A measurement program that replaces OpenSSL's allocator and scans every freed block for
+        key bytes: a 20-byte block holding the full key, freed at `pbkdf1.c:318`.
+      ko: >-
+        OpenSSL 할당자를 바꿔 해제되는 블록마다 키 바이트가 남았는지 재는 측정 프로그램으로 찾았습니다.
+        `pbkdf1.c:318`에서 해제되는 20바이트 블록에 키 전체가 들어 있었습니다.
+    fix:
+      en: >-
+        `OPENSSL_clear_free()` on both paths; `test_kdf_pbkdf1_skey` now watches freed blocks and
+        fails if the change is reverted.
+      ko: >-
+        두 경로 모두 `OPENSSL_clear_free()`로 바꿨습니다. 기존 시험 `test_kdf_pbkdf1_skey`가 이제 해제
+        블록을 감시하고, 수정을 되돌리면 실패합니다.
+    review:
+      en: Approved by two reviewers; triaged as a bug with FIPS relevance.
+      ko: 리뷰어 두 명이 승인했고, FIPS와 관련된 버그로 분류됐습니다.
+    quote: >-
+      this is quite neat technique, I wonder if it should be generalised and used with other part
+      of the code [that] pass around key material.
+    quote_ko: >-
+      꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.

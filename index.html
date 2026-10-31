@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hansaem Wi — Open-source security contributions</title>
+<meta name="description" content="Security fixes for open-source cryptography — found by measurement, verified by tests.">
+<link rel="alternate" hreflang="en" href="https://wihansaem1991.github.io/">
+<link rel="alternate" hreflang="ko" href="https://wihansaem1991.github.io/ko/">
+<style>
+  :root { --fg:#1d2433; --muted:#5b6475; --line:#e3e7ee; --accent:#1f6feb; --ok:#1a7f37; --merged:#8250df; --bg:#ffffff; --card:#f7f9fc; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fg:#e6e9ef; --muted:#9aa3b2; --line:#2a313c; --accent:#58a6ff; --ok:#3fb950; --merged:#a371f7; --bg:#0f1419; --card:#161b22; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 56px 24px 72px; }
+  header { position: relative; }
+  .lang { position:absolute; top:0; right:0; font-size:14px; }
+  header h1 { margin: 0 0 6px; font-size: 32px; letter-spacing: -0.02em; padding-right: 80px; }
+  header p { margin: 0; color: var(--muted); }
+  .tags { margin: 16px 0 0; display:flex; flex-wrap:wrap; gap:8px; padding:0; list-style:none; }
+  .tags li { border:1px solid var(--line); border-radius:999px; padding:2px 12px; font-size:13px; color:var(--muted); }
+  h2 { margin: 48px 0 16px; font-size: 20px; }
+  .stats { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .stat b { display:block; font-size:28px; }
+  .stat span { color:var(--muted); font-size:14px; }
+  .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align: top; }
+  th { color:var(--muted); font-weight:600; background:var(--card); white-space:nowrap; }
+  tr:last-child td { border-bottom:none; }
+  td a { color:var(--fg); }
+  td a:hover { color:var(--accent); }
+  .none { color:var(--muted); }
+  .cvss { color:var(--muted); font-size:12px; }
+  article { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:16px; }
+  article h3 { margin:0 0 4px; font-size:18px; }
+  article h3 a { color:var(--fg); text-decoration:none; }
+  article h3 a:hover { color:var(--accent); }
+  .meta { color:var(--muted); font-size:14px; margin-bottom:12px; }
+  .badge { display:inline-block; font-size:12px; font-weight:600; border-radius:999px; padding:0 10px; white-space:nowrap; }
+  h3 .badge { margin-left:6px; vertical-align: 2px; }
+  .badge.approved { color:var(--ok); border:1px solid var(--ok); }
+  .badge.merged { color:var(--merged); border:1px solid var(--merged); }
+  dl { margin:0; display:grid; grid-template-columns: 110px 1fr; gap:6px 16px; }
+  dt { color:var(--muted); font-size:14px; }
+  dd { margin:0; }
+  code { font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background:var(--line); padding:1px 5px; border-radius:4px; }
+  .tr { font-style: normal; font-size: 14px; }
+  blockquote { margin:12px 0 0; padding:8px 14px; border-left:3px solid var(--accent); color:var(--muted); font-style: italic; }
+  footer { margin-top:48px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); padding-top:16px; }
+  a { color: var(--accent); }
+  @media (max-width: 600px) { .stats { grid-template-columns: 1fr; } dl { grid-template-columns: 1fr; } dt { margin-top:6px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <nav class="lang"><a href="ko/" hreflang="ko">한국어</a></nav>
+    <h1>Hansaem Wi</h1>
+    <p>Security fixes for open-source cryptography — found by measurement, verified by tests.</p>
+    <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
+  </header>
+
+  <h2>At a glance</h2>
+  <div class="stats"><div class="stat"><b>1</b><span>approved or merged</span></div><div class="stat"><b>1</b><span>projects</span></div><div class="stat"><b>0</b><span>CVEs</span></div></div>
+
+  <h2>Contributions</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Project</th><th>Contribution</th><th>Type</th><th>CVE</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody><tr><td>OpenSSL</td><td><a href="#openssl-openssl-33444">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></a></td><td>Hardening</td><td><span class="none">—</span></td><td><span class="badge approved">Approved</span></td><td>2026-10-30</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>Details</h2>
+
+  <article id="openssl-openssl-33444">
+    <h3><a href="https://github.com/openssl/openssl/pull/33444">OpenSSL — Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></a><span class="badge approved">Approved</span></h3>
+    <div class="meta">openssl/openssl #33444 · submitted 2026-10-29 · Approved 2026-10-30 · master, 3.6, 4.0, 4.1</div>
+    <dl><dt>Defect</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Found by</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
+  </article>
+
+  <footer>Updated 2026-10-31. Only approved or merged work is listed; each entry links to the original pull request or advisory. Development was assisted by Claude Code, and every change was reproduced, tested and disclosed as AI-assisted in the commit.</footer>
+</main>
+</body>
+</html>
