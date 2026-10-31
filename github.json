@@ -1,26 +1,96 @@
 {
  "Mbed-TLS/mbedtls#11036": {
   "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 2,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-30",
+   "stage": "review"
+  },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11036"
  },
  "RustCrypto/signatures#1493": {
   "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 11,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-31",
+   "stage": "review"
+  },
   "merge": null,
   "url": "https://github.com/RustCrypto/signatures/pull/1493"
  },
  "mitmproxy/mitmproxy#8548": {
   "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 26,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-31",
+   "stage": "review"
+  },
   "merge": null,
   "url": "https://github.com/mitmproxy/mitmproxy/pull/8548"
  },
  "open-quantum-safe/liboqs#2665": {
   "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 2,
+    "pending": 0
+   },
+   "ci_waiting": 1,
+   "draft": true,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-31",
+   "stage": "ci_approval"
+  },
   "merge": null,
   "url": "https://github.com/open-quantum-safe/liboqs/pull/2665"
  },
  "open-quantum-safe/oqs-provider#861": {
   "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 2,
+    "pending": 0
+   },
+   "ci_waiting": 5,
+   "draft": true,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-29",
+   "stage": "ci_approval"
+  },
   "merge": null,
   "url": "https://github.com/open-quantum-safe/oqs-provider/pull/861"
  },
@@ -32,8 +102,60 @@
     "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741"
    }
   ],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 11,
+   "draft": false,
+   "ended": null,
+   "first_response": "2026-10-30",
+   "last_response": "2026-10-30",
+   "opened": "2026-10-30",
+   "stage": "rereview"
+  },
   "merge": null,
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813"
+ },
+ "openssl/openssl#33426": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 1,
+    "pending": 0
+   },
+   "ci_waiting": 13,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-28",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33426"
+ },
+ "openssl/openssl#33430": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 1,
+    "pending": 0
+   },
+   "ci_waiting": 13,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-28",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33430"
  },
  "openssl/openssl#33444": {
   "approvals": [
@@ -48,6 +170,20 @@
     "url": "https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151"
    }
   ],
+  "live": {
+   "checks": {
+    "fail": 1,
+    "pass": 106,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": "2026-10-30",
+   "last_response": "2026-10-30",
+   "opened": "2026-10-29",
+   "stage": "approved"
+  },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33444"
  }

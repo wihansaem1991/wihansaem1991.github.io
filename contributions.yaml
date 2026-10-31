@@ -1,6 +1,6 @@
-# Portfolio data. build.py renders only entries whose status is approved or merged,
-# once in English (index.html) and once in Korean (ko/index.html). Entries for pull requests
-# still under review stay here with status: open and appear once sync.py sees an approval.
+# Contribution and CVE challenge board. build.py renders every entry, once in English
+# (index.html) and once in Korean (ko/index.html); the stage of each pull request comes from
+# github.json, which sync.py refreshes (every hour in GitHub Actions).
 # type: hardening | bugfix | test | vulnerability   (vulnerability entries carry a CVE id once assigned)
 # Each entry is a briefing: defect (the problem), background (the knowledge it took),
 # found_by, fix, review. Text fields are {en, ko} and accept `code` spans.
@@ -9,8 +9,12 @@
 owner:
   name: Hansaem Wi
   tagline:
-    en: Security fixes for open-source cryptography — found by measurement, verified by tests.
-    ko: 오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고, 시험으로 검증해 고칩니다.
+    en: >-
+      Security fixes and vulnerability reports for open-source cryptography, found by measurement
+      and verified by tests, tracked here from submission to merge or CVE.
+    ko: >-
+      오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고 시험으로 검증해 고칩니다. 제출부터 머지·CVE까지
+      진행 상황을 여기서 공개합니다.
   areas:
     en: [Post-quantum cryptography, KCMVP module validation, VPN, HSM / PKCS#11, AI systems]
     ko: [양자내성암호(PQC), KCMVP 암호모듈 검증, VPN, HSM / PKCS#11, AI 시스템]
@@ -67,6 +71,96 @@ entries:
       of the code [that] pass around key material.
     quote_ko: >-
       꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.
+
+  - project: OpenSSL
+    repo: openssl/openssl
+    pr: 33426
+    title:
+      en: Clear type-specific private key DER before freeing it
+      ko: 키 형식별(type-specific) 개인키 DER를 지운 뒤 해제
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-28
+    decided: null
+    defect:
+      en: >-
+        `key_to_type_specific_der_bio()` freed the DER produced by the key's i2d function with
+        `OPENSSL_free()`. For a private key that buffer holds the whole key, so every
+        `i2d_PrivateKey()` or "type-specific" DER encoding of an RSA, EC, DSA or SM2 key left it in
+        freed memory. The PEM path already cleared its copy.
+      ko: >-
+        `key_to_type_specific_der_bio()`가 키의 i2d 함수가 만든 DER를 `OPENSSL_free()`로 해제했습니다. 개인키라면
+        이 버퍼에 키 전체가 들어 있어서, RSA·EC·DSA·SM2 키를 `i2d_PrivateKey()`나 "type-specific" DER로
+        인코딩할 때마다 키가 해제된 메모리에 남았습니다. PEM 경로는 이미 사본을 지우고 있었습니다.
+    background:
+      en: >-
+        The zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP) and how OpenSSL 3 encoders hand key
+        material between `i2d` functions and BIOs.
+      ko: >-
+        ISO/IEC 19790(FIPS 140-3·KCMVP)의 제로화 요건과, OpenSSL 3 인코더가 `i2d` 함수와 BIO 사이에서 키를
+        넘기는 방식을 바탕으로 봤습니다.
+    found_by:
+      en: >-
+        The freed-block measurement program, which swaps OpenSSL's allocator and looks for key bytes in
+        every freed block, run over the key encoders.
+      ko: >-
+        OpenSSL 할당자를 바꿔 해제 블록마다 키 바이트를 찾는 측정 프로그램을 키 인코더에 돌려 찾았습니다.
+    fix:
+      en: >-
+        `OPENSSL_clear_free()` for the encoded buffer. `test_type_specific_der_cleanse` encodes an RSA
+        key both ways under a watching allocator and fails without the fix.
+      ko: >-
+        인코딩 버퍼를 `OPENSSL_clear_free()`로 해제합니다. 새 시험 `test_type_specific_der_cleanse`는 감시
+        할당자를 건 채 RSA 키를 두 방식으로 인코딩하고, 수정이 없으면 실패합니다.
+
+  - project: OpenSSL
+    repo: openssl/openssl
+    pr: 33430
+    title:
+      en: Clear the `EVP_ENCODE_CTX` when freeing it
+      ko: "`EVP_ENCODE_CTX`를 해제할 때 지우기"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-28
+    decided: null
+    defect:
+      en: >-
+        The base64 context keeps the last partial line of its input and was freed without clearing
+        it. `PEM_write_bio()` encodes private key DER through such a context, so the last
+        (length mod 48) bytes of the key stayed in freed memory: the end of `iqmp` for RSA, private
+        key bytes for Ed448, ML-DSA and ML-KEM. Reading PEM left base64 text the same way.
+      ko: >-
+        base64 문맥은 입력의 마지막 부분 줄을 들고 있는데, 지우지 않고 해제했습니다. `PEM_write_bio()`는 개인키
+        DER를 이 문맥으로 인코딩하므로 키의 마지막 (길이 mod 48)바이트가 해제된 메모리에 남았습니다. RSA라면
+        `iqmp` 끝부분, Ed448·ML-DSA·ML-KEM이라면 개인키 바이트입니다. PEM을 읽을 때도 base64 문자열이 같은
+        식으로 남았습니다.
+    background:
+      en: >-
+        Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) followed through the PEM and base64 layers:
+        `EVP_ENCODE_CTX` has been opaque since OpenSSL 1.1.0 and is always allocated by
+        `EVP_ENCODE_CTX_new()`, so clearing it on free covers PEM reading, PEM writing and
+        `BIO_f_base64`.
+      ko: >-
+        제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 PEM·base64 계층까지 따라갔습니다. `EVP_ENCODE_CTX`는
+        OpenSSL 1.1.0부터 불투명 구조체라 항상 `EVP_ENCODE_CTX_new()`로 만들어지므로, 해제할 때 지우면 PEM
+        읽기·쓰기와 `BIO_f_base64`가 모두 해결됩니다.
+    found_by:
+      en: >-
+        The same freed-block measurement program, run over PEM encoding of private keys.
+      ko: >-
+        같은 해제 블록 측정 프로그램을 개인키 PEM 인코딩에 돌려 찾았습니다.
+    fix:
+      en: >-
+        Clear the context in `EVP_ENCODE_CTX_free()`. `test_encode_ctx_free_clears_input` leaves a
+        partial block in a context, swaps the free function and fails if the freed context still
+        holds the input.
+      ko: >-
+        `EVP_ENCODE_CTX_free()`에서 문맥을 지웁니다. 새 시험 `test_encode_ctx_free_clears_input`은 문맥에 부분
+        블록을 남긴 채 해제 함수를 바꿔 끼우고, 해제된 문맥에 입력이 남아 있으면 실패합니다.
 
   - project: oqs-provider
     repo: open-quantum-safe/oqs-provider
@@ -346,3 +440,19 @@ entries:
       ko: >-
         ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결
         코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.
+
+# Vulnerability reports sent through a project's private channel. While `public: false` the page
+# shows only the label, date, channel and stage; project, title and briefing stay out of this file
+# until the project discloses the issue. sync.py updates `status` and `cve` from the advisory
+# listed for the label in .private/advisories.json (git-ignored, on the owner's machine only).
+# status: triage | accepted | fixed | published | closed
+vulnerabilities:
+  - label: VR-1
+    public: false
+    submitted: 2026-10-31
+    channel:
+      en: GitHub private vulnerability report
+      ko: GitHub 비공개 취약점 보고
+    status: triage
+    cve: null
+    cvss: null

@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hansaem Wi — 오픈소스 보안 기여</title>
-<meta name="description" content="오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고, 시험으로 검증해 고칩니다.">
+<title>Hansaem Wi — 오픈소스 보안 기여 · CVE 도전</title>
+<meta name="description" content="오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고 시험으로 검증해 고칩니다. 제출부터 머지·CVE까지 진행 상황을 여기서 공개합니다.">
 <link rel="alternate" hreflang="en" href="https://wihansaem1991.github.io/">
 <link rel="alternate" hreflang="ko" href="https://wihansaem1991.github.io/ko/">
 <style>
-  :root { --fg:#1d2433; --muted:#5b6475; --line:#e3e7ee; --accent:#1f6feb; --ok:#1a7f37; --merged:#8250df; --bg:#ffffff; --card:#f7f9fc; }
+  :root { --fg:#1d2433; --muted:#5b6475; --line:#e3e7ee; --accent:#1f6feb; --ok:#1a7f37; --merged:#8250df; --warn:#9a6700; --bad:#cf222e; --bg:#ffffff; --card:#f7f9fc; }
   @media (prefers-color-scheme: dark) {
-    :root { --fg:#e6e9ef; --muted:#9aa3b2; --line:#2a313c; --accent:#58a6ff; --ok:#3fb950; --merged:#a371f7; --bg:#0f1419; --card:#161b22; }
+    :root { --fg:#e6e9ef; --muted:#9aa3b2; --line:#2a313c; --accent:#58a6ff; --ok:#3fb950; --merged:#a371f7; --warn:#d29922; --bad:#f85149; --bg:#0f1419; --card:#161b22; }
   }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--fg);
          font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
-  main { max-width: 920px; margin: 0 auto; padding: 56px 24px 72px; }
+  main { max-width: 1040px; margin: 0 auto; padding: 56px 24px 72px; }
   header { position: relative; }
   .lang { position:absolute; top:0; right:0; font-size:14px; }
   header h1 { margin: 0 0 6px; font-size: 32px; letter-spacing: -0.02em; padding-right: 80px; }
@@ -23,18 +23,21 @@
   .tags { margin: 16px 0 0; display:flex; flex-wrap:wrap; gap:8px; padding:0; list-style:none; }
   .tags li { border:1px solid var(--line); border-radius:999px; padding:2px 12px; font-size:13px; color:var(--muted); }
   h2 { margin: 48px 0 16px; font-size: 20px; }
-  .stats { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+  .stats { display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; }
   .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
   .stat b { display:block; font-size:28px; }
   .stat span { color:var(--muted); font-size:14px; }
+  .live { margin-top:10px; color:var(--muted); font-size:13px; }
   .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; }
   table { width:100%; border-collapse:collapse; font-size:14px; }
   th, td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align: top; }
   th { color:var(--muted); font-weight:600; background:var(--card); white-space:nowrap; }
+  td:nth-child(5), td:nth-child(6), td:nth-child(7) { white-space:nowrap; }
   tr:last-child td { border-bottom:none; }
   td a { color:var(--fg); }
   td a:hover { color:var(--accent); }
   .none { color:var(--muted); }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .wait { color:var(--warn); }
   .more { color:var(--muted); text-decoration:none; font-size:13px; }
   .evidence a { white-space:nowrap; }
   .cvss { color:var(--muted); font-size:12px; }
@@ -43,10 +46,12 @@
   article h3 a { color:var(--fg); text-decoration:none; }
   article h3 a:hover { color:var(--accent); }
   .meta { color:var(--muted); font-size:14px; margin-bottom:12px; }
-  .badge { display:inline-block; font-size:12px; font-weight:600; border-radius:999px; padding:0 10px; white-space:nowrap; }
+  .badge { display:inline-block; font-size:12px; font-weight:600; border-radius:999px; padding:0 10px; white-space:nowrap; border:1px solid var(--muted); color:var(--muted); }
   h3 .badge { margin-left:6px; vertical-align: 2px; }
-  .badge.approved { color:var(--ok); border:1px solid var(--ok); }
-  .badge.merged { color:var(--merged); border:1px solid var(--merged); }
+  .badge.approved, .badge.v-fixed { color:var(--ok); border-color:var(--ok); }
+  .badge.merged, .badge.v-published { color:var(--merged); border-color:var(--merged); }
+  .badge.changes { color:var(--bad); border-color:var(--bad); }
+  .badge.rereview, .badge.ci_approval, .badge.v-triage, .badge.v-accepted { color:var(--warn); border-color:var(--warn); }
   dl { margin:0; display:grid; grid-template-columns: 140px 1fr; gap:8px 16px; }
   dt { color:var(--muted); font-size:14px; }
   dd { margin:0; }
@@ -55,7 +60,7 @@
   blockquote { margin:12px 0 0; padding:8px 14px; border-left:3px solid var(--accent); color:var(--muted); font-style: italic; }
   footer { margin-top:48px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); padding-top:16px; }
   a { color: var(--accent); }
-  @media (max-width: 600px) { .stats { grid-template-columns: 1fr; } dl { grid-template-columns: 1fr; } dt { margin-top:6px; } }
+  @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } dl { grid-template-columns: 1fr; } dt { margin-top:6px; } }
 </style>
 </head>
 <body>
@@ -63,30 +68,120 @@
   <header>
     <nav class="lang"><a href="../" hreflang="en">English</a></nav>
     <h1>Hansaem Wi</h1>
-    <p>오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고, 시험으로 검증해 고칩니다.</p>
+    <p>오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고 시험으로 검증해 고칩니다. 제출부터 머지·CVE까지 진행 상황을 여기서 공개합니다.</p>
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <h2>한눈에 보기</h2>
-  <div class="stats"><div class="stat"><b>1</b><span>승인·머지</span></div><div class="stat"><b>1</b><span>프로젝트</span></div><div class="stat"><b>0</b><span>CVE</span></div></div>
+  <h2>진행 현황</h2>
+  <div class="stats"><div class="stat"><b id="s-prs">9</b><span>제출한 PR</span></div><div class="stat"><b id="s-replied">2</b><span>메인테이너 응답</span></div><div class="stat"><b id="s-done">1</b><span>승인·머지</span></div><div class="stat"><b id="s-vulns">1</b><span>취약점 보고</span></div><div class="stat"><b id="s-cves">0</b><span>CVE</span></div></div>
+  <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <h2>기여 목록</h2>
+  <h2>PR 도전 현황</h2>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>프로젝트</th><th>기여</th><th>종류</th><th>CVE</th><th>상태</th><th>날짜</th></tr></thead>
-      <tbody><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener"><code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제 ↗</a> <a class="more" href="#openssl-openssl-33444">#</a></td><td>보안 강화</td><td><span class="none">—</span></td><td><span class="badge approved">승인</span></td><td>2026-10-30</td></tr></tbody>
+      <thead><tr><th>프로젝트</th><th>기여</th><th>종류</th><th>단계</th><th>제출</th><th>경과일</th><th>첫 응답</th><th>CI</th></tr></thead>
+      <tbody><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener"><code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제 ↗</a> <a class="more" href="#openssl-openssl-33444">#</a></td><td>보안 강화</td><td><span class="badge approved" data-pr="openssl/openssl#33444">승인</span></td><td>2026-10-29</td><td>1</td><td>2026-10-30</td><td><span class="ok">✓106</span> <span class="bad">✗1</span></td></tr><tr><td>pkcs11-provider</td><td><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">큰 버퍼에도 ECDH 공유 비밀값만 돌려주기 ↗</a> <a class="more" href="#openssl-projects-pkcs11-provider-813">#</a></td><td>버그 수정</td><td><span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">수정 반영, 재리뷰 대기</span></td><td>2026-10-30</td><td>1</td><td>2026-10-30</td><td><span class="wait">⏸11</span></td></tr><tr><td>Mbed TLS</td><td><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">파서가 없는 X.509 확장이 중복돼도 거부 ↗</a> <a class="more" href="#Mbed-TLS-mbedtls-11036">#</a></td><td>버그 수정</td><td><span class="badge review" data-pr="Mbed-TLS/mbedtls#11036">리뷰 대기</span></td><td>2026-10-30</td><td>1</td><td><span class="none">—</span></td><td><span class="ok">✓2</span></td></tr><tr><td>mitmproxy</td><td><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener"><code>--set confdir</code>에서도 설정 파일 옵션을 먼저 적용 ↗</a> <a class="more" href="#mitmproxy-mitmproxy-8548">#</a></td><td>버그 수정</td><td><span class="badge review" data-pr="mitmproxy/mitmproxy#8548">리뷰 대기</span></td><td>2026-10-31</td><td>0</td><td><span class="none">—</span></td><td><span class="ok">✓26</span></td></tr><tr><td>RustCrypto</td><td><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">ml-dsa: context가 있는 Wycheproof 검증 벡터도 시험 ↗</a> <a class="more" href="#RustCrypto-signatures-1493">#</a></td><td>시험 보강</td><td><span class="badge review" data-pr="RustCrypto/signatures#1493">리뷰 대기</span></td><td>2026-10-31</td><td>0</td><td><span class="none">—</span></td><td><span class="ok">✓11</span></td></tr><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">키 형식별(type-specific) 개인키 DER를 지운 뒤 해제 ↗</a> <a class="more" href="#openssl-openssl-33426">#</a></td><td>보안 강화</td><td><span class="badge ci_approval" data-pr="openssl/openssl#33426">CI 실행 허가 대기</span></td><td>2026-10-28</td><td>3</td><td><span class="none">—</span></td><td><span class="ok">✓1</span> <span class="wait">⏸13</span></td></tr><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener"><code>EVP_ENCODE_CTX</code>를 해제할 때 지우기 ↗</a> <a class="more" href="#openssl-openssl-33430">#</a></td><td>보안 강화</td><td><span class="badge ci_approval" data-pr="openssl/openssl#33430">CI 실행 허가 대기</span></td><td>2026-10-28</td><td>3</td><td><span class="none">—</span></td><td><span class="ok">✓1</span> <span class="wait">⏸13</span></td></tr><tr><td>oqs-provider</td><td><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">개인키 사본을 지운 뒤 해제 ↗</a> <a class="more" href="#open-quantum-safe-oqs-provider-861">#</a></td><td>보안 강화</td><td><span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">CI 실행 허가 대기 · 초안</span></td><td>2026-10-29</td><td>2</td><td><span class="none">—</span></td><td><span class="ok">✓2</span> <span class="wait">⏸5</span></td></tr><tr><td>liboqs</td><td><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">잘못된 길이의 ML-DSA Wycheproof 검증 벡터가 라이브러리까지 가도록 ↗</a> <a class="more" href="#open-quantum-safe-liboqs-2665">#</a></td><td>시험 보강</td><td><span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">CI 실행 허가 대기 · 초안</span></td><td>2026-10-31</td><td>0</td><td><span class="none">—</span></td><td><span class="ok">✓2</span> <span class="wait">⏸1</span></td></tr></tbody>
     </table>
   </div>
 
-  <h2>상세</h2>
+  <h2>CVE 도전</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>보고</th><th>제출</th><th>경로</th><th>단계</th><th>CVE</th><th>내용</th></tr></thead>
+      <tbody><tr><td>VR-1</td><td>2026-10-31</td><td>GitHub 비공개 취약점 보고</td><td><span class="badge v-triage">분류 중</span></td><td><span class="none">—</span></td><td><span class="none">공개 전까지 프로젝트·내용 비공개</span></td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>브리핑</h2>
 
   <article id="openssl-openssl-33444">
-    <h3><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">OpenSSL — <code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제</a><span class="badge approved">승인</span></h3>
+    <h3><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">OpenSSL — <code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제</a><span class="badge approved" data-pr="openssl/openssl#33444">승인</span></h3>
     <div class="meta">openssl/openssl #33444 · 제출 2026-10-29 · 승인 2026-10-30 · master, 3.6, 4.0, 4.1</div>
     <dl><dt>문제</dt><dd>파생 키를 <code>EVP_SKEY</code>로 가져온 뒤 임시 버퍼를 <code>OPENSSL_free()</code>로 해제해서, 키 전체가 해제된 힙 메모리에 그대로 남았습니다.</dd><dt>배경 지식</dt><dd>FIPS 140-3와 KCMVP 검증의 바탕인 ISO/IEC 19790은 다 쓴 키를 지우도록(제로화) 요구합니다. 파생 키도 비밀값이라 메모리를 돌려주기 전에 지워야 하고, OpenSSL은 이를 위해 <code>OPENSSL_clear_free()</code>를 둡니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제되는 블록마다 키 바이트가 남았는지 재는 측정 프로그램으로 찾았습니다. <code>pbkdf1.c:318</code>에서 해제되는 20바이트 블록에 키 전체가 들어 있었습니다.</dd><dt>수정</dt><dd>두 경로 모두 <code>OPENSSL_clear_free()</code>로 바꿨습니다. 기존 시험 <code>test_kdf_pbkdf1_skey</code>가 이제 해제 블록을 감시하고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>리뷰어 두 명이 승인했고, FIPS와 관련된 버그로 분류됐습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">PR 원문 #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — 리뷰어<br><span class="tr">(번역) 꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.</span></blockquote>
   </article>
+  <article id="openssl-projects-pkcs11-provider-813">
+    <h3><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">pkcs11-provider — 큰 버퍼에도 ECDH 공유 비밀값만 돌려주기</a><span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">수정 반영, 재리뷰 대기</span></h3>
+    <div class="meta">openssl-projects/pkcs11-provider #813 · 제출 2026-10-30</div>
+    <dl><dt>문제</dt><dd>PKCS#11 토큰을 쓰면 <code>EVP_PKEY_derive()</code>가 공유 비밀값 크기가 아니라 호출자 버퍼 크기만큼 토큰에 요청했습니다. NSS softokn은 P-256 비밀값 앞을 0으로 채워 돌려줘서, 64바이트 버퍼에는 0 32개 뒤에 비밀값이 들어갔고 ECDH 양쪽 값이 서로 달라졌습니다.</dd><dt>배경 지식</dt><dd>PKCS#11·HSM 연동 지식이 필요했습니다. ECDH 파생(<code>CKM_ECDH1_DERIVE</code>, <code>CKD_NULL</code>)은 출력 길이를 키 템플릿의 <code>CKA_VALUE_LEN</code>에서 가져오고, OpenSSL <code>EVP_PKEY_derive()</code>는 길이를 버퍼 크기로 받아 실제로 쓴 바이트 수를 돌려줍니다. 두 규약이 어긋나는 지점이었습니다.</dd><dt>찾은 방법</dt><dd>차등 시험으로 찾았습니다. 같은 ECDH 파생을 OpenSSL 기본 provider와 NSS softokn 토큰 위의 pkcs11-provider에 여러 크기의 출력 버퍼로 넣어 결과를 비교했습니다.</dd><dt>수정</dt><dd>요청 길이를 키 크기로 제한했습니다. 새 회귀 시험이 오래된 누수도 드러냈습니다. 한 문맥에서 두 번 파생하면 상대 공개점 사본을 덮어써 앞 사본이 새는 문제로, Address Sanitizer 시험이 잡았고 같은 PR에서 고쳤습니다.</dd><dt>리뷰</dt><dd>메인테이너가 승인한 뒤 회귀 시험 구조 정리와 Address Sanitizer 실패 해결을 요청했고, 두 가지 모두 새 커밋으로 반영했습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">PR 원문 #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
+  </article>
+  <article id="Mbed-TLS-mbedtls-11036">
+    <h3><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Mbed TLS — 파서가 없는 X.509 확장이 중복돼도 거부</a><span class="badge review" data-pr="Mbed-TLS/mbedtls#11036">리뷰 대기</span></h3>
+    <div class="meta">Mbed-TLS/mbedtls #11036 · 제출 2026-10-30</div>
+    <dl><dt>문제</dt><dd>Mbed TLS는 자기가 해석하는 확장이 인증서에 두 번 나오면 거부했지만, 건너뛰거나 콜백에 넘기는 확장이 두 번 나오면 그대로 받아들였습니다.</dd><dt>배경 지식</dt><dd>RFC 5280 4.2절은 인증서에 같은 확장을 두 번 넣지 못하게 합니다. 건너뛰는 확장은 해석하지 않으니, 이 규칙을 적용하려면 확장 목록의 DER 구조를 직접 다뤄야 했습니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 방향을 제시해 둔 이슈 #4069에서 시작했습니다. 빠진 경우마다 시험용 인증서를 만들었고, 수정 전에는 그중 2개가 잘못 통과했습니다.</dd><dt>수정</dt><dd>건너뛰거나 콜백에 넘기는 확장도 이미 읽은 확장의 OID와 비교해 중복이면 거부합니다. 시험 3건을 추가했습니다(<code>test_suite_x509parse</code> 902/902).</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">PR 원문 #11036 ↗</a> · <a href="https://github.com/Mbed-TLS/mbedtls/pull/11036/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+  </article>
+  <article id="mitmproxy-mitmproxy-8548">
+    <h3><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy — <code>--set confdir</code>에서도 설정 파일 옵션을 먼저 적용</a><span class="badge review" data-pr="mitmproxy/mitmproxy#8548">리뷰 대기</span></h3>
+    <div class="meta">mitmproxy/mitmproxy #8548 · 제출 2026-10-31</div>
+    <dl><dt>문제</dt><dd><code>--set confdir=...</code>을 주면 mitmproxy가 그 폴더의 <code>config.yaml</code>에서 <code>cert_passphrase</code>를 읽기 전에 CA부터 불러왔습니다. 그래서 암호가 걸린 CA 키를 읽지 못해 시작하자마자 종료됐습니다(2023년부터 열린 이슈 #6014).</dd><dt>배경 지식</dt><dd>TLS 가로채기 구조를 알아야 했습니다. mitmproxy는 자체 CA로 인증서를 즉석에서 서명하므로 시작할 때 CA 개인키를 읽어야 하고, 암호화된 PKCS#8 키는 암호가 먼저 있어야 합니다. 옵션 관리자는 갱신할 때마다 애드온에 알리므로, 갱신 순서가 애드온이 보는 값을 정합니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 원인을 짚어 둔 이슈 #6014와, 2023년 이후 리뷰 없이 멈춘 PR을 보고 골랐습니다. 암호 걸린 CA로 리눅스에서 재현했습니다.</dd><dt>수정</dt><dd><code>--set</code> 옵션과 설정 파일을 옵션 사본(구독자가 없음)에서 먼저 합친 뒤 결과를 한 번에 적용합니다. 우선순위는 그대로입니다. 새 시험은 암호 걸린 CA로 mitmdump를 띄우고, 예전 순서로 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">PR 원문 #8548 ↗</a> · <a href="https://github.com/mitmproxy/mitmproxy/pull/8548/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+  </article>
+  <article id="RustCrypto-signatures-1493">
+    <h3><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">RustCrypto — ml-dsa: context가 있는 Wycheproof 검증 벡터도 시험</a><span class="badge review" data-pr="RustCrypto/signatures#1493">리뷰 대기</span></h3>
+    <div class="meta">RustCrypto/signatures #1493 · 제출 2026-10-31</div>
+    <dl><dt>문제</dt><dd>ML-DSA Wycheproof 검증 시험이 context 문자열이 있는 경우를 모두 건너뛰었습니다. 그래서 255바이트보다 긴 context를 거부하는 검사를 지워도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 서명과 검증에서 255바이트보다 긴 context를 거부하도록 정합니다. C2SP Wycheproof 벡터는 7·255·256바이트 context로 바로 이 점을 시험합니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ML-DSA 벡터를 이 크레이트에 돌려 보고 변이 시험을 했습니다. 길이 검사를 지워도 기존 시험이 하나도 실패하지 않았습니다.</dd><dt>수정</dt><dd>context가 있는 경우를 <code>verify_with_context()</code>로 돌립니다. 이제 길이 검사를 지우면 ML-DSA-44·65·87 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">PR 원문 #1493 ↗</a> · <a href="https://github.com/RustCrypto/signatures/pull/1493/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+  </article>
+  <article id="openssl-openssl-33426">
+    <h3><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">OpenSSL — 키 형식별(type-specific) 개인키 DER를 지운 뒤 해제</a><span class="badge ci_approval" data-pr="openssl/openssl#33426">CI 실행 허가 대기</span></h3>
+    <div class="meta">openssl/openssl #33426 · 제출 2026-10-28</div>
+    <dl><dt>문제</dt><dd><code>key_to_type_specific_der_bio()</code>가 키의 i2d 함수가 만든 DER를 <code>OPENSSL_free()</code>로 해제했습니다. 개인키라면 이 버퍼에 키 전체가 들어 있어서, RSA·EC·DSA·SM2 키를 <code>i2d_PrivateKey()</code>나 &quot;type-specific&quot; DER로 인코딩할 때마다 키가 해제된 메모리에 남았습니다. PEM 경로는 이미 사본을 지우고 있었습니다.</dd><dt>배경 지식</dt><dd>ISO/IEC 19790(FIPS 140-3·KCMVP)의 제로화 요건과, OpenSSL 3 인코더가 <code>i2d</code> 함수와 BIO 사이에서 키를 넘기는 방식을 바탕으로 봤습니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제 블록마다 키 바이트를 찾는 측정 프로그램을 키 인코더에 돌려 찾았습니다.</dd><dt>수정</dt><dd>인코딩 버퍼를 <code>OPENSSL_clear_free()</code>로 해제합니다. 새 시험 <code>test_type_specific_der_cleanse</code>는 감시 할당자를 건 채 RSA 키를 두 방식으로 인코딩하고, 수정이 없으면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">PR 원문 #33426 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33426/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+  </article>
+  <article id="openssl-openssl-33430">
+    <h3><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">OpenSSL — <code>EVP_ENCODE_CTX</code>를 해제할 때 지우기</a><span class="badge ci_approval" data-pr="openssl/openssl#33430">CI 실행 허가 대기</span></h3>
+    <div class="meta">openssl/openssl #33430 · 제출 2026-10-28</div>
+    <dl><dt>문제</dt><dd>base64 문맥은 입력의 마지막 부분 줄을 들고 있는데, 지우지 않고 해제했습니다. <code>PEM_write_bio()</code>는 개인키 DER를 이 문맥으로 인코딩하므로 키의 마지막 (길이 mod 48)바이트가 해제된 메모리에 남았습니다. RSA라면 <code>iqmp</code> 끝부분, Ed448·ML-DSA·ML-KEM이라면 개인키 바이트입니다. PEM을 읽을 때도 base64 문자열이 같은 식으로 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 PEM·base64 계층까지 따라갔습니다. <code>EVP_ENCODE_CTX</code>는 OpenSSL 1.1.0부터 불투명 구조체라 항상 <code>EVP_ENCODE_CTX_new()</code>로 만들어지므로, 해제할 때 지우면 PEM 읽기·쓰기와 <code>BIO_f_base64</code>가 모두 해결됩니다.</dd><dt>찾은 방법</dt><dd>같은 해제 블록 측정 프로그램을 개인키 PEM 인코딩에 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>EVP_ENCODE_CTX_free()</code>에서 문맥을 지웁니다. 새 시험 <code>test_encode_ctx_free_clears_input</code>은 문맥에 부분 블록을 남긴 채 해제 함수를 바꿔 끼우고, 해제된 문맥에 입력이 남아 있으면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">PR 원문 #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+  </article>
+  <article id="open-quantum-safe-oqs-provider-861">
+    <h3><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">oqs-provider — 개인키 사본을 지운 뒤 해제</a><span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">CI 실행 허가 대기 · 초안</span></h3>
+    <div class="meta">open-quantum-safe/oqs-provider #861 · 제출 2026-10-29</div>
+    <dl><dt>문제</dt><dd>양자내성 개인키를 PKCS#8 DER로 인코딩·디코딩하거나 내보낼(export) 때, oqs-provider가 키의 임시 사본을 지우지 않고 해제했습니다. ML-KEM·ML-DSA를 비롯한 양자내성 개인키가 해제된 힙 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>OpenSSL 3 provider 안에서 키가 오가는 경로와 ISO/IEC 19790(FIPS 140-3·KCMVP)의 제로화 요건을 알아야 보이는 문제였습니다. <code>OSSL_PARAM_free()</code>는 보안 힙 블록만 지웁니다. 그래서 OpenSSL의 <code>ml_kem_export()</code>는 해제 전에 파라미터를 지우는데, oqs-provider에는 이 단계가 없었습니다.</dd><dt>찾은 방법</dt><dd>해제 블록 측정 프로그램을 알고리즘 111종에 돌렸습니다. 개인키가 든 해제 블록이 1,377개였고, 수정 뒤 oqs-provider 자체 경로(서명 55종 × 8개 경로)에서는 0개가 됐습니다. 남은 823개는 libcrypto 몫입니다. 키 교환 경로를 다시 재서 KEM 56종 전부에서 내보내기 사본을 찾았습니다.</dd><dt>수정</dt><dd>인코더·디코더는 <code>ASN1_STRING_clear_free()</code>·<code>OPENSSL_clear_free()</code>로 바꾸고, 내보낸 파라미터는 <code>OSSL_PARAM_free()</code> 전에 <code>OPENSSL_cleanse()</code>로 지웁니다. 새 시험 <code>oqs_privkey_cleanse</code>가 해제 블록을 감시하고, 수정을 하나라도 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">PR 원문 #861 ↗</a> · <a href="https://github.com/open-quantum-safe/oqs-provider/pull/861/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+  </article>
+  <article id="open-quantum-safe-liboqs-2665">
+    <h3><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">liboqs — 잘못된 길이의 ML-DSA Wycheproof 검증 벡터가 라이브러리까지 가도록</a><span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">CI 실행 허가 대기 · 초안</span></h3>
+    <div class="meta">open-quantum-safe/liboqs #2665 · 제출 2026-10-31</div>
+    <dl><dt>문제</dt><dd>liboqs 시험 하네스가 길이가 틀린 ML-DSA 서명과 255바이트를 넘는 context를 라이브러리 호출 전에 걸렀고, 실행기는 이를 통과로 셌습니다. 그래서 Wycheproof <code>IncorrectSignatureLength</code>·<code>InvalidContext</code> 벡터가 liboqs에 닿지 않았고, liboqs ML-DSA 연결 코드의 서명 길이 검사를 꺼도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 매개변수 집합마다 서명 길이를 고정합니다. liboqs는 mldsa-native 구현을 자체 연결 코드로 감싸므로, 공개 API에서 이 길이를 지키는 책임이 그 연결 코드에 있습니다.</dd><dt>찾은 방법</dt><dd>암호 라이브러리 9곳의 Wycheproof 시험 하네스에서 건너뛰는 벡터를 훑은 뒤, liboqs에서 변이 시험으로 확인했습니다.</dd><dt>수정</dt><dd>ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결 코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">PR 원문 #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+  </article>
 
-  <footer>2026-10-31 갱신. 승인되거나 머지된 기여만 싣고, 항목마다 원본 PR이나 보안 권고로 연결합니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
+  <footer>2026-10-31 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
+<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-10-31 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "done": ["approved", "merged"]}</script>
+<script>
+/* Re-read merged, closed and approved pull requests from the GitHub search API on every load,
+   so a refresh shows them without waiting for the hourly rebuild. Three unauthenticated
+   search requests; on any failure the page keeps the snapshot it was built with. */
+(async () => {
+  const L = JSON.parse(document.getElementById("labels").textContent);
+  const out = document.getElementById("live");
+  const search = (q) =>
+    fetch("https://api.github.com/search/issues?per_page=100&q=" + encodeURIComponent(q),
+          { headers: { Accept: "application/vnd.github+json" } })
+      .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); });
+  try {
+    const base = "author:" + L.owner + " is:pr";
+    const [all, approved, changes] = await Promise.all(
+      [base, base + " review:approved", base + " review:changes_requested"].map(search));
+    const id = (it) => it.repository_url.replace("https://api.github.com/repos/", "") + "#" + it.number;
+    const ok = new Set(approved.items.map(id));
+    const asked = new Set(changes.items.map(id));
+    for (const it of all.items) {
+      let stage = null;
+      if (it.pull_request && it.pull_request.merged_at) stage = "merged";
+      else if (it.state === "closed") stage = "closed";
+      else if (ok.has(id(it)) && !asked.has(id(it))) stage = "approved";
+      if (!stage) continue;
+      for (const el of document.querySelectorAll('[data-pr="' + CSS.escape(id(it)) + '"]')) {
+        el.className = "badge " + stage;
+        el.textContent = L.stages[stage];
+      }
+    }
+    const rows = document.querySelectorAll("tbody tr td .badge[data-pr]");
+    const done = [...rows].filter((el) => L.done.some((s) => el.classList.contains(s))).length;
+    document.getElementById("s-done").textContent = String(done);
+    const t = new Date().toLocaleString(document.documentElement.lang === "ko" ? "ko-KR" : "en-GB",
+      { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    out.textContent = L.live.replace("{t}", t + " KST");
+  } catch (e) {
+    out.textContent = L.snapshot;
+  }
+})();
+</script>
 </body>
 </html>
