@@ -1,4 +1,23 @@
 {
+ "Mbed-TLS/TF-PSA-Crypto#960": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 1,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-31",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960"
+ },
  "Mbed-TLS/mbedtls#11036": {
   "approvals": [],
   "live": {
@@ -118,6 +137,44 @@
   },
   "merge": null,
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813"
+ },
+ "openssl-projects/pkcs11-provider#814": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 11,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-31",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl-projects/pkcs11-provider/pull/814"
+ },
+ "openssl-projects/pkcs11-provider#815": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 11,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-10-31",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl-projects/pkcs11-provider/pull/815"
  },
  "openssl/openssl#33426": {
   "approvals": [],
