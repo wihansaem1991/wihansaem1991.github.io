@@ -7,6 +7,7 @@
 <meta name="description" content="Security fixes and vulnerability reports for open-source cryptography, found by measurement and verified by tests, tracked here from submission to merge or CVE.">
 <link rel="alternate" hreflang="en" href="https://wihansaem1991.github.io/">
 <link rel="alternate" hreflang="ko" href="https://wihansaem1991.github.io/ko/">
+<script>document.documentElement.classList.add("js");</script>
 <style>
   :root { --fg:#1d2433; --muted:#5b6475; --line:#e3e7ee; --accent:#1f6feb; --ok:#1a7f37; --merged:#8250df; --warn:#9a6700; --bad:#cf222e; --bg:#ffffff; --card:#f7f9fc; }
   @media (prefers-color-scheme: dark) {
@@ -15,52 +16,62 @@
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--fg);
          font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
-  main { max-width: 1040px; margin: 0 auto; padding: 56px 24px 72px; }
+  main { max-width: 960px; margin: 0 auto; padding: 40px 20px 64px; }
   header { position: relative; }
   .lang { position:absolute; top:0; right:0; font-size:14px; }
-  header h1 { margin: 0 0 6px; font-size: 32px; letter-spacing: -0.02em; padding-right: 80px; }
-  header p { margin: 0; color: var(--muted); }
-  .tags { margin: 16px 0 0; display:flex; flex-wrap:wrap; gap:8px; padding:0; list-style:none; }
-  .tags li { border:1px solid var(--line); border-radius:999px; padding:2px 12px; font-size:13px; color:var(--muted); }
-  h2 { margin: 48px 0 16px; font-size: 20px; }
-  .stats { display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; }
-  .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
-  .stat b { display:block; font-size:28px; }
-  .stat span { color:var(--muted); font-size:14px; }
-  .live { margin-top:10px; color:var(--muted); font-size:13px; }
-  .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; }
+  header h1 { margin: 0 0 4px; font-size: 28px; letter-spacing: -0.02em; padding-right: 80px; }
+  header p { margin: 0; color: var(--muted); font-size: 15px; }
+  .tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; padding:0; list-style:none; }
+  .tags li { border:1px solid var(--line); border-radius:999px; padding:1px 10px; font-size:12px; color:var(--muted); }
+  .summary { margin-top:20px; font-size:15px; }
+  .live { color:var(--muted); font-size:13px; }
+  .tabbar { position: sticky; top: 0; z-index: 2; background: var(--bg); margin: 16px -20px 0; padding: 10px 20px;
+            display:flex; gap:8px; overflow-x:auto; border-bottom:1px solid var(--line); scrollbar-width: none; }
+  .tab { flex: none; font: inherit; font-size:14px; color:var(--fg); background:var(--card); border:1px solid var(--line);
+         border-radius:999px; padding:6px 14px; cursor:pointer; white-space:nowrap; }
+  .tab .count { color:var(--muted); font-weight:600; margin-left:2px; }
+  .tab[aria-selected="true"] { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .tab[aria-selected="true"] .count { color:#fff; }
+  .hint { color:var(--muted); font-size:13px; margin:12px 0 8px; }
+  .panel { margin-top: 4px; }
+  .js .panel[hidden], .js .entry.off { display:none; }
+  .entry { position:relative; background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; overflow-wrap:anywhere; }
+  .entry summary { list-style:none; cursor:pointer; padding:12px 16px; display:grid; gap:2px; }
+  .entry summary::-webkit-details-marker { display:none; }
+  .entry summary::after { content:"▾"; position:absolute; right:16px; top:12px; color:var(--muted); }
+  .entry[open] summary::after { content:"▴"; }
+  .line1 { padding-right:20px; }
+  .line1 b { font-size:15px; margin-right:6px; }
+  .line2 { font-size:14px; }
+  .line3 { font-size:12px; color:var(--muted); }
+  .body { padding: 0 16px 16px; border-top:1px solid var(--line); }
+  .meta { font-size:13px; margin:10px 0; }
+  .meta a { color:var(--muted); }
+  .empty { color:var(--muted); font-size:14px; padding: 12px 2px; }
+  .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:12px; }
   table { width:100%; border-collapse:collapse; font-size:14px; }
   th, td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align: top; }
   th { color:var(--muted); font-weight:600; background:var(--card); white-space:nowrap; }
-  td:nth-child(5), td:nth-child(6), td:nth-child(7) { white-space:nowrap; }
   tr:last-child td { border-bottom:none; }
   td a { color:var(--fg); }
-  td a:hover { color:var(--accent); }
   .none { color:var(--muted); }
   .ok { color:var(--ok); } .bad { color:var(--bad); } .wait { color:var(--warn); }
-  .more { color:var(--muted); text-decoration:none; font-size:13px; }
   .evidence a { white-space:nowrap; }
   .cvss { color:var(--muted); font-size:12px; }
-  article { overflow-wrap:anywhere; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:16px; }
-  article h3 { margin:0 0 4px; font-size:18px; }
-  article h3 a { color:var(--fg); text-decoration:none; }
-  article h3 a:hover { color:var(--accent); }
-  .meta { color:var(--muted); font-size:14px; margin-bottom:12px; }
-  .badge { display:inline-block; font-size:12px; font-weight:600; border-radius:999px; padding:0 10px; white-space:nowrap; border:1px solid var(--muted); color:var(--muted); }
-  h3 .badge { margin-left:6px; vertical-align: 2px; }
+  .badge { display:inline-block; font-size:12px; font-weight:600; border-radius:999px; padding:0 10px; white-space:nowrap; border:1px solid var(--muted); color:var(--muted); vertical-align: 1px; }
   .badge.approved, .badge.v-fixed { color:var(--ok); border-color:var(--ok); }
   .badge.merged, .badge.v-published { color:var(--merged); border-color:var(--merged); }
   .badge.changes { color:var(--bad); border-color:var(--bad); }
   .badge.rereview, .badge.ci_approval, .badge.v-triage, .badge.v-accepted { color:var(--warn); border-color:var(--warn); }
-  dl { margin:0; display:grid; grid-template-columns: 140px 1fr; gap:8px 16px; }
+  dl { margin:0; display:grid; grid-template-columns: 120px 1fr; gap:8px 16px; font-size:15px; }
   dt { color:var(--muted); font-size:14px; }
   dd { margin:0; }
   code { font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background:var(--line); padding:1px 5px; border-radius:4px; }
   .tr { font-style: normal; font-size: 14px; }
   blockquote { margin:12px 0 0; padding:8px 14px; border-left:3px solid var(--accent); color:var(--muted); font-style: italic; }
-  footer { margin-top:48px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); padding-top:16px; }
+  footer { margin-top:40px; color:var(--muted); font-size:12px; border-top:1px solid var(--line); padding-top:14px; }
   a { color: var(--accent); }
-  @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } dl { grid-template-columns: 1fr; } dt { margin-top:6px; } }
+  @media (max-width: 600px) { dl { grid-template-columns: 1fr; } dt { margin-top:6px; } header h1 { font-size: 24px; } }
 </style>
 </head>
 <body>
@@ -72,115 +83,201 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <h2>Progress</h2>
-  <div class="stats"><div class="stat"><b id="s-prs">9</b><span>pull requests</span></div><div class="stat"><b id="s-replied">2</b><span>maintainer replied</span></div><div class="stat"><b id="s-done">1</b><span>approved or merged</span></div><div class="stat"><b id="s-vulns">1</b><span>vulnerability reports</span></div><div class="stat"><b id="s-cves">0</b><span>CVEs</span></div></div>
+  <div class="summary">9 pull requests · 2 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <h2>Pull requests</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Project</th><th>Contribution</th><th>Type</th><th>Stage</th><th>Submitted</th><th>Days</th><th>First response</th><th>CI</th></tr></thead>
-      <tbody><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code> ↗</a> <a class="more" href="#openssl-openssl-33444">#</a></td><td>Hardening</td><td><span class="badge approved" data-pr="openssl/openssl#33444">Approved</span></td><td>2026-10-29</td><td>1</td><td>2026-10-30</td><td><span class="ok">✓106</span> <span class="bad">✗1</span></td></tr><tr><td>pkcs11-provider</td><td><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">Return only the ECDH secret into larger buffers ↗</a> <a class="more" href="#openssl-projects-pkcs11-provider-813">#</a></td><td>Bug fix</td><td><span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">Updated, awaiting re-review</span></td><td>2026-10-30</td><td>1</td><td>2026-10-30</td><td><span class="wait">⏸11</span></td></tr><tr><td>Mbed TLS</td><td><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Reject repeated X.509 extensions that have no parser ↗</a> <a class="more" href="#Mbed-TLS-mbedtls-11036">#</a></td><td>Bug fix</td><td><span class="badge review" data-pr="Mbed-TLS/mbedtls#11036">Awaiting review</span></td><td>2026-10-30</td><td>1</td><td><span class="none">—</span></td><td><span class="ok">✓2</span></td></tr><tr><td>mitmproxy</td><td><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">Apply config file options before addons see <code>--set confdir</code> ↗</a> <a class="more" href="#mitmproxy-mitmproxy-8548">#</a></td><td>Bug fix</td><td><span class="badge review" data-pr="mitmproxy/mitmproxy#8548">Awaiting review</span></td><td>2026-10-31</td><td>0</td><td><span class="none">—</span></td><td><span class="ok">✓26</span></td></tr><tr><td>RustCrypto</td><td><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">ml-dsa: check Wycheproof verify vectors that have a context ↗</a> <a class="more" href="#RustCrypto-signatures-1493">#</a></td><td>Test coverage</td><td><span class="badge review" data-pr="RustCrypto/signatures#1493">Awaiting review</span></td><td>2026-10-31</td><td>0</td><td><span class="none">—</span></td><td><span class="ok">✓11</span></td></tr><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">Clear type-specific private key DER before freeing it ↗</a> <a class="more" href="#openssl-openssl-33426">#</a></td><td>Hardening</td><td><span class="badge ci_approval" data-pr="openssl/openssl#33426">Awaiting CI approval</span></td><td>2026-10-28</td><td>3</td><td><span class="none">—</span></td><td><span class="ok">✓1</span> <span class="wait">⏸13</span></td></tr><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">Clear the <code>EVP_ENCODE_CTX</code> when freeing it ↗</a> <a class="more" href="#openssl-openssl-33430">#</a></td><td>Hardening</td><td><span class="badge ci_approval" data-pr="openssl/openssl#33430">Awaiting CI approval</span></td><td>2026-10-28</td><td>3</td><td><span class="none">—</span></td><td><span class="ok">✓1</span> <span class="wait">⏸13</span></td></tr><tr><td>oqs-provider</td><td><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">Clear private key copies before freeing them ↗</a> <a class="more" href="#open-quantum-safe-oqs-provider-861">#</a></td><td>Hardening</td><td><span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval · draft</span></td><td>2026-10-29</td><td>2</td><td><span class="none">—</span></td><td><span class="ok">✓2</span> <span class="wait">⏸5</span></td></tr><tr><td>liboqs</td><td><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">Let ML-DSA Wycheproof verify vectors reach the library with wrong lengths ↗</a> <a class="more" href="#open-quantum-safe-liboqs-2665">#</a></td><td>Test coverage</td><td><span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">Awaiting CI approval · draft</span></td><td>2026-10-31</td><td>0</td><td><span class="none">—</span></td><td><span class="ok">✓2</span> <span class="wait">⏸1</span></td></tr></tbody>
-    </table>
-  </div>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">9</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">1</span></button></nav>
 
-  <h2>CVE challenge</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Report</th><th>Submitted</th><th>Channel</th><th>Stage</th><th>CVE</th><th>Details</th></tr></thead>
-      <tbody><tr><td>VR-1</td><td>2026-10-31</td><td>GitHub private vulnerability report</td><td><span class="badge v-triage">Under triage</span></td><td><span class="none">—</span></td><td><span class="none">Project and details withheld until disclosure</span></td></tr></tbody>
-    </table>
-  </div>
+  <section class="panel" id="panel-prs">
+    <p class="hint">Open an entry to read its briefing.</p>
 
-  <h2>Briefings</h2>
+  <details class="entry" id="openssl-openssl-33444" data-group="done">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge approved" data-pr="openssl/openssl#33444">Approved</span></span>
+      <span class="line2">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></span>
+      <span class="line3">submitted 2026-10-29 · 1 days · first reply 2026-10-30 · CI <span class="ok">✓106</span> <span class="bad">✗1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">openssl/openssl #33444 · Hardening · Approved 2026-10-30 · master, 3.6, 4.0, 4.1 ↗</a></div>
+      <dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Pull request #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
+    </div>
+  </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-813" data-group="review">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">Updated, awaiting re-review</span></span>
+      <span class="line2">Return only the ECDH secret into larger buffers</span>
+      <span class="line3">submitted 2026-10-30 · 1 days · first reply 2026-10-30 · CI <span class="wait">⏸11</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">Pull request #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="Mbed-TLS-mbedtls-11036" data-group="review">
+    <summary>
+      <span class="line1"><b>Mbed TLS</b> <span class="badge review" data-pr="Mbed-TLS/mbedtls#11036">Awaiting review</span></span>
+      <span class="line2">Reject repeated X.509 extensions that have no parser</span>
+      <span class="line3">submitted 2026-10-30 · 1 days · no reply yet · CI <span class="ok">✓2</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Mbed-TLS/mbedtls #11036 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>Mbed TLS rejected a certificate that repeated an extension it parses, but accepted one that repeated an extension it skips or hands to a callback.</dd><dt>Background</dt><dd>RFC 5280 section 4.2: a certificate must not include more than one instance of a particular extension. Applying that rule needs the DER layout of the extensions sequence, since skipped extensions are never decoded.</dd><dt>How it was found</dt><dd>Issue #4069, where a maintainer had proposed the approach. Test certificates were generated for the missing cases; two of them were wrongly accepted before the fix.</dd><dt>Fix</dt><dd>When an extension is skipped or passed to the callback, compare its OID with the extensions already read and reject a repeat; three new test cases (902/902 in <code>test_suite_x509parse</code>).</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Pull request #11036 ↗</a> · <a href="https://github.com/Mbed-TLS/mbedtls/pull/11036/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="mitmproxy-mitmproxy-8548" data-group="review">
+    <summary>
+      <span class="line1"><b>mitmproxy</b> <span class="badge review" data-pr="mitmproxy/mitmproxy#8548">Awaiting review</span></span>
+      <span class="line2">Apply config file options before addons see <code>--set confdir</code></span>
+      <span class="line3">submitted 2026-10-31 · 0 days · no reply yet · CI <span class="ok">✓26</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy/mitmproxy #8548 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>With <code>--set confdir=...</code>, mitmproxy loaded the CA from that directory before reading <code>cert_passphrase</code> from the directory&#x27;s <code>config.yaml</code>. An encrypted CA key then failed to load and mitmproxy exited at startup (issue #6014, open since 2023).</dd><dt>Background</dt><dd>TLS interception: mitmproxy signs certificates on the fly with its own CA, so the CA private key has to load at startup, and an encrypted PKCS#8 key needs its passphrase first. Its option manager notifies addons on every update, so the order of updates decides what an addon sees.</dd><dt>How it was found</dt><dd>Issue #6014 with the maintainer&#x27;s diagnosis, and a stalled pull request from 2023 that had never been reviewed. Reproduced on Linux with an encrypted CA.</dd><dt>Fix</dt><dd>Work out the <code>--set</code> options and the config file on a copy of the options (a copy has no subscribers) and apply the result in one update; precedence is unchanged. A new test runs mitmdump with an encrypted CA and fails with the old order.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">Pull request #8548 ↗</a> · <a href="https://github.com/mitmproxy/mitmproxy/pull/8548/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-signatures-1493" data-group="review">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/signatures#1493">Awaiting review</span></span>
+      <span class="line2">ml-dsa: check Wycheproof verify vectors that have a context</span>
+      <span class="line3">submitted 2026-10-31 · 0 days · no reply yet · CI <span class="ok">✓11</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">RustCrypto/signatures #1493 · Test coverage ↗</a></div>
+      <dl><dt>Problem</dt><dd>The ML-DSA Wycheproof verification test skipped every case with a context string, so deleting the check that rejects contexts longer than 255 bytes left all tests passing.</dd><dt>Background</dt><dd>FIPS 204: ML-DSA signing and verification reject a context string longer than 255 bytes. The C2SP Wycheproof vectors test exactly that with 7-, 255- and 256-byte contexts.</dd><dt>How it was found</dt><dd>Running the Wycheproof ML-DSA vectors against the crate, then mutation testing: removing the length check went unnoticed by every existing test.</dd><dt>Fix</dt><dd>Run the context cases through <code>verify_with_context()</code>. With the length check removed, the ML-DSA-44, -65 and -87 tests now fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">Pull request #1493 ↗</a> · <a href="https://github.com/RustCrypto/signatures/pull/1493/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33426" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33426">Awaiting CI approval</span></span>
+      <span class="line2">Clear type-specific private key DER before freeing it</span>
+      <span class="line3">submitted 2026-10-28 · 3 days · no reply yet · CI <span class="ok">✓1</span> <span class="wait">⏸13</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">openssl/openssl #33426 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>key_to_type_specific_der_bio()</code> freed the DER produced by the key&#x27;s i2d function with <code>OPENSSL_free()</code>. For a private key that buffer holds the whole key, so every <code>i2d_PrivateKey()</code> or &quot;type-specific&quot; DER encoding of an RSA, EC, DSA or SM2 key left it in freed memory. The PEM path already cleared its copy.</dd><dt>Background</dt><dd>The zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP) and how OpenSSL 3 encoders hand key material between <code>i2d</code> functions and BIOs.</dd><dt>How it was found</dt><dd>The freed-block measurement program, which swaps OpenSSL&#x27;s allocator and looks for key bytes in every freed block, run over the key encoders.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> for the encoded buffer. <code>test_type_specific_der_cleanse</code> encodes an RSA key both ways under a watching allocator and fails without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">Pull request #33426 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33426/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33430" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33430">Awaiting CI approval</span></span>
+      <span class="line2">Clear the <code>EVP_ENCODE_CTX</code> when freeing it</span>
+      <span class="line3">submitted 2026-10-28 · 3 days · no reply yet · CI <span class="ok">✓1</span> <span class="wait">⏸13</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>The base64 context keeps the last partial line of its input and was freed without clearing it. <code>PEM_write_bio()</code> encodes private key DER through such a context, so the last (length mod 48) bytes of the key stayed in freed memory: the end of <code>iqmp</code> for RSA, private key bytes for Ed448, ML-DSA and ML-KEM. Reading PEM left base64 text the same way.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) followed through the PEM and base64 layers: <code>EVP_ENCODE_CTX</code> has been opaque since OpenSSL 1.1.0 and is always allocated by <code>EVP_ENCODE_CTX_new()</code>, so clearing it on free covers PEM reading, PEM writing and <code>BIO_f_base64</code>.</dd><dt>How it was found</dt><dd>The same freed-block measurement program, run over PEM encoding of private keys.</dd><dt>Fix</dt><dd>Clear the context in <code>EVP_ENCODE_CTX_free()</code>. <code>test_encode_ctx_free_clears_input</code> leaves a partial block in a context, swaps the free function and fails if the freed context still holds the input.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">Pull request #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
+    <summary>
+      <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval · draft</span></span>
+      <span class="line2">Clear private key copies before freeing them</span>
+      <span class="line3">submitted 2026-10-29 · 2 days · no reply yet · CI <span class="ok">✓2</span> <span class="wait">⏸5</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">open-quantum-safe/oqs-provider #861 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>When post-quantum private keys were encoded to or decoded from PKCS#8 DER, and when they were exported, oqs-provider freed temporary copies of the key without clearing them. ML-KEM, ML-DSA and the other post-quantum private keys stayed in released heap memory.</dd><dt>Background</dt><dd>How keys travel through an OpenSSL 3 provider, and the zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP). <code>OSSL_PARAM_free()</code> clears only secure-heap blocks, which is why OpenSSL&#x27;s own <code>ml_kem_export()</code> cleanses its parameters before freeing them; oqs-provider had no such step.</dd><dt>How it was found</dt><dd>The freed-block measurement program run over 111 algorithms: 1,377 freed blocks held private keys. The fix removes every one on oqs-provider&#x27;s own paths (55 signature algorithms × 8 paths); the 823 left come from libcrypto. A second run over the key-exchange paths found the export copy for all 56 KEM algorithms.</dd><dt>Fix</dt><dd><code>ASN1_STRING_clear_free()</code> and <code>OPENSSL_clear_free()</code> in the encoder and decoder, and <code>OPENSSL_cleanse()</code> of the exported parameters before <code>OSSL_PARAM_free()</code>. A new test, <code>oqs_privkey_cleanse</code>, watches freed blocks and fails if any of the changes is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">Pull request #861 ↗</a> · <a href="https://github.com/open-quantum-safe/oqs-provider/pull/861/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="open-quantum-safe-liboqs-2665" data-group="ci">
+    <summary>
+      <span class="line1"><b>liboqs</b> <span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">Awaiting CI approval · draft</span></span>
+      <span class="line2">Let ML-DSA Wycheproof verify vectors reach the library with wrong lengths</span>
+      <span class="line3">submitted 2026-10-31 · 0 days · no reply yet · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · Test coverage ↗</a></div>
+      <dl><dt>Problem</dt><dd>liboqs&#x27;s test harness rejected ML-DSA signatures of the wrong length, and contexts longer than 255 bytes, before calling the library, and the runner counted that as a pass. The Wycheproof <code>IncorrectSignatureLength</code> and <code>InvalidContext</code> vectors never reached liboqs: disabling the signature-length check in liboqs&#x27;s ML-DSA glue code left every test passing.</dd><dt>Background</dt><dd>FIPS 204 fixes the ML-DSA signature length for each parameter set. liboqs wraps the mldsa-native implementation in its own glue code, and that glue is what has to enforce the length at the public API.</dd><dt>How it was found</dt><dd>A sweep of the Wycheproof test harnesses of nine cryptography libraries for vectors that are skipped, followed by mutation testing on liboqs.</dd><dt>Fix</dt><dd>For ML-DSA, reject only malformed hex input, as the neighbouring SLH-DSA branch already does, so the vectors exercise the library&#x27;s own checks. Disabling the glue check now fails the Wycheproof tests for all three parameter sets.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">Pull request #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+    <p class="empty" id="empty" hidden>Nothing here right now.</p>
+  </section>
 
-  <article id="openssl-openssl-33444">
-    <h3><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">OpenSSL — Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></a><span class="badge approved" data-pr="openssl/openssl#33444">Approved</span></h3>
-    <div class="meta">openssl/openssl #33444 · submitted 2026-10-29 · Approved 2026-10-30 · master, 3.6, 4.0, 4.1</div>
-    <dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Pull request #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
-  </article>
-  <article id="openssl-projects-pkcs11-provider-813">
-    <h3><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">pkcs11-provider — Return only the ECDH secret into larger buffers</a><span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">Updated, awaiting re-review</span></h3>
-    <div class="meta">openssl-projects/pkcs11-provider #813 · submitted 2026-10-30</div>
-    <dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">Pull request #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
-  </article>
-  <article id="Mbed-TLS-mbedtls-11036">
-    <h3><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Mbed TLS — Reject repeated X.509 extensions that have no parser</a><span class="badge review" data-pr="Mbed-TLS/mbedtls#11036">Awaiting review</span></h3>
-    <div class="meta">Mbed-TLS/mbedtls #11036 · submitted 2026-10-30</div>
-    <dl><dt>Problem</dt><dd>Mbed TLS rejected a certificate that repeated an extension it parses, but accepted one that repeated an extension it skips or hands to a callback.</dd><dt>Background</dt><dd>RFC 5280 section 4.2: a certificate must not include more than one instance of a particular extension. Applying that rule needs the DER layout of the extensions sequence, since skipped extensions are never decoded.</dd><dt>How it was found</dt><dd>Issue #4069, where a maintainer had proposed the approach. Test certificates were generated for the missing cases; two of them were wrongly accepted before the fix.</dd><dt>Fix</dt><dd>When an extension is skipped or passed to the callback, compare its OID with the extensions already read and reject a repeat; three new test cases (902/902 in <code>test_suite_x509parse</code>).</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Pull request #11036 ↗</a> · <a href="https://github.com/Mbed-TLS/mbedtls/pull/11036/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-  </article>
-  <article id="mitmproxy-mitmproxy-8548">
-    <h3><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy — Apply config file options before addons see <code>--set confdir</code></a><span class="badge review" data-pr="mitmproxy/mitmproxy#8548">Awaiting review</span></h3>
-    <div class="meta">mitmproxy/mitmproxy #8548 · submitted 2026-10-31</div>
-    <dl><dt>Problem</dt><dd>With <code>--set confdir=...</code>, mitmproxy loaded the CA from that directory before reading <code>cert_passphrase</code> from the directory&#x27;s <code>config.yaml</code>. An encrypted CA key then failed to load and mitmproxy exited at startup (issue #6014, open since 2023).</dd><dt>Background</dt><dd>TLS interception: mitmproxy signs certificates on the fly with its own CA, so the CA private key has to load at startup, and an encrypted PKCS#8 key needs its passphrase first. Its option manager notifies addons on every update, so the order of updates decides what an addon sees.</dd><dt>How it was found</dt><dd>Issue #6014 with the maintainer&#x27;s diagnosis, and a stalled pull request from 2023 that had never been reviewed. Reproduced on Linux with an encrypted CA.</dd><dt>Fix</dt><dd>Work out the <code>--set</code> options and the config file on a copy of the options (a copy has no subscribers) and apply the result in one update; precedence is unchanged. A new test runs mitmdump with an encrypted CA and fails with the old order.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">Pull request #8548 ↗</a> · <a href="https://github.com/mitmproxy/mitmproxy/pull/8548/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-  </article>
-  <article id="RustCrypto-signatures-1493">
-    <h3><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">RustCrypto — ml-dsa: check Wycheproof verify vectors that have a context</a><span class="badge review" data-pr="RustCrypto/signatures#1493">Awaiting review</span></h3>
-    <div class="meta">RustCrypto/signatures #1493 · submitted 2026-10-31</div>
-    <dl><dt>Problem</dt><dd>The ML-DSA Wycheproof verification test skipped every case with a context string, so deleting the check that rejects contexts longer than 255 bytes left all tests passing.</dd><dt>Background</dt><dd>FIPS 204: ML-DSA signing and verification reject a context string longer than 255 bytes. The C2SP Wycheproof vectors test exactly that with 7-, 255- and 256-byte contexts.</dd><dt>How it was found</dt><dd>Running the Wycheproof ML-DSA vectors against the crate, then mutation testing: removing the length check went unnoticed by every existing test.</dd><dt>Fix</dt><dd>Run the context cases through <code>verify_with_context()</code>. With the length check removed, the ML-DSA-44, -65 and -87 tests now fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">Pull request #1493 ↗</a> · <a href="https://github.com/RustCrypto/signatures/pull/1493/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-  </article>
-  <article id="openssl-openssl-33426">
-    <h3><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">OpenSSL — Clear type-specific private key DER before freeing it</a><span class="badge ci_approval" data-pr="openssl/openssl#33426">Awaiting CI approval</span></h3>
-    <div class="meta">openssl/openssl #33426 · submitted 2026-10-28</div>
-    <dl><dt>Problem</dt><dd><code>key_to_type_specific_der_bio()</code> freed the DER produced by the key&#x27;s i2d function with <code>OPENSSL_free()</code>. For a private key that buffer holds the whole key, so every <code>i2d_PrivateKey()</code> or &quot;type-specific&quot; DER encoding of an RSA, EC, DSA or SM2 key left it in freed memory. The PEM path already cleared its copy.</dd><dt>Background</dt><dd>The zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP) and how OpenSSL 3 encoders hand key material between <code>i2d</code> functions and BIOs.</dd><dt>How it was found</dt><dd>The freed-block measurement program, which swaps OpenSSL&#x27;s allocator and looks for key bytes in every freed block, run over the key encoders.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> for the encoded buffer. <code>test_type_specific_der_cleanse</code> encodes an RSA key both ways under a watching allocator and fails without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">Pull request #33426 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33426/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-  </article>
-  <article id="openssl-openssl-33430">
-    <h3><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">OpenSSL — Clear the <code>EVP_ENCODE_CTX</code> when freeing it</a><span class="badge ci_approval" data-pr="openssl/openssl#33430">Awaiting CI approval</span></h3>
-    <div class="meta">openssl/openssl #33430 · submitted 2026-10-28</div>
-    <dl><dt>Problem</dt><dd>The base64 context keeps the last partial line of its input and was freed without clearing it. <code>PEM_write_bio()</code> encodes private key DER through such a context, so the last (length mod 48) bytes of the key stayed in freed memory: the end of <code>iqmp</code> for RSA, private key bytes for Ed448, ML-DSA and ML-KEM. Reading PEM left base64 text the same way.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) followed through the PEM and base64 layers: <code>EVP_ENCODE_CTX</code> has been opaque since OpenSSL 1.1.0 and is always allocated by <code>EVP_ENCODE_CTX_new()</code>, so clearing it on free covers PEM reading, PEM writing and <code>BIO_f_base64</code>.</dd><dt>How it was found</dt><dd>The same freed-block measurement program, run over PEM encoding of private keys.</dd><dt>Fix</dt><dd>Clear the context in <code>EVP_ENCODE_CTX_free()</code>. <code>test_encode_ctx_free_clears_input</code> leaves a partial block in a context, swaps the free function and fails if the freed context still holds the input.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">Pull request #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-  </article>
-  <article id="open-quantum-safe-oqs-provider-861">
-    <h3><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">oqs-provider — Clear private key copies before freeing them</a><span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval · draft</span></h3>
-    <div class="meta">open-quantum-safe/oqs-provider #861 · submitted 2026-10-29</div>
-    <dl><dt>Problem</dt><dd>When post-quantum private keys were encoded to or decoded from PKCS#8 DER, and when they were exported, oqs-provider freed temporary copies of the key without clearing them. ML-KEM, ML-DSA and the other post-quantum private keys stayed in released heap memory.</dd><dt>Background</dt><dd>How keys travel through an OpenSSL 3 provider, and the zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP). <code>OSSL_PARAM_free()</code> clears only secure-heap blocks, which is why OpenSSL&#x27;s own <code>ml_kem_export()</code> cleanses its parameters before freeing them; oqs-provider had no such step.</dd><dt>How it was found</dt><dd>The freed-block measurement program run over 111 algorithms: 1,377 freed blocks held private keys. The fix removes every one on oqs-provider&#x27;s own paths (55 signature algorithms × 8 paths); the 823 left come from libcrypto. A second run over the key-exchange paths found the export copy for all 56 KEM algorithms.</dd><dt>Fix</dt><dd><code>ASN1_STRING_clear_free()</code> and <code>OPENSSL_clear_free()</code> in the encoder and decoder, and <code>OPENSSL_cleanse()</code> of the exported parameters before <code>OSSL_PARAM_free()</code>. A new test, <code>oqs_privkey_cleanse</code>, watches freed blocks and fails if any of the changes is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">Pull request #861 ↗</a> · <a href="https://github.com/open-quantum-safe/oqs-provider/pull/861/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-  </article>
-  <article id="open-quantum-safe-liboqs-2665">
-    <h3><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">liboqs — Let ML-DSA Wycheproof verify vectors reach the library with wrong lengths</a><span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">Awaiting CI approval · draft</span></h3>
-    <div class="meta">open-quantum-safe/liboqs #2665 · submitted 2026-10-31</div>
-    <dl><dt>Problem</dt><dd>liboqs&#x27;s test harness rejected ML-DSA signatures of the wrong length, and contexts longer than 255 bytes, before calling the library, and the runner counted that as a pass. The Wycheproof <code>IncorrectSignatureLength</code> and <code>InvalidContext</code> vectors never reached liboqs: disabling the signature-length check in liboqs&#x27;s ML-DSA glue code left every test passing.</dd><dt>Background</dt><dd>FIPS 204 fixes the ML-DSA signature length for each parameter set. liboqs wraps the mldsa-native implementation in its own glue code, and that glue is what has to enforce the length at the public API.</dd><dt>How it was found</dt><dd>A sweep of the Wycheproof test harnesses of nine cryptography libraries for vectors that are skipped, followed by mutation testing on liboqs.</dd><dt>Fix</dt><dd>For ML-DSA, reject only malformed hex input, as the neighbouring SLH-DSA branch already does, so the vectors exercise the library&#x27;s own checks. Disabling the glue check now fails the Wycheproof tests for all three parameter sets.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">Pull request #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-  </article>
+  <section class="panel" id="panel-cve">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Report</th><th>Submitted</th><th>Channel</th><th>Stage</th><th>CVE</th><th>Details</th></tr></thead>
+        <tbody><tr><td>VR-1</td><td>2026-10-31</td><td>GitHub private vulnerability report</td><td><span class="badge v-triage">Under triage</span></td><td><span class="none">—</span></td><td><span class="none">Project and details withheld until disclosure</span></td></tr></tbody>
+      </table>
+    </div>
+  </section>
 
   <footer>Updated 2026-10-31; refreshed from GitHub every hour, and merged, closed and approved stages are re-read on every page load. Private vulnerability reports show only their stage until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
 </main>
-<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "Merged", "approved": "Approved", "rereview": "Updated, awaiting re-review", "changes": "Changes requested", "review": "Awaiting review", "ci_approval": "Awaiting CI approval", "closed": "Closed", "open": "Open"}, "live": "Stages read from GitHub just now ({t}).", "loading": "Reading current stages from GitHub…", "snapshot": "Showing the snapshot of 2026-10-31; GitHub could not be reached from this browser.", "done": ["approved", "merged"]}</script>
+<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "Merged", "approved": "Approved", "rereview": "Updated, awaiting re-review", "changes": "Changes requested", "review": "Awaiting review", "ci_approval": "Awaiting CI approval", "closed": "Closed", "open": "Open"}, "live": "Stages read from GitHub just now ({t}).", "loading": "Reading current stages from GitHub…", "snapshot": "Showing the snapshot of 2026-10-31; GitHub could not be reached from this browser.", "groups": {"merged": "done", "approved": "done", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
 <script>
-/* Re-read merged, closed and approved pull requests from the GitHub search API on every load,
-   so a refresh shows them without waiting for the hourly rebuild. Three unauthenticated
-   search requests; on any failure the page keeps the snapshot it was built with. */
-(async () => {
+(() => {
   const L = JSON.parse(document.getElementById("labels").textContent);
+  const tabs = [...document.querySelectorAll(".tab")];
+  const entries = () => [...document.querySelectorAll(".entry")];
+
+  /* Show the entries of one tab; the CVE tab shows the report table instead. */
+  function show(name) {
+    if (!tabs.some((t) => t.dataset.tab === name && !t.hidden)) name = "all";
+    for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.tab === name));
+    document.getElementById("panel-cve").hidden = name !== "cve";
+    document.getElementById("panel-prs").hidden = name === "cve";
+    let shown = 0;
+    for (const e of entries()) {
+      const on = name === "all" || e.dataset.group === name;
+      e.classList.toggle("off", !on);
+      if (on) shown++;
+    }
+    document.getElementById("empty").hidden = shown > 0 || name === "cve";
+  }
+  function count() {
+    const n = { done: 0, review: 0, ci: 0, closed: 0 };
+    for (const e of entries()) n[e.dataset.group] = (n[e.dataset.group] || 0) + 1;
+    for (const g of Object.keys(n)) {
+      const c = document.getElementById("c-" + g);
+      if (c) c.textContent = String(n[g]);
+    }
+    const closed = tabs.find((t) => t.dataset.tab === "closed");
+    if (closed) closed.hidden = n.closed === 0;
+  }
+  const current = () => (location.hash.startsWith("#tab-") ? location.hash.slice(5) : "all");
+  for (const t of tabs) t.addEventListener("click", () => {
+    show(t.dataset.tab);
+    try { history.replaceState(null, "", "#tab-" + t.dataset.tab); } catch (e) { /* file:// pages */ }
+  });
+  /* a link to one entry (#owner-repo-123) opens it in the All tab */
+  const target = location.hash && !location.hash.startsWith("#tab-") ? document.getElementById(location.hash.slice(1)) : null;
+  if (target && target.tagName === "DETAILS") { target.open = true; show("all"); } else show(current());
+
+  /* Re-read merged, closed and approved pull requests from the GitHub search API on every load,
+     so a refresh shows them without waiting for the next rebuild. Three unauthenticated
+     search requests; on any failure the page keeps the snapshot it was built with. */
   const out = document.getElementById("live");
   const search = (q) =>
     fetch("https://api.github.com/search/issues?per_page=100&q=" + encodeURIComponent(q),
           { headers: { Accept: "application/vnd.github+json" } })
       .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); });
-  try {
-    const base = "author:" + L.owner + " is:pr";
-    const [all, approved, changes] = await Promise.all(
-      [base, base + " review:approved", base + " review:changes_requested"].map(search));
-    const id = (it) => it.repository_url.replace("https://api.github.com/repos/", "") + "#" + it.number;
-    const ok = new Set(approved.items.map(id));
-    const asked = new Set(changes.items.map(id));
-    for (const it of all.items) {
-      let stage = null;
-      if (it.pull_request && it.pull_request.merged_at) stage = "merged";
-      else if (it.state === "closed") stage = "closed";
-      else if (ok.has(id(it)) && !asked.has(id(it))) stage = "approved";
-      if (!stage) continue;
-      for (const el of document.querySelectorAll('[data-pr="' + CSS.escape(id(it)) + '"]')) {
-        el.className = "badge " + stage;
-        el.textContent = L.stages[stage];
+  const base = "author:" + L.owner + " is:pr";
+  Promise.all([base, base + " review:approved", base + " review:changes_requested"].map(search))
+    .then(([all, approved, changes]) => {
+      const id = (it) => it.repository_url.replace("https://api.github.com/repos/", "") + "#" + it.number;
+      const ok = new Set(approved.items.map(id));
+      const asked = new Set(changes.items.map(id));
+      for (const it of all.items) {
+        let stage = null;
+        if (it.pull_request && it.pull_request.merged_at) stage = "merged";
+        else if (it.state === "closed") stage = "closed";
+        else if (ok.has(id(it)) && !asked.has(id(it))) stage = "approved";
+        if (!stage) continue;
+        for (const el of document.querySelectorAll('[data-pr="' + CSS.escape(id(it)) + '"]')) {
+          el.className = "badge " + stage;
+          el.textContent = L.stages[stage];
+          const entry = el.closest(".entry");
+          if (entry) entry.dataset.group = L.groups[stage];
+        }
       }
-    }
-    const rows = document.querySelectorAll("tbody tr td .badge[data-pr]");
-    const done = [...rows].filter((el) => L.done.some((s) => el.classList.contains(s))).length;
-    document.getElementById("s-done").textContent = String(done);
-    const t = new Date().toLocaleString(document.documentElement.lang === "ko" ? "ko-KR" : "en-GB",
-      { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
-    out.textContent = L.live.replace("{t}", t + " KST");
-  } catch (e) {
-    out.textContent = L.snapshot;
-  }
+      count();
+      show(tabs.find((t) => t.getAttribute("aria-selected") === "true")?.dataset.tab || "all");
+      const t = new Date().toLocaleString(document.documentElement.lang === "ko" ? "ko-KR" : "en-GB",
+        { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+      out.textContent = L.live.replace("{t}", t + " KST");
+    })
+    .catch(() => { out.textContent = L.snapshot; });
 })();
 </script>
 </body>

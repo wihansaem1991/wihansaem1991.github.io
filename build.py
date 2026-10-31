@@ -21,15 +21,22 @@ KST = dt.timezone(dt.timedelta(hours=9))
 DONE = ("approved", "merged")
 # order of the challenge table: finished work first, then what waits on maintainers
 STAGE_ORDER = ["merged", "approved", "rereview", "changes", "review", "ci_approval", "closed"]
+# tabs: each stage belongs to one group
+GROUP = {"merged": "done", "approved": "done", "rereview": "review", "changes": "review", "review": "review",
+         "open": "review", "ci_approval": "ci", "closed": "closed"}
+TABS = ["all", "done", "review", "ci", "closed", "cve"]
 
 UI = {
     "en": {
         "html_lang": "en", "title_suffix": "Open-source security contributions & CVE challenge",
         "switch": '<a href="ko/" hreflang="ko">한국어</a>',
-        "glance": "Progress", "challenge": "Pull requests", "cve": "CVE challenge", "details": "Briefings",
-        "cols": ["Project", "Contribution", "Type", "Stage", "Submitted", "Days", "First response", "CI"],
+        "tabs": {"all": "All", "done": "Approved / merged", "review": "In review", "ci": "Awaiting CI approval",
+                 "closed": "Closed", "cve": "CVE challenge"},
+        "summary": "{prs} pull requests · {replied} with a maintainer reply · {cves} CVEs",
+        "hint": "Open an entry to read its briefing.",
         "cve_cols": ["Report", "Submitted", "Channel", "Stage", "CVE", "Details"],
-        "stats": ["pull requests", "maintainer replied", "approved or merged", "vulnerability reports", "CVEs"],
+        "days": "{n} days", "first": "first reply {d}", "no_reply": "no reply yet", "ci": "CI",
+        "empty_tab": "Nothing here right now.",
         "types": {"hardening": "Hardening", "bugfix": "Bug fix", "test": "Test coverage",
                   "vulnerability": "Vulnerability"},
         "stages": {"merged": "Merged", "approved": "Approved", "rereview": "Updated, awaiting re-review",
@@ -54,10 +61,13 @@ UI = {
     "ko": {
         "html_lang": "ko", "title_suffix": "오픈소스 보안 기여 · CVE 도전",
         "switch": '<a href="../" hreflang="en">English</a>',
-        "glance": "진행 현황", "challenge": "PR 도전 현황", "cve": "CVE 도전", "details": "브리핑",
-        "cols": ["프로젝트", "기여", "종류", "단계", "제출", "경과일", "첫 응답", "CI"],
+        "tabs": {"all": "전체", "done": "승인·머지", "review": "리뷰 중", "ci": "CI 허가 대기", "closed": "닫힘",
+                 "cve": "CVE 도전"},
+        "summary": "제출 PR {prs}건 · 메인테이너 응답 {replied}건 · CVE {cves}건",
+        "hint": "항목을 누르면 브리핑이 펼쳐집니다.",
         "cve_cols": ["보고", "제출", "경로", "단계", "CVE", "내용"],
-        "stats": ["제출한 PR", "메인테이너 응답", "승인·머지", "취약점 보고", "CVE"],
+        "days": "{n}일째", "first": "첫 응답 {d}", "no_reply": "응답 아직", "ci": "CI",
+        "empty_tab": "지금은 해당 항목이 없습니다.",
         "types": {"hardening": "보안 강화", "bugfix": "버그 수정", "test": "시험 보강", "vulnerability": "취약점"},
         "stages": {"merged": "머지됨", "approved": "승인", "rereview": "수정 반영, 재리뷰 대기",
                    "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기",
@@ -164,10 +174,15 @@ def cve_cell(cve, cvss=None):
     return cell
 
 
-def card(e, lang, ev):
+def entry(e, lang, ev, today):
+    """One pull request: a summary line that opens into its briefing."""
     t = UI[lang]
     url = f'https://github.com/{e["repo"]}/pull/{e["pr"]}'
-    meta = [f'{html.escape(e["repo"])} #{e["pr"]}', f'{t["submitted"]} {e["submitted"]}']
+    live = (ev.get(key(e)) or {}).get("live") or {}
+    first = live.get("first_response")
+    facts = [f'{t["submitted"]} {e["submitted"]}', t["days"].format(n=days(e, ev, today)),
+             t["first"].format(d=first) if first else t["no_reply"], f'{t["ci"]} {ci_cell(e, ev)}']
+    meta = [f'{html.escape(e["repo"])} #{e["pr"]}', t["types"].get(e["type"], text(e["type"]))]
     if e.get("status") in DONE and e.get("decided"):
         meta.append(f'{t["stages"][e["status"]]} {e["decided"]}')
     if e.get("branches"):
@@ -183,11 +198,17 @@ def card(e, lang, ev):
             quote += f'<br><span class="tr">(번역) {text(e["quote_ko"])}</span>'
         quote += "</blockquote>"
     return f"""
-  <article id="{anchor(e)}">
-    <h3><a href="{url}" target="_blank" rel="noopener">{text(e['project'])} — {text(pick(e['title'], lang))}</a>{badge(e, ev, t)}</h3>
-    <div class="meta">{' · '.join(meta)}</div>
-    <dl>{dl}</dl>{quote}
-  </article>"""
+  <details class="entry" id="{anchor(e)}" data-group="{GROUP.get(stage_of(e, ev), "review")}">
+    <summary>
+      <span class="line1"><b>{text(e['project'])}</b> {badge(e, ev, t)}</span>
+      <span class="line2">{text(pick(e['title'], lang))}</span>
+      <span class="line3">{' · '.join(facts)}</span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="{url}" target="_blank" rel="noopener">{' · '.join(meta)} ↗</a></div>
+      <dl>{dl}</dl>{quote}
+    </div>
+  </details>"""
 
 
 def vuln_row(v, lang):
@@ -207,39 +228,34 @@ def vuln_row(v, lang):
 
 def render(data, lang, tmpl, ev, today):
     t, owner = UI[lang], data["owner"]
-    entries = list(data.get("entries") or [])
-    entries.sort(key=lambda e: (STAGE_ORDER.index(stage_of(e, ev)) if stage_of(e, ev) in STAGE_ORDER else 99,
-                                str(e.get("submitted"))), reverse=False)
+    entries = sorted(data.get("entries") or [],
+                     key=lambda e: (STAGE_ORDER.index(stage_of(e, ev)) if stage_of(e, ev) in STAGE_ORDER else 99,
+                                    str(e.get("submitted"))))
     vulns = list(data.get("vulnerabilities") or [])
-    rows = "".join(
-        f"<tr><td>{text(e['project'])}</td>"
-        f"<td><a href=\"https://github.com/{e['repo']}/pull/{e['pr']}\" target=\"_blank\" rel=\"noopener\">"
-        f"{text(pick(e['title'], lang))} ↗</a> <a class=\"more\" href=\"#{anchor(e)}\">#</a></td>"
-        f"<td>{t['types'].get(e['type'], text(e['type']))}</td><td>{badge(e, ev, t)}</td>"
-        f"<td>{e['submitted']}</td><td>{days(e, ev, today)}</td>"
-        f"<td>{((ev.get(key(e)) or {}).get('live') or {}).get('first_response') or '<span class=\"none\">—</span>'}</td>"
-        f"<td>{ci_cell(e, ev)}</td></tr>" for e in entries)
+    groups = [GROUP.get(stage_of(e, ev), "review") for e in entries]
+    counts = {g: groups.count(g) for g in TABS}
+    counts["all"] = len(entries)
+    counts["cve"] = len(vulns)
+    tabs = "".join(
+        f'<button type="button" role="tab" class="tab" data-tab="{g}"{" hidden" if g == "closed" and not counts[g] else ""}>'
+        f'{t["tabs"][g]} <span class="count" id="c-{g}">{counts[g]}</span></button>'
+        for g in TABS)
     replied = sum(1 for e in entries if ((ev.get(key(e)) or {}).get("live") or {}).get("first_response"))
-    done = sum(1 for e in entries if stage_of(e, ev) in DONE)
     cves = sum(1 for e in entries if e.get("cve")) + sum(1 for v in vulns if v.get("cve"))
-    numbers = [len(entries), replied, done, len(vulns), cves]
-    stat_ids = ["s-prs", "s-replied", "s-done", "s-vulns", "s-cves"]
     labels = {"owner": owner["github"], "stages": t["stages"], "live": t["live"], "loading": t["loading"],
-              "snapshot": t["snapshot"].format(d=today.isoformat()), "done": list(DONE)}
+              "snapshot": t["snapshot"].format(d=today.isoformat()), "groups": GROUP}
     subs = {
         "html_lang": t["html_lang"], "name": html.escape(owner["name"]),
         "title_suffix": t["title_suffix"], "tagline": html.escape(pick(owner["tagline"], lang)),
-        "switch": t["switch"], "glance": t["glance"], "challenge": t["challenge"], "cve": t["cve"],
-        "details": t["details"], "loading": t["loading"],
+        "switch": t["switch"], "loading": t["loading"], "hint": t["hint"], "empty_tab": t["empty_tab"],
+        "summary": html.escape(t["summary"].format(prs=len(entries), replied=replied, cves=cves)),
         "tags": "".join(f"<li>{html.escape(a)}</li>" for a in pick(owner["areas"], lang)),
-        "stats": "".join(f'<div class="stat"><b id="{i}">{n}</b><span>{l}</span></div>'
-                         for i, n, l in zip(stat_ids, numbers, t["stats"])),
-        "head": "".join(f"<th>{c}</th>" for c in t["cols"]),
-        "rows": rows or f'<tr><td colspan="8" class="none">{t["empty"]}</td></tr>',
+        "tabs": tabs,
+        "entries": "".join(entry(e, lang, ev, today) for e in entries)
+        or f'<p class="none">{t["empty"]}</p>',
         "cve_head": "".join(f"<th>{c}</th>" for c in t["cve_cols"]),
         "cve_rows": "".join(vuln_row(v, lang) for v in vulns)
         or f'<tr><td colspan="6" class="none">{t["no_cve"]}</td></tr>',
-        "cards": "".join(card(e, lang, ev) for e in entries),
         "labels": json.dumps(labels, ensure_ascii=False).replace("</", "<\\/"),
         "footer": html.escape(t["footer"].format(d=today.isoformat())),
     }
