@@ -35,6 +35,8 @@
   td a { color:var(--fg); }
   td a:hover { color:var(--accent); }
   .none { color:var(--muted); }
+  .more { color:var(--muted); text-decoration:none; font-size:13px; }
+  .evidence a { white-space:nowrap; }
   .cvss { color:var(--muted); font-size:12px; }
   article { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:16px; }
   article h3 { margin:0 0 4px; font-size:18px; }
@@ -72,16 +74,16 @@
   <div class="table-wrap">
     <table>
       <thead><tr><th>프로젝트</th><th>기여</th><th>종류</th><th>CVE</th><th>상태</th><th>날짜</th></tr></thead>
-      <tbody><tr><td>OpenSSL</td><td><a href="#openssl-openssl-33444"><code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제</a></td><td>보안 강화</td><td><span class="none">—</span></td><td><span class="badge approved">승인</span></td><td>2026-10-30</td></tr></tbody>
+      <tbody><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener"><code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제 ↗</a> <a class="more" href="#openssl-openssl-33444">#</a></td><td>보안 강화</td><td><span class="none">—</span></td><td><span class="badge approved">승인</span></td><td>2026-10-30</td></tr></tbody>
     </table>
   </div>
 
   <h2>상세</h2>
 
   <article id="openssl-openssl-33444">
-    <h3><a href="https://github.com/openssl/openssl/pull/33444">OpenSSL — <code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제</a><span class="badge approved">승인</span></h3>
+    <h3><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">OpenSSL — <code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제</a><span class="badge approved">승인</span></h3>
     <div class="meta">openssl/openssl #33444 · 제출 2026-10-29 · 승인 2026-10-30 · master, 3.6, 4.0, 4.1</div>
-    <dl><dt>결함</dt><dd>파생 키를 <code>EVP_SKEY</code>로 가져온 뒤 임시 버퍼를 <code>OPENSSL_free()</code>로 해제해서, 키 전체가 해제된 힙 메모리에 그대로 남았습니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제되는 블록마다 키 바이트가 남았는지 재는 측정 프로그램으로 찾았습니다. <code>pbkdf1.c:318</code>에서 해제되는 20바이트 블록에 키 전체가 들어 있었습니다.</dd><dt>수정</dt><dd>두 경로 모두 <code>OPENSSL_clear_free()</code>로 바꿨습니다. 기존 시험 <code>test_kdf_pbkdf1_skey</code>가 이제 해제 블록을 감시하고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>리뷰어 두 명이 승인했고, FIPS와 관련된 버그로 분류됐습니다.</dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — 리뷰어<br><span class="tr">(번역) 꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.</span></blockquote>
+    <dl><dt>결함</dt><dd>파생 키를 <code>EVP_SKEY</code>로 가져온 뒤 임시 버퍼를 <code>OPENSSL_free()</code>로 해제해서, 키 전체가 해제된 힙 메모리에 그대로 남았습니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제되는 블록마다 키 바이트가 남았는지 재는 측정 프로그램으로 찾았습니다. <code>pbkdf1.c:318</code>에서 해제되는 20바이트 블록에 키 전체가 들어 있었습니다.</dd><dt>수정</dt><dd>두 경로 모두 <code>OPENSSL_clear_free()</code>로 바꿨습니다. 기존 시험 <code>test_kdf_pbkdf1_skey</code>가 이제 해제 블록을 감시하고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>리뷰어 두 명이 승인했고, FIPS와 관련된 버그로 분류됐습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">PR 원문 #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — 리뷰어<br><span class="tr">(번역) 꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.</span></blockquote>
   </article>
 
   <footer>2026-10-31 갱신. 승인되거나 머지된 기여만 싣고, 항목마다 원본 PR이나 보안 권고로 연결합니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>

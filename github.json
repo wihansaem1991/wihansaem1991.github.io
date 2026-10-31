@@ -1,0 +1,18 @@
+{
+ "openssl/openssl#33444": {
+  "approvals": [
+   {
+    "by": "esyr",
+    "date": "2026-10-30",
+    "url": "https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986"
+   },
+   {
+    "by": "fwh-dc",
+    "date": "2026-10-30",
+    "url": "https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151"
+   }
+  ],
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33444"
+ }
+}

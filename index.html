@@ -35,6 +35,8 @@
   td a { color:var(--fg); }
   td a:hover { color:var(--accent); }
   .none { color:var(--muted); }
+  .more { color:var(--muted); text-decoration:none; font-size:13px; }
+  .evidence a { white-space:nowrap; }
   .cvss { color:var(--muted); font-size:12px; }
   article { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:16px; }
   article h3 { margin:0 0 4px; font-size:18px; }
@@ -72,16 +74,16 @@
   <div class="table-wrap">
     <table>
       <thead><tr><th>Project</th><th>Contribution</th><th>Type</th><th>CVE</th><th>Status</th><th>Date</th></tr></thead>
-      <tbody><tr><td>OpenSSL</td><td><a href="#openssl-openssl-33444">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></a></td><td>Hardening</td><td><span class="none">—</span></td><td><span class="badge approved">Approved</span></td><td>2026-10-30</td></tr></tbody>
+      <tbody><tr><td>OpenSSL</td><td><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code> ↗</a> <a class="more" href="#openssl-openssl-33444">#</a></td><td>Hardening</td><td><span class="none">—</span></td><td><span class="badge approved">Approved</span></td><td>2026-10-30</td></tr></tbody>
     </table>
   </div>
 
   <h2>Details</h2>
 
   <article id="openssl-openssl-33444">
-    <h3><a href="https://github.com/openssl/openssl/pull/33444">OpenSSL — Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></a><span class="badge approved">Approved</span></h3>
+    <h3><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">OpenSSL — Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></a><span class="badge approved">Approved</span></h3>
     <div class="meta">openssl/openssl #33444 · submitted 2026-10-29 · Approved 2026-10-30 · master, 3.6, 4.0, 4.1</div>
-    <dl><dt>Defect</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Found by</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
+    <dl><dt>Defect</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Found by</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Pull request #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
   </article>
 
   <footer>Updated 2026-10-31. Only approved or merged work is listed; each entry links to the original pull request or advisory. Development was assisted by Claude Code, and every change was reproduced, tested and disclosed as AI-assisted in the commit.</footer>
