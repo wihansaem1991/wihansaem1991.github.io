@@ -1,4 +1,40 @@
 {
+ "Mbed-TLS/mbedtls#11036": {
+  "approvals": [],
+  "merge": null,
+  "url": "https://github.com/Mbed-TLS/mbedtls/pull/11036"
+ },
+ "RustCrypto/signatures#1493": {
+  "approvals": [],
+  "merge": null,
+  "url": "https://github.com/RustCrypto/signatures/pull/1493"
+ },
+ "mitmproxy/mitmproxy#8548": {
+  "approvals": [],
+  "merge": null,
+  "url": "https://github.com/mitmproxy/mitmproxy/pull/8548"
+ },
+ "open-quantum-safe/liboqs#2665": {
+  "approvals": [],
+  "merge": null,
+  "url": "https://github.com/open-quantum-safe/liboqs/pull/2665"
+ },
+ "open-quantum-safe/oqs-provider#861": {
+  "approvals": [],
+  "merge": null,
+  "url": "https://github.com/open-quantum-safe/oqs-provider/pull/861"
+ },
+ "openssl-projects/pkcs11-provider#813": {
+  "approvals": [
+   {
+    "by": "simo5",
+    "date": "2026-10-30",
+    "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741"
+   }
+  ],
+  "merge": null,
+  "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813"
+ },
  "openssl/openssl#33444": {
   "approvals": [
    {

@@ -1,8 +1,10 @@
 # Portfolio data. build.py renders only entries whose status is approved or merged,
-# once in English (index.html) and once in Korean (ko/index.html).
-# type: hardening | bugfix | vulnerability   (vulnerability entries carry a CVE id once assigned)
-# Text fields are {en, ko} and accept `code` spans. Reviewer quotes stay in the original language;
-# quote_ko is a marked translation.
+# once in English (index.html) and once in Korean (ko/index.html). Entries for pull requests
+# still under review stay here with status: open and appear once sync.py sees an approval.
+# type: hardening | bugfix | test | vulnerability   (vulnerability entries carry a CVE id once assigned)
+# Each entry is a briefing: defect (the problem), background (the knowledge it took),
+# found_by, fix, review. Text fields are {en, ko} and accept `code` spans.
+# Reviewer quotes stay in the original language; quote_ko is a marked translation.
 
 owner:
   name: Hansaem Wi
@@ -35,6 +37,14 @@ entries:
       ko: >-
         파생 키를 `EVP_SKEY`로 가져온 뒤 임시 버퍼를 `OPENSSL_free()`로 해제해서, 키 전체가 해제된 힙
         메모리에 그대로 남았습니다.
+    background:
+      en: >-
+        Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea's
+        KCMVP validation: a derived key is secret material and has to be cleared before its memory
+        is released. OpenSSL provides `OPENSSL_clear_free()` for exactly this.
+      ko: >-
+        FIPS 140-3와 KCMVP 검증의 바탕인 ISO/IEC 19790은 다 쓴 키를 지우도록(제로화) 요구합니다. 파생 키도
+        비밀값이라 메모리를 돌려주기 전에 지워야 하고, OpenSSL은 이를 위해 `OPENSSL_clear_free()`를 둡니다.
     found_by:
       en: >-
         A measurement program that replaces OpenSSL's allocator and scans every freed block for
@@ -57,3 +67,282 @@ entries:
       of the code [that] pass around key material.
     quote_ko: >-
       꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.
+
+  - project: oqs-provider
+    repo: open-quantum-safe/oqs-provider
+    pr: 861
+    title:
+      en: Clear private key copies before freeing them
+      ko: 개인키 사본을 지운 뒤 해제
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-29
+    decided: null
+    defect:
+      en: >-
+        When post-quantum private keys were encoded to or decoded from PKCS#8 DER, and when they were
+        exported, oqs-provider freed temporary copies of the key without clearing them. ML-KEM, ML-DSA
+        and the other post-quantum private keys stayed in released heap memory.
+      ko: >-
+        양자내성 개인키를 PKCS#8 DER로 인코딩·디코딩하거나 내보낼(export) 때, oqs-provider가 키의 임시 사본을
+        지우지 않고 해제했습니다. ML-KEM·ML-DSA를 비롯한 양자내성 개인키가 해제된 힙 메모리에 남았습니다.
+    background:
+      en: >-
+        How keys travel through an OpenSSL 3 provider, and the zeroisation rule of ISO/IEC 19790
+        (FIPS 140-3, KCMVP). `OSSL_PARAM_free()` clears only secure-heap blocks, which is why OpenSSL's
+        own `ml_kem_export()` cleanses its parameters before freeing them; oqs-provider had no such step.
+      ko: >-
+        OpenSSL 3 provider 안에서 키가 오가는 경로와 ISO/IEC 19790(FIPS 140-3·KCMVP)의 제로화 요건을 알아야
+        보이는 문제였습니다. `OSSL_PARAM_free()`는 보안 힙 블록만 지웁니다. 그래서 OpenSSL의
+        `ml_kem_export()`는 해제 전에 파라미터를 지우는데, oqs-provider에는 이 단계가 없었습니다.
+    found_by:
+      en: >-
+        The freed-block measurement program run over 111 algorithms: 1,377 freed blocks held private
+        keys. The fix removes every one on oqs-provider's own paths (55 signature algorithms × 8
+        paths); the 823 left come from libcrypto. A second run over the key-exchange paths found the
+        export copy for all 56 KEM algorithms.
+      ko: >-
+        해제 블록 측정 프로그램을 알고리즘 111종에 돌렸습니다. 개인키가 든 해제 블록이 1,377개였고, 수정
+        뒤 oqs-provider 자체 경로(서명 55종 × 8개 경로)에서는 0개가 됐습니다. 남은 823개는 libcrypto 몫입니다.
+        키 교환 경로를 다시 재서 KEM 56종 전부에서 내보내기 사본을 찾았습니다.
+    fix:
+      en: >-
+        `ASN1_STRING_clear_free()` and `OPENSSL_clear_free()` in the encoder and decoder, and
+        `OPENSSL_cleanse()` of the exported parameters before `OSSL_PARAM_free()`. A new test,
+        `oqs_privkey_cleanse`, watches freed blocks and fails if any of the changes is reverted.
+      ko: >-
+        인코더·디코더는 `ASN1_STRING_clear_free()`·`OPENSSL_clear_free()`로 바꾸고, 내보낸 파라미터는
+        `OSSL_PARAM_free()` 전에 `OPENSSL_cleanse()`로 지웁니다. 새 시험 `oqs_privkey_cleanse`가 해제 블록을
+        감시하고, 수정을 하나라도 되돌리면 실패합니다.
+
+  - project: pkcs11-provider
+    repo: openssl-projects/pkcs11-provider
+    pr: 813
+    title:
+      en: Return only the ECDH secret into larger buffers
+      ko: 큰 버퍼에도 ECDH 공유 비밀값만 돌려주기
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-30
+    decided: null
+    defect:
+      en: >-
+        With a PKCS#11 token, `EVP_PKEY_derive()` asked the token for as many bytes as the caller's
+        buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret
+        left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two
+        sides of an ECDH exchange no longer agreed.
+      ko: >-
+        PKCS#11 토큰을 쓰면 `EVP_PKEY_derive()`가 공유 비밀값 크기가 아니라 호출자 버퍼 크기만큼 토큰에
+        요청했습니다. NSS softokn은 P-256 비밀값 앞을 0으로 채워 돌려줘서, 64바이트 버퍼에는 0 32개 뒤에
+        비밀값이 들어갔고 ECDH 양쪽 값이 서로 달라졌습니다.
+    background:
+      en: >-
+        PKCS#11 and HSM integration: an ECDH derivation (`CKM_ECDH1_DERIVE` with `CKD_NULL`) takes its
+        output length from `CKA_VALUE_LEN` in the key template, while OpenSSL's `EVP_PKEY_derive()`
+        treats the length as the buffer size and reports how many bytes it wrote.
+      ko: >-
+        PKCS#11·HSM 연동 지식이 필요했습니다. ECDH 파생(`CKM_ECDH1_DERIVE`, `CKD_NULL`)은 출력 길이를 키
+        템플릿의 `CKA_VALUE_LEN`에서 가져오고, OpenSSL `EVP_PKEY_derive()`는 길이를 버퍼 크기로 받아 실제로 쓴
+        바이트 수를 돌려줍니다. 두 규약이 어긋나는 지점이었습니다.
+    found_by:
+      en: >-
+        Differential testing: the same ECDH derivation through OpenSSL's default provider and through
+        pkcs11-provider on an NSS softokn token, with output buffers of several sizes.
+      ko: >-
+        차등 시험으로 찾았습니다. 같은 ECDH 파생을 OpenSSL 기본 provider와 NSS softokn 토큰 위의
+        pkcs11-provider에 여러 크기의 출력 버퍼로 넣어 결과를 비교했습니다.
+    fix:
+      en: >-
+        Cap the requested length at the key size. The new regression test then exposed an older leak:
+        deriving twice on one context overwrote the copy of the peer's public point, which the Address
+        Sanitizer job reported. That leak is fixed in the same pull request.
+      ko: >-
+        요청 길이를 키 크기로 제한했습니다. 새 회귀 시험이 오래된 누수도 드러냈습니다. 한 문맥에서 두 번
+        파생하면 상대 공개점 사본을 덮어써 앞 사본이 새는 문제로, Address Sanitizer 시험이 잡았고 같은 PR에서
+        고쳤습니다.
+    review:
+      en: >-
+        The maintainer approved the change, then asked for the regression test to be restructured and
+        for the Address Sanitizer failure to be fixed; both followed in new commits.
+      ko: >-
+        메인테이너가 승인한 뒤 회귀 시험 구조 정리와 Address Sanitizer 실패 해결을 요청했고, 두 가지 모두 새
+        커밋으로 반영했습니다.
+
+  - project: Mbed TLS
+    repo: Mbed-TLS/mbedtls
+    pr: 11036
+    title:
+      en: Reject repeated X.509 extensions that have no parser
+      ko: 파서가 없는 X.509 확장이 중복돼도 거부
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-30
+    decided: null
+    defect:
+      en: >-
+        Mbed TLS rejected a certificate that repeated an extension it parses, but accepted one that
+        repeated an extension it skips or hands to a callback.
+      ko: >-
+        Mbed TLS는 자기가 해석하는 확장이 인증서에 두 번 나오면 거부했지만, 건너뛰거나 콜백에 넘기는 확장이
+        두 번 나오면 그대로 받아들였습니다.
+    background:
+      en: >-
+        RFC 5280 section 4.2: a certificate must not include more than one instance of a particular
+        extension. Applying that rule needs the DER layout of the extensions sequence, since skipped
+        extensions are never decoded.
+      ko: >-
+        RFC 5280 4.2절은 인증서에 같은 확장을 두 번 넣지 못하게 합니다. 건너뛰는 확장은 해석하지 않으니, 이
+        규칙을 적용하려면 확장 목록의 DER 구조를 직접 다뤄야 했습니다.
+    found_by:
+      en: >-
+        Issue #4069, where a maintainer had proposed the approach. Test certificates were generated for
+        the missing cases; two of them were wrongly accepted before the fix.
+      ko: >-
+        메인테이너가 방향을 제시해 둔 이슈 #4069에서 시작했습니다. 빠진 경우마다 시험용 인증서를 만들었고,
+        수정 전에는 그중 2개가 잘못 통과했습니다.
+    fix:
+      en: >-
+        When an extension is skipped or passed to the callback, compare its OID with the extensions
+        already read and reject a repeat; three new test cases (902/902 in `test_suite_x509parse`).
+      ko: >-
+        건너뛰거나 콜백에 넘기는 확장도 이미 읽은 확장의 OID와 비교해 중복이면 거부합니다. 시험 3건을
+        추가했습니다(`test_suite_x509parse` 902/902).
+
+  - project: mitmproxy
+    repo: mitmproxy/mitmproxy
+    pr: 8548
+    title:
+      en: Apply config file options before addons see `--set confdir`
+      ko: "`--set confdir`에서도 설정 파일 옵션을 먼저 적용"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-31
+    decided: null
+    defect:
+      en: >-
+        With `--set confdir=...`, mitmproxy loaded the CA from that directory before reading
+        `cert_passphrase` from the directory's `config.yaml`. An encrypted CA key then failed to load
+        and mitmproxy exited at startup (issue #6014, open since 2023).
+      ko: >-
+        `--set confdir=...`을 주면 mitmproxy가 그 폴더의 `config.yaml`에서 `cert_passphrase`를 읽기 전에 CA부터
+        불러왔습니다. 그래서 암호가 걸린 CA 키를 읽지 못해 시작하자마자 종료됐습니다(2023년부터 열린 이슈
+        #6014).
+    background:
+      en: >-
+        TLS interception: mitmproxy signs certificates on the fly with its own CA, so the CA private
+        key has to load at startup, and an encrypted PKCS#8 key needs its passphrase first. Its option
+        manager notifies addons on every update, so the order of updates decides what an addon sees.
+      ko: >-
+        TLS 가로채기 구조를 알아야 했습니다. mitmproxy는 자체 CA로 인증서를 즉석에서 서명하므로 시작할 때 CA
+        개인키를 읽어야 하고, 암호화된 PKCS#8 키는 암호가 먼저 있어야 합니다. 옵션 관리자는 갱신할 때마다
+        애드온에 알리므로, 갱신 순서가 애드온이 보는 값을 정합니다.
+    found_by:
+      en: >-
+        Issue #6014 with the maintainer's diagnosis, and a stalled pull request from 2023 that had
+        never been reviewed. Reproduced on Linux with an encrypted CA.
+      ko: >-
+        메인테이너가 원인을 짚어 둔 이슈 #6014와, 2023년 이후 리뷰 없이 멈춘 PR을 보고 골랐습니다. 암호 걸린
+        CA로 리눅스에서 재현했습니다.
+    fix:
+      en: >-
+        Work out the `--set` options and the config file on a copy of the options (a copy has no
+        subscribers) and apply the result in one update; precedence is unchanged. A new test runs
+        mitmdump with an encrypted CA and fails with the old order.
+      ko: >-
+        `--set` 옵션과 설정 파일을 옵션 사본(구독자가 없음)에서 먼저 합친 뒤 결과를 한 번에 적용합니다.
+        우선순위는 그대로입니다. 새 시험은 암호 걸린 CA로 mitmdump를 띄우고, 예전 순서로 되돌리면 실패합니다.
+
+  - project: RustCrypto
+    repo: RustCrypto/signatures
+    pr: 1493
+    title:
+      en: "ml-dsa: check Wycheproof verify vectors that have a context"
+      ko: "ml-dsa: context가 있는 Wycheproof 검증 벡터도 시험"
+    type: test
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-31
+    decided: null
+    defect:
+      en: >-
+        The ML-DSA Wycheproof verification test skipped every case with a context string, so deleting
+        the check that rejects contexts longer than 255 bytes left all tests passing.
+      ko: >-
+        ML-DSA Wycheproof 검증 시험이 context 문자열이 있는 경우를 모두 건너뛰었습니다. 그래서 255바이트보다 긴
+        context를 거부하는 검사를 지워도 시험이 전부 통과했습니다.
+    background:
+      en: >-
+        FIPS 204: ML-DSA signing and verification reject a context string longer than 255 bytes.
+        The C2SP Wycheproof vectors test exactly that with 7-, 255- and 256-byte contexts.
+      ko: >-
+        FIPS 204는 ML-DSA 서명과 검증에서 255바이트보다 긴 context를 거부하도록 정합니다. C2SP Wycheproof
+        벡터는 7·255·256바이트 context로 바로 이 점을 시험합니다.
+    found_by:
+      en: >-
+        Running the Wycheproof ML-DSA vectors against the crate, then mutation testing: removing the
+        length check went unnoticed by every existing test.
+      ko: >-
+        Wycheproof ML-DSA 벡터를 이 크레이트에 돌려 보고 변이 시험을 했습니다. 길이 검사를 지워도 기존 시험이
+        하나도 실패하지 않았습니다.
+    fix:
+      en: >-
+        Run the context cases through `verify_with_context()`. With the length check removed, the
+        ML-DSA-44, -65 and -87 tests now fail.
+      ko: >-
+        context가 있는 경우를 `verify_with_context()`로 돌립니다. 이제 길이 검사를 지우면 ML-DSA-44·65·87
+        시험이 실패합니다.
+
+  - project: liboqs
+    repo: open-quantum-safe/liboqs
+    pr: 2665
+    title:
+      en: Let ML-DSA Wycheproof verify vectors reach the library with wrong lengths
+      ko: 잘못된 길이의 ML-DSA Wycheproof 검증 벡터가 라이브러리까지 가도록
+    type: test
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-10-31
+    decided: null
+    defect:
+      en: >-
+        liboqs's test harness rejected ML-DSA signatures of the wrong length, and contexts longer than
+        255 bytes, before calling the library, and the runner counted that as a pass. The Wycheproof
+        `IncorrectSignatureLength` and `InvalidContext` vectors never reached liboqs: disabling the
+        signature-length check in liboqs's ML-DSA glue code left every test passing.
+      ko: >-
+        liboqs 시험 하네스가 길이가 틀린 ML-DSA 서명과 255바이트를 넘는 context를 라이브러리 호출 전에 걸렀고,
+        실행기는 이를 통과로 셌습니다. 그래서 Wycheproof `IncorrectSignatureLength`·`InvalidContext` 벡터가
+        liboqs에 닿지 않았고, liboqs ML-DSA 연결 코드의 서명 길이 검사를 꺼도 시험이 전부 통과했습니다.
+    background:
+      en: >-
+        FIPS 204 fixes the ML-DSA signature length for each parameter set. liboqs wraps the mldsa-native
+        implementation in its own glue code, and that glue is what has to enforce the length at the
+        public API.
+      ko: >-
+        FIPS 204는 ML-DSA 매개변수 집합마다 서명 길이를 고정합니다. liboqs는 mldsa-native 구현을 자체 연결
+        코드로 감싸므로, 공개 API에서 이 길이를 지키는 책임이 그 연결 코드에 있습니다.
+    found_by:
+      en: >-
+        A sweep of the Wycheproof test harnesses of nine cryptography libraries for vectors that are
+        skipped, followed by mutation testing on liboqs.
+      ko: >-
+        암호 라이브러리 9곳의 Wycheproof 시험 하네스에서 건너뛰는 벡터를 훑은 뒤, liboqs에서 변이 시험으로
+        확인했습니다.
+    fix:
+      en: >-
+        For ML-DSA, reject only malformed hex input, as the neighbouring SLH-DSA branch already does,
+        so the vectors exercise the library's own checks. Disabling the glue check now fails the
+        Wycheproof tests for all three parameter sets.
+      ko: >-
+        ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결
+        코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.

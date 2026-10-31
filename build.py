@@ -23,10 +23,11 @@ UI = {
         "contributions": "Contributions", "details": "Details",
         "cols": ["Project", "Contribution", "Type", "CVE", "Status", "Date"],
         "stats": ["approved or merged", "projects", "CVEs"],
-        "types": {"hardening": "Hardening", "bugfix": "Bug fix", "vulnerability": "Vulnerability"},
+        "types": {"hardening": "Hardening", "bugfix": "Bug fix", "test": "Test coverage",
+                  "vulnerability": "Vulnerability"},
         "status": {"approved": "Approved", "merged": "Merged"},
-        "dt": {"cve": "CVE", "defect": "Defect", "found_by": "Found by", "fix": "Fix", "review": "Review",
-               "evidence": "Evidence"},
+        "dt": {"cve": "CVE", "defect": "Problem", "background": "Background", "found_by": "How it was found",
+               "fix": "Fix", "review": "Review", "evidence": "Evidence"},
         "ev": {"pr": "Pull request", "files": "Changed files", "approved_by": "Approved by", "merge": "Merge commit"},
         "submitted": "submitted", "reviewer": "reviewer", "empty": "Nothing approved yet.",
         "footer": ("Updated {d}. Only approved or merged work is listed; each entry links to the original "
@@ -39,10 +40,10 @@ UI = {
         "contributions": "기여 목록", "details": "상세",
         "cols": ["프로젝트", "기여", "종류", "CVE", "상태", "날짜"],
         "stats": ["승인·머지", "프로젝트", "CVE"],
-        "types": {"hardening": "보안 강화", "bugfix": "버그 수정", "vulnerability": "취약점"},
+        "types": {"hardening": "보안 강화", "bugfix": "버그 수정", "test": "시험 보강", "vulnerability": "취약점"},
         "status": {"approved": "승인", "merged": "머지됨"},
-        "dt": {"cve": "CVE", "defect": "결함", "found_by": "찾은 방법", "fix": "수정", "review": "리뷰",
-               "evidence": "증빙"},
+        "dt": {"cve": "CVE", "defect": "문제", "background": "배경 지식", "found_by": "찾은 방법",
+               "fix": "수정", "review": "리뷰", "evidence": "증빙"},
         "ev": {"pr": "PR 원문", "files": "바뀐 코드", "approved_by": "승인한 리뷰어", "merge": "머지 커밋"},
         "submitted": "제출", "reviewer": "리뷰어", "empty": "아직 승인된 기여가 없습니다.",
         "footer": ("{d} 갱신. 승인되거나 머지된 기여만 싣고, 항목마다 원본 PR이나 보안 권고로 연결합니다. "
@@ -99,7 +100,7 @@ def card(e, lang, ev):
             f'{t["status"][e["status"]]} {e["decided"]}']
     if e.get("branches"):
         meta.append(", ".join(html.escape(str(b)) for b in e["branches"]))
-    keys = (["cve"] if e.get("cve") else []) + ["defect", "found_by", "fix", "review"]
+    keys = (["cve"] if e.get("cve") else []) + ["defect", "background", "found_by", "fix", "review"]
     dl = "".join(f'<dt>{t["dt"][k]}</dt><dd>{cve_cell(e) if k == "cve" else text(pick(e[k], lang))}</dd>'
                  for k in keys if k == "cve" or e.get(k))
     dl += f'<dt>{t["dt"]["evidence"]}</dt><dd class="evidence">{evidence_cell(e, lang, ev)}</dd>'
