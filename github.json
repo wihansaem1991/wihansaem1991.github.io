@@ -190,8 +190,8 @@
    "ci_waiting": 1,
    "draft": true,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-01",
+   "last_response": "2026-11-01",
    "opened": "2026-10-31",
    "stage": "ci_approval"
   },
