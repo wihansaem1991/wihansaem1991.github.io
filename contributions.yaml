@@ -1152,3 +1152,13 @@ vulnerabilities:
     status: triage
     cve: null
     cvss: null
+
+  - label: VR-6
+    public: false
+    submitted: 2026-11-01
+    channel:
+      en: GitHub private vulnerability report
+      ko: GitHub 비공개 취약점 보고
+    status: triage
+    cve: null
+    cvss: null
