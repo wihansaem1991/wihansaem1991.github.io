@@ -886,6 +886,50 @@ entries:
         모듈러 거듭제곱 코드처럼 `mbedtls_mpi_zeroize_and_free()`로 해제합니다. 두 측정값이 모두 0이 됐고,
         `bignum`·`rsa` 시험 묶음도 통과합니다.
 
+  - project: tpm2-tss
+    repo: tpm2-software/tpm2-tss
+    pr: 3198
+    title:
+      en: "mu: Accept a NULL offset in the TPMS_EMPTY marshalling functions"
+      ko: "mu: TPMS_EMPTY 마샬링 함수가 NULL offset을 받게 고침"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        `Tss2_MU_TPMS_EMPTY_Marshal()` and `Tss2_MU_TPMS_EMPTY_Unmarshal()` read `*offset` for a
+        debug log line without checking it. Every other function in the file accepts a NULL offset;
+        these two read through a NULL pointer.
+      ko: >-
+        `Tss2_MU_TPMS_EMPTY_Marshal()`·`Tss2_MU_TPMS_EMPTY_Unmarshal()`가 디버그 로그를 찍으려고 `*offset`을
+        확인 없이 읽었습니다. 같은 파일의 다른 함수는 모두 NULL offset을 받는데, 이 둘은 널 포인터를
+        읽었습니다.
+    background:
+      en: >-
+        tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs
+        `offset ? *offset : 0xffff`. At the default log level `LOG_DEBUG()` is a plain function call,
+        so its arguments are evaluated even when debug logging is off.
+      ko: >-
+        tpm2-tss는 마샬링(MU) 함수를 C 매크로로 찍어 내고, 매크로마다 로그에 `offset ? *offset : 0xffff`를
+        씁니다. 기본 로그 수준에서 `LOG_DEBUG()`는 그냥 함수 호출이라 디버그 로그가 꺼져 있어도 인자를
+        계산합니다.
+    found_by:
+      en: >-
+        Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.
+      ko: >-
+        MU 함수에 NULL offset을 넘겨 UndefinedBehaviorSanitizer로 돌려 찾았습니다.
+    fix:
+      en: >-
+        `TPMS_MARSHAL_0` and `TPMS_UNMARSHAL_0` log `offset ? *offset : 0xffff` like the other
+        macros. A new unit test stops with the UBSan report when the fix is reverted;
+        `TPMS-marshal` passes 12/12.
+      ko: >-
+        `TPMS_MARSHAL_0`·`TPMS_UNMARSHAL_0`도 다른 매크로처럼 `offset ? *offset : 0xffff`를 씁니다. 수정을
+        되돌리면 새 단위 시험이 UBSan 보고로 멈추고, 고친 뒤 `TPMS-marshal` 시험 12개가 모두 통과합니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # A repository whose changes are not GitHub pull requests gives `link` and `status` instead.
@@ -999,6 +1043,15 @@ repos:
     focus:
       en: Certificate and configuration handling
       ko: 인증서·설정 처리
+
+  - project: tpm2-tss
+    repo: tpm2-software/tpm2-tss
+    about:
+      en: TPM 2.0 software stack (TCG TSS 2.0) in C
+      ko: TPM 2.0 소프트웨어 스택(TCG TSS 2.0, C)
+    focus:
+      en: Argument handling in the marshalling (MU) functions
+      ko: 마샬링(MU) 함수의 인자 처리
 
 # Vulnerability reports sent through a project's private channel. While `public: false` the page
 # shows only the label, date, channel and stage; project, title and briefing stay out of this file
