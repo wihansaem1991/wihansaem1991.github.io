@@ -271,5 +271,24 @@
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33470"
+ },
+ "openssl/openssl#33471": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 1,
+    "pending": 0
+   },
+   "ci_waiting": 13,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33471"
  }
 }

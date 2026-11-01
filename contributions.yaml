@@ -209,6 +209,50 @@ entries:
         두 오류 경로 모두 `OPENSSL_clear_free()`로 바꿨습니다. 새 시험 `test_derive_skey_clears_on_failure`는
         X25519 비밀 길이의 두 배를 요청하고 해제 블록을 감시해, 수정을 되돌리면 실패합니다.
 
+  - project: OpenSSL
+    repo: openssl/openssl
+    pr: 33471
+    title:
+      en: Clear the previous DHKEM IKM when it is replaced
+      ko: DHKEM IKM을 바꿀 때 이전 IKM 지우기
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        The DHKEM IKM on an EC or X25519/X448 key generation context fixes the private key that
+        will be generated (RFC 9180 DeriveKeyPair). Setting a new IKM freed the previous copy with
+        `OPENSSL_free()`, so a value that recreates the private key stayed in freed memory.
+      ko: >-
+        EC·X25519/X448 키 생성 문맥에 넣는 DHKEM IKM은 만들어질 개인키를 정하는 씨앗입니다(RFC 9180
+        DeriveKeyPair). IKM을 새로 넣으면 이전 사본을 `OPENSSL_free()`로 해제해서, 개인키를 다시 만들 수
+        있는 값이 해제된 메모리에 남았습니다.
+    background:
+      en: >-
+        HPKE key derivation (RFC 9180) and the zeroisation of keying material that determines a key
+        (ISO/IEC 19790, FIPS 140-3, KCMVP). The generation context's cleanup already cleared the
+        IKM; only the replace path did not.
+      ko: >-
+        HPKE 키 유도(RFC 9180)와, 키를 정하는 재료의 제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을
+        썼습니다. 생성 문맥의 정리 함수는 이미 IKM을 지웠고, 바꿔 넣는 경로만 빠져 있었습니다.
+    found_by:
+      en: >-
+        A static scan for secrets freed without clearing, confirmed with the freed-block measurement
+        program: the old 32-byte IKM was left for X25519, X448 and P-256.
+      ko: >-
+        지우지 않고 해제하는 비밀값 정적 스캔으로 짚고, 해제 블록 측정 프로그램으로 X25519·X448·P-256
+        모두에서 이전 32바이트 IKM이 남는 것을 확인했습니다.
+    fix:
+      en: >-
+        `OPENSSL_clear_free()` in `ecx_gen_set_params()` and in the EC `COPY_OCTET_PARAM()` macro.
+        `test_ikm_cleared_on_reset` sets the IKM twice and fails if either change is reverted.
+      ko: >-
+        `ecx_gen_set_params()`와 EC의 `COPY_OCTET_PARAM()` 매크로를 `OPENSSL_clear_free()`로 바꿨습니다.
+        새 시험 `test_ikm_cleared_on_reset`은 IKM을 두 번 넣고, 두 수정 중 하나라도 되돌리면 실패합니다.
+
   - project: oqs-provider
     repo: open-quantum-safe/oqs-provider
     pr: 861

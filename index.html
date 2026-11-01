@@ -84,10 +84,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">13 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">14 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">15</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">7</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">16</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">8</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -211,6 +211,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">openssl/openssl #33470 · Hardening ↗</a></div>
       <dl><dt>Problem</dt><dd>When the key exchange has no <code>derive_skey</code>, <code>EVP_PKEY_derive_SKEY()</code> derives into a temporary buffer, and its two error paths freed that buffer with <code>OPENSSL_free()</code>. Asking for more bytes than the shared secret has is enough: X25519 and X448 write the real secret, the length check fails, and the shared secret stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation of temporary secrets (ISO/IEC 19790, FIPS 140-3, KCMVP) applied to the new <code>EVP_SKEY</code> key-exchange API. The success path of the same function already used <code>OPENSSL_clear_free()</code>; this is the pattern reviewers accepted in #33444.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing listed the two lines; the freed-block measurement program then confirmed the X25519 and X448 secrets left at <code>exchange.c:553</code>, with nothing left when the requested length matched.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both error paths. <code>test_derive_skey_clears_on_failure</code> asks for twice the X25519 secret length, watches freed blocks and fails if the change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">Pull request #33470 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33470/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33471" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33471">Awaiting CI approval</span></span>
+      <span class="line2">Clear the previous DHKEM IKM when it is replaced</span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="ok">✓1</span> <span class="wait">⏸13</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>The DHKEM IKM on an EC or X25519/X448 key generation context fixes the private key that will be generated (RFC 9180 DeriveKeyPair). Setting a new IKM freed the previous copy with <code>OPENSSL_free()</code>, so a value that recreates the private key stayed in freed memory.</dd><dt>Background</dt><dd>HPKE key derivation (RFC 9180) and the zeroisation of keying material that determines a key (ISO/IEC 19790, FIPS 140-3, KCMVP). The generation context&#x27;s cleanup already cleared the IKM; only the replace path did not.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing, confirmed with the freed-block measurement program: the old 32-byte IKM was left for X25519, X448 and P-256.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> in <code>ecx_gen_set_params()</code> and in the EC <code>COPY_OCTET_PARAM()</code> macro. <code>test_ikm_cleared_on_reset</code> sets the IKM twice and fails if either change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">Pull request #33471 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33471/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="ci">
