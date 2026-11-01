@@ -84,10 +84,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">18 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">19 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">20</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">5</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">11</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">21</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">6</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">11</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -156,6 +156,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · Test coverage ↗</a></div>
       <dl><dt>Problem</dt><dd>The <code>rsa</code> crate&#x27;s Wycheproof tests covered only PKCS#1 v1.5 and PSS signatures. Removing any one of three OAEP padding checks (leading zero byte, non-zero bytes before the 0x01 separator, missing separator) left the whole test suite green.</dd><dt>Background</dt><dd>RSA-OAEP (RFC 8017) decryption must reject malformed padding without revealing which check failed; Wycheproof&#x27;s OAEP files contain exactly those malformed ciphertexts.</dd><dt>How it was found</dt><dd>Mutation testing: each padding check was removed in turn and the existing suite run, then the same change was run against the Wycheproof OAEP vectors.</dd><dt>Fix</dt><dd><code>test_rsa_oaep_decrypt</code> runs 1098 vectors from 22 files; each of the three mutations makes 21 of them fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">Pull request #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-crypto-bigint-1382" data-group="review">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1382">Awaiting review</span></span>
+      <span class="line2">BoxedUint: parse &quot;0&quot; as a one-limb zero</span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="ok">✓6</span> <span class="wait">…26</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1382 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>Parsing the string <code>&quot;0&quot;</code> produced a big integer with no limbs at all. It printed as an empty string and panicked in <code>bits_vartime()</code>.</dd><dt>Background</dt><dd>Arbitrary-precision integer representation in a constant-time cryptography library: every value, including zero, is expected to have at least one limb.</dd><dt>How it was found</dt><dd>Differential fuzzing of the big-integer API against <code>num-bigint</code>.</dd><dt>Fix</dt><dd>Return the canonical one-limb zero when no digits remain; a new test covers several spellings of zero in four radixes and panics without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">Pull request #1382 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1382/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-TF-PSA-Crypto-960" data-group="review">
