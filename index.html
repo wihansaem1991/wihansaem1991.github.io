@@ -95,7 +95,7 @@
   <div class="summary">24 pull requests and 6 vulnerability reports · 5 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">30</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">8</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">13</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">1</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">30</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">9</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -109,17 +109,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">RustCrypto/signatures #1493 · Test coverage · Merged 2026-10-31 ↗</a></div>
       <dl><dt>Problem</dt><dd>The ML-DSA Wycheproof verification test skipped every case with a context string, so deleting the check that rejects contexts longer than 255 bytes left all tests passing.</dd><dt>Background</dt><dd>FIPS 204: ML-DSA signing and verification reject a context string longer than 255 bytes. The C2SP Wycheproof vectors test exactly that with 7-, 255- and 256-byte contexts.</dd><dt>How it was found</dt><dd>Running the Wycheproof ML-DSA vectors against the crate, then mutation testing: removing the length check went unnoticed by every existing test.</dd><dt>Fix</dt><dd>Run the context cases through <code>verify_with_context()</code>. With the length check removed, the ML-DSA-44, -65 and -87 tests now fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">Pull request #1493 ↗</a> · <a href="https://github.com/RustCrypto/signatures/pull/1493/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/RustCrypto/signatures/pull/1493#pullrequestreview-5725286433" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/signatures/commit/ebee8f9a79e8c7cd22254059791acd5121596fa4" target="_blank" rel="noopener">Merge commit ebee8f9a79 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-openssl-33444" data-group="done">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge approved" data-pr="openssl/openssl#33444">Approved</span></span>
-      <span class="line2">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></span>
-      <span class="line3">submitted 2026-10-29 · 1 days · first reply 2026-10-30 · CI <span class="ok">✓106</span> <span class="bad">✗1</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">openssl/openssl #33444 · Hardening · Approved 2026-10-30 · master, 3.6, 4.0, 4.1 ↗</a></div>
-      <dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Pull request #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
     </div>
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-813" data-group="review">
@@ -186,6 +175,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">Mbed-TLS/TF-PSA-Crypto #960 · Hardening ↗</a></div>
       <dl><dt>Problem</dt><dd>The modular inverse routine freed its work buffer without clearing it. After <code>mbedtls_mpi_inv_mod()</code> the inverse stayed in freed heap memory, and after 2048-bit RSA key generation the private CRT coefficient QP did.</dd><dt>Background</dt><dd>Cryptographic module validation: critical security parameters must be zeroized when no longer needed (ISO/IEC 19790 and its Korean counterpart used in KCMVP), and RSA-CRT private keys include QP = q^-1 mod p.</dd><dt>How it was found</dt><dd>Measurement on aarch64 Linux: <code>free()</code> was intercepted and every freed block searched for the known values, with a control build that disables zeroization to prove the harness finds them.</dd><dt>Fix</dt><dd>Release the buffer with <code>mbedtls_mpi_zeroize_and_free()</code>, as the modular exponentiation code already does. Both measurements drop to 0; the <code>bignum</code> and <code>rsa</code> test suites pass.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">Pull request #960 ↗</a> · <a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="tpm2-software-tpm2-tss-3198" data-group="review">
+    <summary>
+      <span class="line1"><b>tpm2-tss</b> <span class="badge review" data-pr="tpm2-software/tpm2-tss#3198">Awaiting review</span></span>
+      <span class="line2">mu: Accept a NULL offset in the TPMS_EMPTY marshalling functions</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="ok">✓31</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">tpm2-software/tpm2-tss #3198 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">Pull request #3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="RustCrypto-crypto-bigint-1383" data-group="review">
@@ -331,17 +331,6 @@
       <dl><dt>Problem</dt><dd>Raw RSA signing (<code>RSA_NO_PADDING</code>) on a token key failed whenever the output buffer was larger than the modulus, although the input was correct; the default provider signs the same input into the same buffer and returns the modulus size.</dd><dt>Background</dt><dd>RSA and OpenSSL provider API: <code>EVP_PKEY_sign()</code> takes the buffer size in <code>*siglen</code>, and raw RSA requires the input to be exactly as long as the modulus (<code>CKM_RSA_X_509</code> in PKCS#11).</dd><dt>How it was found</dt><dd>The same buffer-size sweep, comparing pkcs11-provider with OpenSSL&#x27;s default provider: buffers of 257, 512 and 8448 bytes failed on the token and succeeded on the default provider.</dd><dt>Fix</dt><dd>Compare the input length with the key&#x27;s modulus size instead of the caller&#x27;s buffer size. The new <code>rsaraw</code> test checks both providers, recovers the data from the token signature, and still refuses input shorter than the modulus.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">Pull request #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="tpm2-software-tpm2-tss-3198" data-group="ci">
-    <summary>
-      <span class="line1"><b>tpm2-tss</b> <span class="badge ci_approval" data-pr="tpm2-software/tpm2-tss#3198">Awaiting CI approval</span></span>
-      <span class="line2">mu: Accept a NULL offset in the TPMS_EMPTY marshalling functions</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="ok">✓2</span> <span class="wait">⏸7</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">tpm2-software/tpm2-tss #3198 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">Pull request #3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="OpenSC-OpenSC-3917" data-group="ci">
     <summary>
       <span class="line1"><b>OpenSC</b> <span class="badge ci_approval" data-pr="OpenSC/OpenSC#3917">Awaiting CI approval</span></span>
@@ -351,6 +340,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · Bug fix ↗</a></div>
       <dl><dt>Problem</dt><dd>OpenSC&#x27;s PKCS#11 module could verify signatures with a public key but not encrypt with one: <code>C_EncryptInit()</code> on an RSA public key failed with <code>CKR_KEY_TYPE_INCONSISTENT</code> (#3144). The p11test suite also never called <code>C_Encrypt()</code>, because its group setup dropped the flag that enables it.</dd><dt>Background</dt><dd>PKCS#11 object operations and mechanism flags (<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5 and raw RSA encryption, and OpenSC&#x27;s existing software path for <code>C_Verify()</code> through OpenSSL.</dd><dt>How it was found</dt><dd>A maintainer-labelled good first issue. A virtual SmartCard-HSM (pico-hsm emulation behind vsmartcard and a user-mode pcscd) reproduced it, and pkcs11-spy showed p11test never reaching <code>C_Encrypt()</code>.</dd><dt>Fix</dt><dd>Public key objects encrypt with <code>CKM_RSA_PKCS</code> and <code>CKM_RSA_X_509</code> through OpenSSL, and p11test now keeps the flag. Card round trips work for both mechanisms; the CI p11test run matches the updated reference with no differences.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">Pull request #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33444" data-group="closed">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge closed" data-pr="openssl/openssl#33444">Closed</span></span>
+      <span class="line2">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></span>
+      <span class="line3">submitted 2026-10-29 · 3 days · first reply 2026-10-30 · CI <span class="ok">✓106</span> <span class="bad">✗1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">openssl/openssl #33444 · Hardening · Approved 2026-10-30 · master, 3.6, 4.0, 4.1 ↗</a></div>
+      <dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Pull request #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
     </div>
   </details>
   <details class="entry" id="randombit-botan-6082" data-group="closed">
@@ -422,7 +422,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">The most widely deployed TLS and cryptography library, in C</div>
       <div class="focus">Looking at: Secrets left in freed memory, measured by hooking the allocator</div>
-      <div class="prs"><span>5 pull requests</span> <span class="badge approved">Approved 1</span> <span class="badge ci_approval">Awaiting CI approval 4</span></div>
+      <div class="prs"><span>5 pull requests</span> <span class="badge ci_approval">Awaiting CI approval 4</span> <span class="badge closed">Closed 1</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -500,7 +500,7 @@
       <div class="name"><b>tpm2-tss</b> <a href="https://github.com/tpm2-software/tpm2-tss" target="_blank" rel="noopener">tpm2-software/tpm2-tss ↗</a></div>
       <div class="about">TPM 2.0 software stack (TCG TSS 2.0) in C</div>
       <div class="focus">Looking at: Argument handling in the marshalling (MU) functions</div>
-      <div class="prs"><span>1 pull requests</span> <span class="badge ci_approval">Awaiting CI approval 1</span></div>
+      <div class="prs"><span>1 pull requests</span> <span class="badge review">Awaiting review 1</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-formats">
       <div class="name"><b>RustCrypto formats</b> <a href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener">RustCrypto/formats ↗</a></div>

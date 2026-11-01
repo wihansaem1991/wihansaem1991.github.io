@@ -339,11 +339,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-01",
    "first_response": "2026-10-30",
-   "last_response": "2026-10-30",
+   "last_response": "2026-11-01",
    "opened": "2026-10-29",
-   "stage": "approved"
+   "stage": "closed"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33444"
@@ -467,16 +467,16 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 2,
+    "pass": 31,
     "pending": 0
    },
-   "ci_waiting": 7,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": null,
    "last_response": null,
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "review"
   },
   "merge": null,
   "url": "https://github.com/tpm2-software/tpm2-tss/pull/3198"
