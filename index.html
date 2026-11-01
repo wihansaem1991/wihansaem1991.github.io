@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">20 pull requests and 5 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">21 pull requests and 5 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">25</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">6</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">5</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">13</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">26</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">7</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">5</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">14</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -320,6 +320,17 @@
       <dl><dt>Problem</dt><dd>Raw RSA signing (<code>RSA_NO_PADDING</code>) on a token key failed whenever the output buffer was larger than the modulus, although the input was correct; the default provider signs the same input into the same buffer and returns the modulus size.</dd><dt>Background</dt><dd>RSA and OpenSSL provider API: <code>EVP_PKEY_sign()</code> takes the buffer size in <code>*siglen</code>, and raw RSA requires the input to be exactly as long as the modulus (<code>CKM_RSA_X_509</code> in PKCS#11).</dd><dt>How it was found</dt><dd>The same buffer-size sweep, comparing pkcs11-provider with OpenSSL&#x27;s default provider: buffers of 257, 512 and 8448 bytes failed on the token and succeeded on the default provider.</dd><dt>Fix</dt><dd>Compare the input length with the key&#x27;s modulus size instead of the caller&#x27;s buffer size. The new <code>rsaraw</code> test checks both providers, recovers the data from the token signature, and still refuses input shorter than the modulus.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">Pull request #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="tpm2-software-tpm2-tss-3198" data-group="review">
+    <summary>
+      <span class="line1"><b>tpm2-tss</b> <span class="badge open" data-pr="tpm2-software/tpm2-tss#3198">Open</span></span>
+      <span class="line2">mu: Accept a NULL offset in the TPMS_EMPTY marshalling functions</span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">tpm2-software/tpm2-tss #3198 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">Pull request #3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="VR-1" data-group="cve">
     <summary>
       <span class="line1"><b>Vulnerability report VR-1</b> <span class="badge vuln">Vulnerability</span> <span class="badge v-triage">Under triage</span></span>
@@ -443,6 +454,12 @@
       <div class="about">Interactive HTTPS proxy, in Python</div>
       <div class="focus">Looking at: Certificate and configuration handling</div>
       <div class="prs"><span>1 pull requests</span> <span class="badge review">Awaiting review 1</span></div>
+    </article>
+    <article class="repo" id="repo-tpm2-software-tpm2-tss">
+      <div class="name"><b>tpm2-tss</b> <a href="https://github.com/tpm2-software/tpm2-tss" target="_blank" rel="noopener">tpm2-software/tpm2-tss ↗</a></div>
+      <div class="about">TPM 2.0 software stack (TCG TSS 2.0) in C</div>
+      <div class="focus">Looking at: Argument handling in the marshalling (MU) functions</div>
+      <div class="prs"><span>1 pull requests</span> <span class="badge open">Open 1</span></div>
     </article></div>
   </section>
 
