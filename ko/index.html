@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 21건 · 취약점 보고 5건 · 메인테이너 응답 3건 · CVE 0건</div>
+  <div class="summary">제출 PR 22건 · 취약점 보고 5건 · 메인테이너 응답 3건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">26</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">7</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">5</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">14</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">27</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">7</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">13</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">5</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">14</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -186,6 +186,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">Mbed-TLS/TF-PSA-Crypto #960 · 보안 강화 ↗</a></div>
       <dl><dt>문제</dt><dd>모듈러 역원 함수가 작업 버퍼를 지우지 않고 해제했습니다. <code>mbedtls_mpi_inv_mod()</code> 뒤에는 역원이, 2048비트 RSA 키 생성 뒤에는 개인키의 CRT 계수 QP가 해제된 힙 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>암호모듈 검증 지식을 썼습니다. 핵심 보안 매개변수는 더 쓰지 않으면 소거해야 하고(ISO/IEC 19790, KCMVP가 쓰는 국내 규격), RSA-CRT 개인키에는 QP = q^-1 mod p가 들어 있습니다.</dd><dt>찾은 방법</dt><dd>aarch64 리눅스에서 측정으로 찾았습니다. <code>free()</code>를 가로채 해제되는 블록마다 알려진 값을 찾았고, 소거를 끈 대조 빌드로 측정이 실제로 잡는지 먼저 확인했습니다.</dd><dt>수정</dt><dd>모듈러 거듭제곱 코드처럼 <code>mbedtls_mpi_zeroize_and_free()</code>로 해제합니다. 두 측정값이 모두 0이 됐고, <code>bignum</code>·<code>rsa</code> 시험 묶음도 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">PR 원문 #960 ↗</a> · <a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-crypto-bigint-1383" data-group="review">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1383">리뷰 대기</span></span>
+      <span class="line2">BoxedUint: from_*e_slice가 정밀도 위 비트를 버린다고 문서 고침</span>
+      <span class="line3">제출 2026-11-01 · 0일째 · 응답 아직 · CI <span class="ok">✓3</span> <span class="wait">…29</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1383 · 문서 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>BoxedUint::from_be_slice</code>·<code>from_le_slice</code> 문서는 값이 <code>bits_precision</code>보다 넓으면 <code>DecodeError::Precision</code>을 돌려준다고 적었습니다. #1266 뒤로 두 함수는 그 비트를 지우고 <code>Ok</code>를 돌려주고, 그 PR이 시험도 그렇게 바꿨습니다.</dd><dt>배경 지식</dt><dd>고정 정밀도 정수 타입은 정밀도보다 넓은 입력을 거부할지, RFC 6979 <code>bits2int</code>처럼 잘라 받을지 밝혀야 합니다. 비밀값을 읽는 호출자가 그 약속에 기댑니다.</dd><dt>찾은 방법</dt><dd>문서에 적힌 오류마다 실제 코드 경로와 맞춰 보고, <code>git log -S</code>로 어긋난 시점을 #1266까지 거슬러 찾았습니다.</dd><dt>수정</dt><dd>잘라 받는 동작을 적고 오류는 <code>DecodeError::InputSize</code>만 남겼습니다. 메인테이너가 옛 오류를 되살리기를 원하면 그쪽으로 바꾸겠다고 PR에 적었습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">PR 원문 #1383 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1383/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33426" data-group="ci">
@@ -320,11 +331,11 @@
       <dl><dt>문제</dt><dd>토큰 키로 RSA 무패딩(<code>RSA_NO_PADDING</code>) 서명을 하면, 입력이 맞아도 출력 버퍼가 모듈러스보다 크기만 하면 실패했습니다. 기본 provider는 같은 입력·같은 버퍼로 서명하고 모듈러스 크기를 돌려줍니다.</dd><dt>배경 지식</dt><dd>RSA와 OpenSSL provider API 지식이 필요했습니다. <code>EVP_PKEY_sign()</code>은 <code>*siglen</code>으로 버퍼 크기를 받고, 무패딩 RSA(PKCS#11의 <code>CKM_RSA_X_509</code>)는 입력이 모듈러스와 정확히 같은 길이여야 합니다.</dd><dt>찾은 방법</dt><dd>같은 버퍼 크기 측정에서 pkcs11-provider와 OpenSSL 기본 provider를 비교해 찾았습니다. 257·512·8448바이트 버퍼가 토큰에서는 실패하고 기본 provider에서는 성공했습니다.</dd><dt>수정</dt><dd>입력 길이를 호출자 버퍼 크기가 아니라 키의 모듈러스 크기와 비교합니다. 새 <code>rsaraw</code> 시험은 두 provider를 모두 확인하고, 토큰 서명에서 원래 데이터를 되살려 보며, 모듈러스보다 짧은 입력은 여전히 거부하는지 봅니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">PR 원문 #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="tpm2-software-tpm2-tss-3198" data-group="review">
+  <details class="entry" id="tpm2-software-tpm2-tss-3198" data-group="ci">
     <summary>
-      <span class="line1"><b>tpm2-tss</b> <span class="badge open" data-pr="tpm2-software/tpm2-tss#3198">열림</span></span>
+      <span class="line1"><b>tpm2-tss</b> <span class="badge ci_approval" data-pr="tpm2-software/tpm2-tss#3198">CI 실행 허가 대기</span></span>
       <span class="line2">mu: TPMS_EMPTY 마샬링 함수가 NULL offset을 받게 고침</span>
-      <span class="line3">제출 2026-11-01 · 0일째 · 응답 아직 · CI <span class="none">—</span></span>
+      <span class="line3">제출 2026-11-01 · 0일째 · 응답 아직 · CI <span class="ok">✓1</span> <span class="wait">…1</span> <span class="wait">⏸7</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">tpm2-software/tpm2-tss #3198 · 버그 수정 ↗</a></div>
@@ -411,7 +422,7 @@
       <div class="name"><b>crypto-bigint</b> <a href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener">RustCrypto/crypto-bigint ↗</a></div>
       <div class="about">상수 시간 큰 정수 연산 Rust 라이브러리</div>
       <div class="focus">보는 것: 문자열·바이트 변환 경계값</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+      <div class="prs"><span>PR 2건</span> <span class="badge review">리뷰 대기 2</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-RSA">
       <div class="name"><b>RustCrypto RSA</b> <a href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener">RustCrypto/RSA ↗</a></div>
@@ -459,7 +470,7 @@
       <div class="name"><b>tpm2-tss</b> <a href="https://github.com/tpm2-software/tpm2-tss" target="_blank" rel="noopener">tpm2-software/tpm2-tss ↗</a></div>
       <div class="about">TPM 2.0 소프트웨어 스택(TCG TSS 2.0, C)</div>
       <div class="focus">보는 것: 마샬링(MU) 함수의 인자 처리</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge open">열림 1</span></div>
+      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
     </article></div>
   </section>
 

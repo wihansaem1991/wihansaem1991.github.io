@@ -75,6 +75,25 @@
   "merge": null,
   "url": "https://github.com/RustCrypto/crypto-bigint/pull/1382"
  },
+ "RustCrypto/crypto-bigint#1383": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 3,
+    "pending": 29
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/RustCrypto/crypto-bigint/pull/1383"
+ },
  "RustCrypto/signatures#1493": {
   "approvals": [
    {
@@ -404,5 +423,24 @@
   },
   "merge": null,
   "url": "https://github.com/schwabe/ics-openvpn/pull/1938"
+ },
+ "tpm2-software/tpm2-tss#3198": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 1,
+    "pending": 1
+   },
+   "ci_waiting": 7,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/tpm2-software/tpm2-tss/pull/3198"
  }
 }
