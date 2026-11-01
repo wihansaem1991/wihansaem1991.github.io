@@ -80,8 +80,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 3,
-    "pending": 29
+    "pass": 33,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
@@ -93,6 +93,25 @@
   },
   "merge": null,
   "url": "https://github.com/RustCrypto/crypto-bigint/pull/1383"
+ },
+ "RustCrypto/formats#2501": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 20,
+    "pending": 90
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/RustCrypto/formats/pull/2501"
  },
  "RustCrypto/signatures#1493": {
   "approvals": [
@@ -353,16 +372,16 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 1,
     "pending": 0
    },
-   "ci_waiting": 2,
+   "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-01",
+   "first_response": "2026-11-01",
+   "last_response": "2026-11-01",
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "closed"
   },
   "merge": null,
   "url": "https://github.com/randombit/botan/pull/6082"
@@ -429,8 +448,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 1,
-    "pending": 1
+    "pass": 2,
+    "pending": 0
    },
    "ci_waiting": 7,
    "draft": false,
