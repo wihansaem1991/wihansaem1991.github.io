@@ -38,7 +38,13 @@
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11036"
  },
  "RustCrypto/signatures#1493": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "tarcieri",
+    "date": "2026-10-31",
+    "url": "https://github.com/RustCrypto/signatures/pull/1493#pullrequestreview-5725286433"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -47,13 +53,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-10-31",
+   "first_response": "2026-10-31",
+   "last_response": "2026-10-31",
    "opened": "2026-10-31",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "ebee8f9a79e8c7cd22254059791acd5121596fa4",
+   "url": "https://github.com/RustCrypto/signatures/commit/ebee8f9a79e8c7cd22254059791acd5121596fa4"
+  },
   "url": "https://github.com/RustCrypto/signatures/pull/1493"
  },
  "mitmproxy/mitmproxy#8548": {
@@ -243,5 +252,24 @@
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33444"
+ },
+ "openssl/openssl#33470": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 1,
+    "pending": 0
+   },
+   "ci_waiting": 13,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33470"
  }
 }
