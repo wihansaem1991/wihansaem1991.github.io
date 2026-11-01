@@ -486,6 +486,48 @@ entries:
         context가 있는 경우를 `verify_with_context()`로 돌립니다. 이제 길이 검사를 지우면 ML-DSA-44·65·87
         시험이 실패합니다.
 
+  - project: RustCrypto
+    repo: RustCrypto/RSA
+    pr: 740
+    title:
+      en: "wycheproof: test OAEP decryption"
+      ko: "wycheproof: OAEP 복호화 벡터 시험 추가"
+    type: test
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        The `rsa` crate's Wycheproof tests covered only PKCS#1 v1.5 and PSS signatures. Removing
+        any one of three OAEP padding checks (leading zero byte, non-zero bytes before the 0x01
+        separator, missing separator) left the whole test suite green.
+      ko: >-
+        `rsa` 크레이트의 Wycheproof 시험은 PKCS#1 v1.5·PSS 서명만 돌렸습니다. OAEP 패딩 검사 세 가지(첫
+        바이트 0, 구분자 0x01 앞의 0 아닌 바이트, 구분자 없음) 중 하나를 빼도 시험이 모두 통과했습니다.
+    background:
+      en: >-
+        RSA-OAEP (RFC 8017) decryption must reject malformed padding without revealing which check
+        failed; Wycheproof's OAEP files contain exactly those malformed ciphertexts.
+      ko: >-
+        RSA-OAEP(RFC 8017) 복호화는 잘못된 패딩을 어느 검사에서 걸렸는지 드러내지 않고 거부해야 합니다.
+        Wycheproof OAEP 파일에 바로 그런 잘못된 암호문이 들어 있습니다.
+    found_by:
+      en: >-
+        Mutation testing: each padding check was removed in turn and the existing suite run, then
+        the same change was run against the Wycheproof OAEP vectors.
+      ko: >-
+        변이 시험으로 찾았습니다. 패딩 검사를 하나씩 빼고 기존 시험을 돌린 뒤, 같은 변경을 Wycheproof OAEP
+        벡터로 다시 돌렸습니다.
+    fix:
+      en: >-
+        `test_rsa_oaep_decrypt` runs 1098 vectors from 22 files; each of the three mutations makes 21
+        of them fail.
+      ko: >-
+        새 시험 `test_rsa_oaep_decrypt`가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개
+        파일에서 실패합니다.
+
   - project: liboqs
     repo: open-quantum-safe/liboqs
     pr: 2665
