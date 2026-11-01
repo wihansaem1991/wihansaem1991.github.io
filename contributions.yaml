@@ -627,6 +627,44 @@ entries:
       ko: >-
         0에서 멈추지 않고 여덟 그룹을 모두 돌게 했습니다. 불일치가 1,524건에서 0건이 됐고 기존 시험의 문자열은 그대로입니다.
 
+  - project: RustCrypto
+    repo: RustCrypto/crypto-bigint
+    pr: 1382
+    title:
+      en: "BoxedUint: parse \"0\" as a one-limb zero"
+      ko: "BoxedUint: \"0\"을 limb 1개짜리 0으로 읽기"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        Parsing the string `"0"` produced a big integer with no limbs at all. It printed as an empty
+        string and panicked in `bits_vartime()`.
+      ko: >-
+        문자열 `"0"`을 읽으면 limb가 하나도 없는 큰 정수가 만들어졌습니다. 출력하면 빈 문자열이 나오고
+        `bits_vartime()`에서 패닉했습니다.
+    background:
+      en: >-
+        Arbitrary-precision integer representation in a constant-time cryptography library: every
+        value, including zero, is expected to have at least one limb.
+      ko: >-
+        상수 시간 암호 라이브러리의 다정밀 정수 표현에서는 0을 포함한 모든 값이 limb를 최소 하나 가져야 합니다.
+    found_by:
+      en: >-
+        Differential fuzzing of the big-integer API against `num-bigint`.
+      ko: >-
+        큰 정수 API를 `num-bigint`와 비교하는 차등 퍼징으로 찾았습니다.
+    fix:
+      en: >-
+        Return the canonical one-limb zero when no digits remain; a new test covers several spellings
+        of zero in four radixes and panics without the fix.
+      ko: >-
+        숫자가 남지 않으면 limb 1개짜리 표준 0을 돌려주게 했습니다. 새 시험은 네 가지 진법에서 0의 여러
+        표기를 확인하고, 수정을 빼면 패닉합니다.
+
   - project: liboqs
     repo: open-quantum-safe/liboqs
     pr: 2665

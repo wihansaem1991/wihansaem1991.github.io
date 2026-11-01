@@ -56,6 +56,25 @@
   "merge": null,
   "url": "https://github.com/RustCrypto/RSA/pull/740"
  },
+ "RustCrypto/crypto-bigint#1382": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 6,
+    "pending": 26
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/RustCrypto/crypto-bigint/pull/1382"
+ },
  "RustCrypto/signatures#1493": {
   "approvals": [
    {
