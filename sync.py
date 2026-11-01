@@ -28,7 +28,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "contributions.yaml")
 EVIDENCE = os.path.join(HERE, "github.json")
 PRIVATE = os.path.join(HERE, ".private", "advisories.json")
-BOT = re.compile(r"bot\b|\[bot\]|^app/", re.I)
+# `gh pr view` drops the "[bot]" suffix from GitHub App logins, so name the common service bots
+BOT = re.compile(r"bot\b|\[bot\]|^app/|^(codecov|coveralls|github-actions|netlify|vercel|sonarcloud|mergify|renovate|dependabot|gitguardian|cla-assistant|claassistant)$", re.I)
 # GitHub advisory states -> stages shown on the page
 ADVISORY_STAGE = {"triage": "triage", "draft": "accepted", "published": "published", "closed": "closed"}
 

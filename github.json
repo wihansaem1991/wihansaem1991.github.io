@@ -61,8 +61,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 6,
-    "pending": 26
+    "pass": 33,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
