@@ -665,6 +665,48 @@ entries:
         숫자가 남지 않으면 limb 1개짜리 표준 0을 돌려주게 했습니다. 새 시험은 네 가지 진법에서 0의 여러
         표기를 확인하고, 수정을 빼면 패닉합니다.
 
+  - project: Botan
+    repo: randombit/botan
+    pr: 6082
+    title:
+      en: Reject Classic McEliece private keys of the wrong length with Invalid_Argument
+      ko: 길이가 틀린 Classic McEliece 비밀키를 Invalid_Argument로 거부
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        A Classic McEliece private key of the wrong length, given directly or inside PKCS#8, hit an
+        internal assertion and raised `Internal_Error`, while the public key path rejected the same
+        mistake as an invalid argument.
+      ko: >-
+        길이가 틀린 Classic McEliece 비밀키를 직접 넘기거나 PKCS#8 안에 넣으면 내부 단언에 걸려
+        `Internal_Error`가 났습니다. 공개키 쪽은 같은 실수를 잘못된 인자로 거부했습니다.
+    background:
+      en: >-
+        Classic McEliece (NIST PQC round 4 KEM) key encodings have fixed sizes per parameter set; a
+        library should report malformed keys as input errors, not as internal failures callers
+        do not expect to catch.
+      ko: >-
+        Classic McEliece(NIST PQC 4라운드 KEM)의 키 인코딩은 매개변수마다 크기가 정해져 있습니다. 라이브러리는
+        잘못된 키를 입력 오류로 알려야 하고, 호출자가 잡을 생각을 하지 않는 내부 오류로 내면 안 됩니다.
+    found_by:
+      en: >-
+        Length and mutation sweeps over Botan's PQC key decoders (16 million inputs, no memory errors)
+        flagged this as the one inconsistent rejection.
+      ko: >-
+        Botan 양자내성 키 디코더에 길이·변형 입력 1,600만 건을 넣은 측정(메모리 오류 0건)에서 유일하게
+        거부 방식이 어긋난 곳으로 나왔습니다.
+    fix:
+      en: >-
+        Check the length in the private key constructor exactly like the public key constructor; a
+        new test fails without the check.
+      ko: >-
+        비밀키 생성자에서도 공개키 생성자와 똑같이 길이를 검사합니다. 새 시험은 검사를 빼면 실패합니다.
+
   - project: liboqs
     repo: open-quantum-safe/liboqs
     pr: 2665

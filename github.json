@@ -329,6 +329,25 @@
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33471"
  },
+ "randombit/botan#6082": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 2,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/randombit/botan/pull/6082"
+ },
  "schwabe/ics-openvpn#1936": {
   "approvals": [],
   "live": {
