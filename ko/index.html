@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 23건 · 취약점 보고 6건 · 메인테이너 응답 4건 · CVE 0건</div>
+  <div class="summary">제출 PR 24건 · 취약점 보고 6건 · 메인테이너 응답 4건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">29</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">8</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">1</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">15</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">30</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">8</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">13</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">1</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -203,7 +203,7 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/formats#2501">리뷰 대기</span></span>
       <span class="line2">der: 잘못된 이진 REAL 값을 패닉 대신 오류로 거부</span>
-      <span class="line3">제출 2026-11-01 · 0일째 · 응답 아직 · CI <span class="ok">✓20</span> <span class="wait">…90</span></span>
+      <span class="line3">제출 2026-11-01 · 0일째 · 응답 아직 · CI <span class="ok">✓110</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">RustCrypto/formats #2501 · 버그 수정 ↗</a></div>
@@ -340,6 +340,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">tpm2-software/tpm2-tss #3198 · 버그 수정 ↗</a></div>
       <dl><dt>문제</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code>·<code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code>가 디버그 로그를 찍으려고 <code>*offset</code>을 확인 없이 읽었습니다. 같은 파일의 다른 함수는 모두 NULL offset을 받는데, 이 둘은 널 포인터를 읽었습니다.</dd><dt>배경 지식</dt><dd>tpm2-tss는 마샬링(MU) 함수를 C 매크로로 찍어 내고, 매크로마다 로그에 <code>offset ? *offset : 0xffff</code>를 씁니다. 기본 로그 수준에서 <code>LOG_DEBUG()</code>는 그냥 함수 호출이라 디버그 로그가 꺼져 있어도 인자를 계산합니다.</dd><dt>찾은 방법</dt><dd>MU 함수에 NULL offset을 넘겨 UndefinedBehaviorSanitizer로 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>TPMS_MARSHAL_0</code>·<code>TPMS_UNMARSHAL_0</code>도 다른 매크로처럼 <code>offset ? *offset : 0xffff</code>를 씁니다. 수정을 되돌리면 새 단위 시험이 UBSan 보고로 멈추고, 고친 뒤 <code>TPMS-marshal</code> 시험 12개가 모두 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">PR 원문 #3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="OpenSC-OpenSC-3917" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenSC</b> <span class="badge ci_approval" data-pr="OpenSC/OpenSC#3917">CI 실행 허가 대기</span></span>
+      <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
+      <span class="line3">제출 2026-11-01 · 0일째 · 응답 아직 · CI <span class="wait">⏸12</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · 버그 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd>OpenSC PKCS#11 모듈은 공개키로 서명 검증은 했지만 암호화는 못 했습니다. RSA 공개키로 <code>C_EncryptInit()</code>을 부르면 <code>CKR_KEY_TYPE_INCONSISTENT</code>로 실패했습니다(#3144). 시험 도구 p11test도 그 기능을 켜는 값을 시험 준비 단계에서 빠뜨려 <code>C_Encrypt()</code>를 한 번도 부르지 않았습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 객체 연산과 메커니즘 표시(<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5·패딩 없는 RSA 암호화, 그리고 OpenSC가 <code>C_Verify()</code>를 OpenSSL로 처리하는 기존 소프트웨어 경로를 썼습니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 입문 과제로 표시한 이슈입니다. 가상 SmartCard-HSM(pico-hsm 에뮬레이션 + vsmartcard + 사용자 모드 pcscd)으로 재현했고, pkcs11-spy로 p11test가 <code>C_Encrypt()</code>까지 가지 않는 것을 찾았습니다.</dd><dt>수정</dt><dd>공개키 객체가 OpenSSL로 <code>CKM_RSA_PKCS</code>·<code>CKM_RSA_X_509</code> 암호화를 하고, p11test가 그 값을 넘기게 고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이 같습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">PR 원문 #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="randombit-botan-6082" data-group="closed">
@@ -496,6 +507,12 @@
       <div class="about">Rust용 DER·PEM·X.509 등 형식 크레이트 모음</div>
       <div class="focus">보는 것: 잘못된 DER 값 해석</div>
       <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-OpenSC-OpenSC">
+      <div class="name"><b>OpenSC</b> <a href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener">OpenSC/OpenSC ↗</a></div>
+      <div class="about">스마트카드 도구와 PKCS#11 모듈</div>
+      <div class="focus">보는 것: PKCS#11 모듈의 빠진 기능(가상 카드로 시험)</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
     </article></div>
   </section>
 
