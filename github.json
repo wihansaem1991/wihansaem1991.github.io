@@ -37,6 +37,25 @@
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11036"
  },
+ "OpenSC/OpenSC#3917": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 12,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/OpenSC/OpenSC/pull/3917"
+ },
  "RustCrypto/RSA#740": {
   "approvals": [],
   "live": {
@@ -99,8 +118,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 20,
-    "pending": 90
+    "pass": 110,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,

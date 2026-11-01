@@ -1019,6 +1019,53 @@ entries:
         세 경우 모두 값 오류를 돌려줍니다. 새 시험이 그 입력들을 다루고, 검사 셋 중 하나만 빼도 실패합니다.
         `der` 시험 120개가 통과합니다.
 
+  - project: OpenSC
+    repo: OpenSC/OpenSC
+    pr: 3917
+    title:
+      en: "pkcs11: Encrypt with RSA public keys in software"
+      ko: "pkcs11: RSA 공개키 암호화를 소프트웨어로 지원"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        OpenSC's PKCS#11 module could verify signatures with a public key but not encrypt with one:
+        `C_EncryptInit()` on an RSA public key failed with `CKR_KEY_TYPE_INCONSISTENT` (#3144). The
+        p11test suite also never called `C_Encrypt()`, because its group setup dropped the flag
+        that enables it.
+      ko: >-
+        OpenSC PKCS#11 모듈은 공개키로 서명 검증은 했지만 암호화는 못 했습니다. RSA 공개키로
+        `C_EncryptInit()`을 부르면 `CKR_KEY_TYPE_INCONSISTENT`로 실패했습니다(#3144). 시험 도구 p11test도 그
+        기능을 켜는 값을 시험 준비 단계에서 빠뜨려 `C_Encrypt()`를 한 번도 부르지 않았습니다.
+    background:
+      en: >-
+        PKCS#11 object operations and mechanism flags (`CKF_ENCRYPT`), RSA PKCS#1 v1.5 and raw RSA
+        encryption, and OpenSC's existing software path for `C_Verify()` through OpenSSL.
+      ko: >-
+        PKCS#11 객체 연산과 메커니즘 표시(`CKF_ENCRYPT`), RSA PKCS#1 v1.5·패딩 없는 RSA 암호화, 그리고 OpenSC가
+        `C_Verify()`를 OpenSSL로 처리하는 기존 소프트웨어 경로를 썼습니다.
+    found_by:
+      en: >-
+        A maintainer-labelled good first issue. A virtual SmartCard-HSM (pico-hsm emulation behind
+        vsmartcard and a user-mode pcscd) reproduced it, and pkcs11-spy showed p11test never
+        reaching `C_Encrypt()`.
+      ko: >-
+        메인테이너가 입문 과제로 표시한 이슈입니다. 가상 SmartCard-HSM(pico-hsm 에뮬레이션 + vsmartcard +
+        사용자 모드 pcscd)으로 재현했고, pkcs11-spy로 p11test가 `C_Encrypt()`까지 가지 않는 것을 찾았습니다.
+    fix:
+      en: >-
+        Public key objects encrypt with `CKM_RSA_PKCS` and `CKM_RSA_X_509` through OpenSSL, and p11test
+        now keeps the flag. Card round trips work for both mechanisms; the CI p11test run matches
+        the updated reference with no differences.
+      ko: >-
+        공개키 객체가 OpenSSL로 `CKM_RSA_PKCS`·`CKM_RSA_X_509` 암호화를 하고, p11test가 그 값을 넘기게
+        고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이
+        같습니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # A repository whose changes are not GitHub pull requests gives `link` and `status` instead.
@@ -1150,6 +1197,15 @@ repos:
     focus:
       en: Decoding of malformed DER values
       ko: 잘못된 DER 값 해석
+
+  - project: OpenSC
+    repo: OpenSC/OpenSC
+    about:
+      en: Smart card tools and PKCS#11 module
+      ko: 스마트카드 도구와 PKCS#11 모듈
+    focus:
+      en: Gaps in the PKCS#11 module, tested on a virtual card
+      ko: PKCS#11 모듈의 빠진 기능(가상 카드로 시험)
 
 # Vulnerability reports sent through a project's private channel. While `public: false` the page
 # shows only the label, date, channel and stage; project, title and briefing stay out of this file
