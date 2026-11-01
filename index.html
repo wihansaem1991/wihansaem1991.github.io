@@ -84,10 +84,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">15 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">18 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">17</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">5</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">8</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">20</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">5</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">11</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -151,7 +151,7 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/RSA#740">Awaiting review</span></span>
       <span class="line2">wycheproof: test OAEP decryption</span>
-      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="ok">✓10</span> <span class="wait">…2</span></span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="ok">✓12</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · Test coverage ↗</a></div>
@@ -233,6 +233,39 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · Hardening ↗</a></div>
       <dl><dt>Problem</dt><dd>The DHKEM IKM on an EC or X25519/X448 key generation context fixes the private key that will be generated (RFC 9180 DeriveKeyPair). Setting a new IKM freed the previous copy with <code>OPENSSL_free()</code>, so a value that recreates the private key stayed in freed memory.</dd><dt>Background</dt><dd>HPKE key derivation (RFC 9180) and the zeroisation of keying material that determines a key (ISO/IEC 19790, FIPS 140-3, KCMVP). The generation context&#x27;s cleanup already cleared the IKM; only the replace path did not.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing, confirmed with the freed-block measurement program: the old 32-byte IKM was left for X25519, X448 and P-256.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> in <code>ecx_gen_set_params()</code> and in the EC <code>COPY_OCTET_PARAM()</code> macro. <code>test_ikm_cleared_on_reset</code> sets the IKM twice and fails if either change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">Pull request #33471 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33471/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="schwabe-ics-openvpn-1936" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenVPN for Android</b> <span class="badge ci_approval" data-pr="schwabe/ics-openvpn#1936">Awaiting CI approval</span></span>
+      <span class="line2">Fix duplicated character before a backslash in config lines</span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="wait">⏸2</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">schwabe/ics-openvpn #1936 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>The <code>.ovpn</code> importer&#x27;s tokenizer kept the previous character across loop iterations, so the character before a backslash was stored twice: <code>ca foo\ bar.crt</code> became <code>fooo bar.crt</code>.</dd><dt>Background</dt><dd>OpenVPN&#x27;s own option tokenizer (<code>parse_line()</code> in <code>options_parse.c</code>) is the reference the app&#x27;s Java port has to match.</dd><dt>How it was found</dt><dd>Differential testing of the Java tokenizer against OpenVPN&#x27;s real <code>parse_line()</code> on random option lines.</dd><dt>Fix</dt><dd>Reset the stored character every iteration, as OpenVPN does; lines split differently by the two dropped from 504 to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">Pull request #1936 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1936/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="schwabe-ics-openvpn-1937" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenVPN for Android</b> <span class="badge ci_approval" data-pr="schwabe/ics-openvpn#1937">Awaiting CI approval</span></span>
+      <span class="line2">Report malformed auth-retry, compat-mode and ifconfig as import errors</span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="wait">⏸2</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">schwabe/ics-openvpn #1937 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>Four malformed option values made the importer throw an uncaught runtime exception, which crashes the app instead of showing an import error.</dd><dt>Background</dt><dd>Robustness of a parser that reads untrusted profile files from users and VPN providers.</dd><dt>How it was found</dt><dd>Fuzzing the importer with random configs on a plain JVM; 30,000 configs hit 9 crash sites.</dd><dt>Fix</dt><dd>A one-character typo fix plus two ConfigParseError conversions; crash sites went to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">Pull request #1937 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1937/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="schwabe-ics-openvpn-1938" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenVPN for Android</b> <span class="badge ci_approval" data-pr="schwabe/ics-openvpn#1938">Awaiting CI approval</span></span>
+      <span class="line2">Keep leading zero groups in IPv6 address strings</span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="wait">⏸2</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">schwabe/ics-openvpn #1938 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>IPv6 addresses with leading zero groups were printed without them (<code>::1</code> as <code>1</code>, <code>::2:0</code> as <code>2::</code>). On Android below 13 that string is used to install VPN routes.</dd><dt>Background</dt><dd>IPv6 text representation (RFC 4291/5952) and Android&#x27;s <code>VpnService.Builder.addRoute()</code> route installation.</dd><dt>How it was found</dt><dd>Comparing the app&#x27;s address formatting with Python&#x27;s <code>ipaddress</code> on random addresses.</dd><dt>Fix</dt><dd>Walk all eight groups instead of stopping at zero; mismatches went from 1,524 to 0 and existing test strings are unchanged.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">Pull request #1938 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1938/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="ci">
