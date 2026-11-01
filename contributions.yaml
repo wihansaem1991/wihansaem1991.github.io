@@ -974,6 +974,51 @@ entries:
         잘라 받는 동작을 적고 오류는 `DecodeError::InputSize`만 남겼습니다. 메인테이너가 옛 오류를 되살리기를
         원하면 그쪽으로 바꾸겠다고 PR에 적었습니다.
 
+  - project: RustCrypto
+    repo: RustCrypto/formats
+    pr: 2501
+    title:
+      en: "der: reject malformed binary REAL values instead of panicking"
+      ko: "der: 잘못된 이진 REAL 값을 패닉 대신 오류로 거부"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        After #2483 fixed truncated content, the `der` crate's ASN.1 REAL (`f64`) decoder still
+        panicked on a mantissa longer than eight octets, and on a zero mantissa or an out-of-range
+        exponent in debug builds. In release builds the last two decoded to NaN and to an unrelated
+        value (exponent 0x7fff gave 0.5).
+      ko: >-
+        #2483이 잘린 내용을 고친 뒤에도 `der` 크레이트의 ASN.1 REAL(`f64`) 해석기는 가수가 8옥텟을 넘으면
+        패닉했고, 가수가 0이거나 지수가 범위를 벗어나면 디버그 빌드에서 패닉했습니다. 릴리스 빌드에서는 뒤의
+        둘이 NaN과 엉뚱한 값(지수 0x7fff → 0.5)이 됐습니다.
+    background:
+      en: >-
+        X.690 binary REAL encoding: sign, base, scaling factor F, exponent octets, then mantissa
+        octets; zero has no contents octets (8.5.2). An IEEE-754 double needs the exponent within
+        -1023..=1023 for this decoder's mapping.
+      ko: >-
+        X.690 이진 REAL 인코딩(부호·밑수·배율 F·지수 옥텟·가수 옥텟)을 썼습니다. 0은 내용 옥텟이 없어야
+        하고(8.5.2), 이 해석기가 IEEE-754 double로 옮기려면 지수가 -1023..=1023 안에 있어야 합니다.
+    found_by:
+      en: >-
+        Reading the decoder after #2483 for the remaining unchecked arithmetic, then reproducing
+        each input on master and on `der` 0.8.3 in debug and release builds.
+      ko: >-
+        #2483 뒤의 해석기 코드에서 검사 없이 남은 산술을 찾고, 입력마다 master와 `der` 0.8.3에서 디버그·릴리스
+        빌드로 재현했습니다.
+    fix:
+      en: >-
+        Return a value error for each case. A new test covers the inputs and fails when any one of
+        the three checks is removed; `der` tests pass (120).
+      ko: >-
+        세 경우 모두 값 오류를 돌려줍니다. 새 시험이 그 입력들을 다루고, 검사 셋 중 하나만 빼도 실패합니다.
+        `der` 시험 120개가 통과합니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # A repository whose changes are not GitHub pull requests gives `link` and `status` instead.
@@ -1096,6 +1141,15 @@ repos:
     focus:
       en: Argument handling in the marshalling (MU) functions
       ko: 마샬링(MU) 함수의 인자 처리
+
+  - project: RustCrypto formats
+    repo: RustCrypto/formats
+    about:
+      en: DER, PEM, X.509 and other format crates for Rust
+      ko: Rust용 DER·PEM·X.509 등 형식 크레이트 모음
+    focus:
+      en: Decoding of malformed DER values
+      ko: 잘못된 DER 값 해석
 
 # Vulnerability reports sent through a project's private channel. While `public: false` the page
 # shows only the label, date, channel and stage; project, title and briefing stay out of this file
