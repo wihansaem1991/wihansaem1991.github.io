@@ -37,6 +37,25 @@
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11036"
  },
+ "RustCrypto/RSA#740": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 10,
+    "pending": 2
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/RustCrypto/RSA/pull/740"
+ },
  "RustCrypto/signatures#1493": {
   "approvals": [
    {

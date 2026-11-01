@@ -84,10 +84,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">14 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">15 pull requests and 2 vulnerability reports · 3 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">16</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">8</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">17</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">5</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">8</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>Closed <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">2</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -145,6 +145,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy/mitmproxy #8548 · Bug fix ↗</a></div>
       <dl><dt>Problem</dt><dd>With <code>--set confdir=...</code>, mitmproxy loaded the CA from that directory before reading <code>cert_passphrase</code> from the directory&#x27;s <code>config.yaml</code>. An encrypted CA key then failed to load and mitmproxy exited at startup (issue #6014, open since 2023).</dd><dt>Background</dt><dd>TLS interception: mitmproxy signs certificates on the fly with its own CA, so the CA private key has to load at startup, and an encrypted PKCS#8 key needs its passphrase first. Its option manager notifies addons on every update, so the order of updates decides what an addon sees.</dd><dt>How it was found</dt><dd>Issue #6014 with the maintainer&#x27;s diagnosis, and a stalled pull request from 2023 that had never been reviewed. Reproduced on Linux with an encrypted CA.</dd><dt>Fix</dt><dd>Work out the <code>--set</code> options and the config file on a copy of the options (a copy has no subscribers) and apply the result in one update; precedence is unchanged. A new test runs mitmdump with an encrypted CA and fails with the old order.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">Pull request #8548 ↗</a> · <a href="https://github.com/mitmproxy/mitmproxy/pull/8548/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-RSA-740" data-group="review">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/RSA#740">Awaiting review</span></span>
+      <span class="line2">wycheproof: test OAEP decryption</span>
+      <span class="line3">submitted 2026-11-01 · 0 days · no reply yet · CI <span class="ok">✓10</span> <span class="wait">…2</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · Test coverage ↗</a></div>
+      <dl><dt>Problem</dt><dd>The <code>rsa</code> crate&#x27;s Wycheproof tests covered only PKCS#1 v1.5 and PSS signatures. Removing any one of three OAEP padding checks (leading zero byte, non-zero bytes before the 0x01 separator, missing separator) left the whole test suite green.</dd><dt>Background</dt><dd>RSA-OAEP (RFC 8017) decryption must reject malformed padding without revealing which check failed; Wycheproof&#x27;s OAEP files contain exactly those malformed ciphertexts.</dd><dt>How it was found</dt><dd>Mutation testing: each padding check was removed in turn and the existing suite run, then the same change was run against the Wycheproof OAEP vectors.</dd><dt>Fix</dt><dd><code>test_rsa_oaep_decrypt</code> runs 1098 vectors from 22 files; each of the three mutations makes 21 of them fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">Pull request #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-TF-PSA-Crypto-960" data-group="review">

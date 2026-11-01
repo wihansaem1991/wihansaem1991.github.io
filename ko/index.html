@@ -84,10 +84,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 14건 · 취약점 보고 2건 · 메인테이너 응답 3건 · CVE 0건</div>
+  <div class="summary">제출 PR 15건 · 취약점 보고 2건 · 메인테이너 응답 3건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">16</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">4</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">8</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">2</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">17</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">5</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">8</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">2</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -145,6 +145,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy/mitmproxy #8548 · 버그 수정 ↗</a></div>
       <dl><dt>문제</dt><dd><code>--set confdir=...</code>을 주면 mitmproxy가 그 폴더의 <code>config.yaml</code>에서 <code>cert_passphrase</code>를 읽기 전에 CA부터 불러왔습니다. 그래서 암호가 걸린 CA 키를 읽지 못해 시작하자마자 종료됐습니다(2023년부터 열린 이슈 #6014).</dd><dt>배경 지식</dt><dd>TLS 가로채기 구조를 알아야 했습니다. mitmproxy는 자체 CA로 인증서를 즉석에서 서명하므로 시작할 때 CA 개인키를 읽어야 하고, 암호화된 PKCS#8 키는 암호가 먼저 있어야 합니다. 옵션 관리자는 갱신할 때마다 애드온에 알리므로, 갱신 순서가 애드온이 보는 값을 정합니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 원인을 짚어 둔 이슈 #6014와, 2023년 이후 리뷰 없이 멈춘 PR을 보고 골랐습니다. 암호 걸린 CA로 리눅스에서 재현했습니다.</dd><dt>수정</dt><dd><code>--set</code> 옵션과 설정 파일을 옵션 사본(구독자가 없음)에서 먼저 합친 뒤 결과를 한 번에 적용합니다. 우선순위는 그대로입니다. 새 시험은 암호 걸린 CA로 mitmdump를 띄우고, 예전 순서로 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">PR 원문 #8548 ↗</a> · <a href="https://github.com/mitmproxy/mitmproxy/pull/8548/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-RSA-740" data-group="review">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/RSA#740">리뷰 대기</span></span>
+      <span class="line2">wycheproof: OAEP 복호화 벡터 시험 추가</span>
+      <span class="line3">제출 2026-11-01 · 0일째 · 응답 아직 · CI <span class="ok">✓10</span> <span class="wait">…2</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · 시험 보강 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>rsa</code> 크레이트의 Wycheproof 시험은 PKCS#1 v1.5·PSS 서명만 돌렸습니다. OAEP 패딩 검사 세 가지(첫 바이트 0, 구분자 0x01 앞의 0 아닌 바이트, 구분자 없음) 중 하나를 빼도 시험이 모두 통과했습니다.</dd><dt>배경 지식</dt><dd>RSA-OAEP(RFC 8017) 복호화는 잘못된 패딩을 어느 검사에서 걸렸는지 드러내지 않고 거부해야 합니다. Wycheproof OAEP 파일에 바로 그런 잘못된 암호문이 들어 있습니다.</dd><dt>찾은 방법</dt><dd>변이 시험으로 찾았습니다. 패딩 검사를 하나씩 빼고 기존 시험을 돌린 뒤, 같은 변경을 Wycheproof OAEP 벡터로 다시 돌렸습니다.</dd><dt>수정</dt><dd>새 시험 <code>test_rsa_oaep_decrypt</code>가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개 파일에서 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">PR 원문 #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-TF-PSA-Crypto-960" data-group="review">
