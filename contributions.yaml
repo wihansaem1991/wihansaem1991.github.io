@@ -886,6 +886,120 @@ entries:
         모듈러 거듭제곱 코드처럼 `mbedtls_mpi_zeroize_and_free()`로 해제합니다. 두 측정값이 모두 0이 됐고,
         `bignum`·`rsa` 시험 묶음도 통과합니다.
 
+# Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
+# project is; focus: what I look at there. The pull request counts per stage come from `entries`.
+# A repository whose changes are not GitHub pull requests gives `link` and `status` instead.
+# Never list a repository that only has a private vulnerability report: that would name it.
+repos:
+  - project: OpenSSL
+    repo: openssl/openssl
+    about:
+      en: The most widely deployed TLS and cryptography library, in C
+      ko: 가장 널리 쓰이는 C TLS·암호 라이브러리
+    focus:
+      en: Secrets left in freed memory, measured by hooking the allocator
+      ko: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)
+  - project: pkcs11-provider
+    repo: openssl-projects/pkcs11-provider
+    about:
+      en: OpenSSL 3 provider for PKCS#11 tokens and HSMs
+      ko: OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider
+    focus:
+      en: Output-buffer length rules of signing, key derivation and ECDH, compared with OpenSSL's default provider
+      ko: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조
+  - project: OpenVPN for Android
+    repo: schwabe/ics-openvpn
+    about:
+      en: The OpenVPN client app for Android
+      ko: 안드로이드용 OpenVPN 앱
+    focus:
+      en: Parsing of imported configuration files
+      ko: 가져온 설정 파일 해석
+  - project: OpenVPN
+    repo: OpenVPN/openvpn
+    link: https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077
+    status:
+      en: 3 changes on Gerrit (2075, 2076, 2077)
+      ko: Gerrit 변경 3건(2075·2076·2077)
+    about:
+      en: OpenVPN itself, in C; patches go through Gerrit
+      ko: OpenVPN 본체(C), 패치는 Gerrit으로 제출
+    focus:
+      en: Key material freed without being cleared
+      ko: 지우지 않고 해제하는 키 재료
+  - project: Botan
+    repo: randombit/botan
+    about:
+      en: C++ cryptography library with many post-quantum algorithms
+      ko: 양자내성 알고리즘이 많은 C++ 암호 라이브러리
+    focus:
+      en: Input validation of post-quantum key and signature sizes
+      ko: 양자내성 키·서명 길이 입력 검증
+  - project: crypto-bigint
+    repo: RustCrypto/crypto-bigint
+    about:
+      en: Constant-time big-integer arithmetic for Rust
+      ko: 상수 시간 큰 정수 연산 Rust 라이브러리
+    focus:
+      en: Edge cases of string and byte conversion
+      ko: 문자열·바이트 변환 경계값
+  - project: RustCrypto RSA
+    repo: RustCrypto/RSA
+    about:
+      en: RSA in pure Rust
+      ko: 순수 Rust RSA 구현
+    focus:
+      en: Wycheproof test vectors the test suite does not run
+      ko: 시험이 돌리지 않는 Wycheproof 벡터
+  - project: RustCrypto signatures
+    repo: RustCrypto/signatures
+    about:
+      en: Signature algorithms for Rust, ML-DSA included
+      ko: Rust 서명 알고리즘 모음(ML-DSA 포함)
+    focus:
+      en: Wycheproof test vectors the test suite skips
+      ko: 시험이 건너뛰는 Wycheproof 벡터
+  - project: liboqs
+    repo: open-quantum-safe/liboqs
+    about:
+      en: C library of post-quantum algorithms (ML-KEM, ML-DSA, SLH-DSA and more)
+      ko: 양자내성 암호 C 라이브러리(ML-KEM·ML-DSA·SLH-DSA 등)
+    focus:
+      en: Signature verification with Wycheproof vectors and wrong lengths
+      ko: 서명 검증에 Wycheproof 벡터·잘못된 길이 넣기
+  - project: oqs-provider
+    repo: open-quantum-safe/oqs-provider
+    about:
+      en: OpenSSL 3 provider that adds post-quantum algorithms
+      ko: OpenSSL 3에 양자내성 알고리즘을 붙이는 provider
+    focus:
+      en: Private-key copies freed without being cleared
+      ko: 지우지 않고 해제하는 개인키 사본
+  - project: TF-PSA-Crypto
+    repo: Mbed-TLS/TF-PSA-Crypto
+    about:
+      en: The PSA Crypto API implementation split out of Mbed TLS
+      ko: Mbed TLS에서 떼어 낸 PSA 암호 API 구현
+    focus:
+      en: Big-number temporaries freed without being cleared
+      ko: 지우지 않고 해제하는 큰 수 임시 버퍼
+  - project: Mbed TLS
+    repo: Mbed-TLS/mbedtls
+    about:
+      en: TLS and X.509 library for embedded devices
+      ko: 임베디드용 TLS·X.509 라이브러리
+    focus:
+      en: X.509 extension parsing
+      ko: X.509 확장 해석
+  - project: mitmproxy
+    repo: mitmproxy/mitmproxy
+    about:
+      en: Interactive HTTPS proxy, in Python
+      ko: HTTPS 통신을 풀어 보는 프록시(Python)
+    focus:
+      en: Certificate and configuration handling
+      ko: 인증서·설정 처리
+
 # Vulnerability reports sent through a project's private channel. While `public: false` the page
 # shows only the label, date, channel and stage; project, title and briefing stay out of this file
 # until the project discloses the issue. sync.py updates `status` and `cve` from the advisory

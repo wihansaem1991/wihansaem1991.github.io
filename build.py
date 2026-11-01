@@ -24,14 +24,17 @@ STAGE_ORDER = ["merged", "approved", "rereview", "changes", "review", "ci_approv
 # tabs: each stage belongs to one group
 GROUP = {"merged": "done", "approved": "done", "rereview": "review", "changes": "review", "review": "review",
          "open": "review", "ci_approval": "ci", "closed": "closed"}
-TABS = ["all", "done", "review", "ci", "closed", "cve"]
+TABS = ["all", "done", "review", "ci", "closed", "cve", "repos"]
 
 UI = {
     "en": {
         "html_lang": "en", "title_suffix": "Open-source security contributions & CVE challenge",
         "switch": '<a href="ko/" hreflang="ko">한국어</a>',
         "tabs": {"all": "All", "done": "Approved / merged", "review": "In review", "ci": "Awaiting CI approval",
-                 "closed": "Closed", "cve": "CVE challenge"},
+                 "closed": "Closed", "cve": "CVE challenge", "repos": "Repositories"},
+        "repos_hint": "Repositories I am auditing now: what each project is and what I look at there. "
+                      "Pull request counts by stage are refreshed every hour.",
+        "focus": "Looking at", "prs": "{n} pull requests", "no_prs": "No pull request yet",
         "summary": "{prs} pull requests and {vulns} vulnerability reports · {replied} with a maintainer reply · {cves} CVEs",
         "vuln": "Vulnerability report",
         "private_body": "Reported through the project's private channel. Details follow once the project publishes a fix.",
@@ -64,7 +67,10 @@ UI = {
         "html_lang": "ko", "title_suffix": "오픈소스 보안 기여 · CVE 도전",
         "switch": '<a href="../" hreflang="en">English</a>',
         "tabs": {"all": "전체", "done": "승인·머지", "review": "리뷰 중", "ci": "CI 허가 대기", "closed": "닫힘",
-                 "cve": "CVE 도전"},
+                 "cve": "CVE 도전", "repos": "분석 중인 저장소"},
+        "repos_hint": "지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었고, "
+                      "단계별 PR 수는 매시간 갱신합니다.",
+        "focus": "보는 것", "prs": "PR {n}건", "no_prs": "아직 PR 없음",
         "summary": "제출 PR {prs}건 · 취약점 보고 {vulns}건 · 메인테이너 응답 {replied}건 · CVE {cves}건",
         "vuln": "취약점 보고",
         "private_body": "프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.",
@@ -247,6 +253,30 @@ def vuln_entry(v, lang):
   </details>"""
 
 
+def repo_card(r, lang, ev, entries):
+    """One repository being audited: what it is, what I look at, and my pull requests by stage."""
+    t = UI[lang]
+    mine = [e for e in entries if e["repo"] == r["repo"]]
+    url = r.get("link") or f'https://github.com/{r["repo"]}'
+    if mine:
+        stages = [stage_of(e, ev) for e in mine]
+        order = sorted(set(stages), key=lambda s: STAGE_ORDER.index(s) if s in STAGE_ORDER else 99)
+        badges = " ".join(f'<span class="badge {s}">{html.escape(t["stages"].get(s, s))} {stages.count(s)}</span>'
+                          for s in order)
+        prs = f'<span>{t["prs"].format(n=len(mine))}</span> {badges}'
+    elif r.get("status"):
+        prs = f'<span>{text(pick(r["status"], lang))}</span>'
+    else:
+        prs = f'<span class="none">{t["no_prs"]}</span>'
+    return f"""
+    <article class="repo" id="repo-{html.escape(r['repo'].replace('/', '-'))}">
+      <div class="name"><b>{text(r['project'])}</b> {ext(url, html.escape(r['repo']))}</div>
+      <div class="about">{text(pick(r.get('about'), lang))}</div>
+      <div class="focus">{t["focus"]}: {text(pick(r.get('focus'), lang))}</div>
+      <div class="prs">{prs}</div>
+    </article>"""
+
+
 def render(data, lang, tmpl, ev, today):
     t, owner = UI[lang], data["owner"]
     entries = sorted(data.get("entries") or [],
@@ -257,6 +287,8 @@ def render(data, lang, tmpl, ev, today):
     counts = {g: groups.count(g) for g in TABS}
     counts["all"] = len(entries) + len(vulns)
     counts["cve"] = len(vulns)
+    repos = list(data.get("repos") or [])
+    counts["repos"] = len(repos)
     tabs = "".join(
         f'<button type="button" role="tab" class="tab" data-tab="{g}"{" hidden" if g == "closed" and not counts[g] else ""}>'
         f'{t["tabs"][g]} <span class="count" id="c-{g}">{counts[g]}</span></button>'
@@ -275,6 +307,8 @@ def render(data, lang, tmpl, ev, today):
         "entries": "".join(entry(e, lang, ev, today) for e in entries)
         + "".join(vuln_entry(v, lang) for v in vulns)
         or f'<p class="none">{t["empty"]}</p>',
+        "repos_hint": t["repos_hint"],
+        "repos": "".join(repo_card(r, lang, ev, entries) for r in repos),
         "labels": json.dumps(labels, ensure_ascii=False).replace("</", "<\\/"),
         "footer": html.escape(t["footer"].format(d=today.isoformat())),
     }
@@ -287,6 +321,9 @@ def main():
     ev_path = os.path.join(HERE, "github.json")
     ev = json.load(open(ev_path, encoding="utf-8")) if os.path.exists(ev_path) else {}
     today = dt.datetime.now(KST).date()
+    listed = {r["repo"] for r in data.get("repos") or []}
+    for repo in sorted({e["repo"] for e in data.get("entries") or []} - listed):
+        print(f"note: {repo} has pull requests but no card under repos:")
     for lang, path in (("en", "index.html"), ("ko", os.path.join("ko", "index.html"))):
         out, n = render(data, lang, tmpl, ev, today)
         os.makedirs(os.path.dirname(os.path.join(HERE, path)) or HERE, exist_ok=True)

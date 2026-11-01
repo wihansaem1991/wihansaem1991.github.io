@@ -70,6 +70,14 @@
   code { font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background:var(--line); padding:1px 5px; border-radius:4px; }
   .tr { font-style: normal; font-size: 14px; }
   blockquote { margin:12px 0 0; padding:8px 14px; border-left:3px solid var(--accent); color:var(--muted); font-style: italic; }
+  .repos { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:10px; }
+  .repo { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px;
+          display:grid; gap:4px; align-content:start; overflow-wrap:anywhere; }
+  .repo .name b { font-size:15px; margin-right:6px; }
+  .repo .name a { font-size:13px; color:var(--muted); }
+  .repo .about { font-size:14px; }
+  .repo .focus { font-size:13px; color:var(--muted); }
+  .repo .prs { display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; font-size:13px; margin-top:4px; }
   footer { margin-top:40px; color:var(--muted); font-size:12px; border-top:1px solid var(--line); padding-top:14px; }
   a { color: var(--accent); }
   @media (max-width: 600px) { dl { grid-template-columns: 1fr; } dt { margin-top:6px; } header h1 { font-size: 24px; } }
@@ -87,7 +95,7 @@
   <div class="summary">제출 PR 20건 · 취약점 보고 3건 · 메인테이너 응답 3건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">23</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">6</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">3</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">23</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">2</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">6</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed" hidden>닫힘 <span class="count" id="c-closed">0</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">3</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">13</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -339,6 +347,89 @@
     <p class="empty" id="empty" hidden>지금은 해당 항목이 없습니다.</p>
   </section>
 
+  <section class="panel" id="panel-repos">
+    <p class="hint">지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었고, 단계별 PR 수는 매시간 갱신합니다.</p>
+    <div class="repos">
+    <article class="repo" id="repo-openssl-openssl">
+      <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
+      <div class="about">가장 널리 쓰이는 C TLS·암호 라이브러리</div>
+      <div class="focus">보는 것: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)</div>
+      <div class="prs"><span>PR 5건</span> <span class="badge approved">승인 1</span> <span class="badge ci_approval">CI 실행 허가 대기 4</span></div>
+    </article>
+    <article class="repo" id="repo-openssl-projects-pkcs11-provider">
+      <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
+      <div class="about">OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider</div>
+      <div class="focus">보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조</div>
+      <div class="prs"><span>PR 3건</span> <span class="badge rereview">수정 반영, 재리뷰 대기 1</span> <span class="badge ci_approval">CI 실행 허가 대기 2</span></div>
+    </article>
+    <article class="repo" id="repo-schwabe-ics-openvpn">
+      <div class="name"><b>OpenVPN for Android</b> <a href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener">schwabe/ics-openvpn ↗</a></div>
+      <div class="about">안드로이드용 OpenVPN 앱</div>
+      <div class="focus">보는 것: 가져온 설정 파일 해석</div>
+      <div class="prs"><span>PR 3건</span> <span class="badge ci_approval">CI 실행 허가 대기 3</span></div>
+    </article>
+    <article class="repo" id="repo-OpenVPN-openvpn">
+      <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
+      <div class="about">OpenVPN 본체(C), 패치는 Gerrit으로 제출</div>
+      <div class="focus">보는 것: 지우지 않고 해제하는 키 재료</div>
+      <div class="prs"><span>Gerrit 변경 3건(2075·2076·2077)</span></div>
+    </article>
+    <article class="repo" id="repo-randombit-botan">
+      <div class="name"><b>Botan</b> <a href="https://github.com/randombit/botan" target="_blank" rel="noopener">randombit/botan ↗</a></div>
+      <div class="about">양자내성 알고리즘이 많은 C++ 암호 라이브러리</div>
+      <div class="focus">보는 것: 양자내성 키·서명 길이 입력 검증</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-RustCrypto-crypto-bigint">
+      <div class="name"><b>crypto-bigint</b> <a href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener">RustCrypto/crypto-bigint ↗</a></div>
+      <div class="about">상수 시간 큰 정수 연산 Rust 라이브러리</div>
+      <div class="focus">보는 것: 문자열·바이트 변환 경계값</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-RustCrypto-RSA">
+      <div class="name"><b>RustCrypto RSA</b> <a href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener">RustCrypto/RSA ↗</a></div>
+      <div class="about">순수 Rust RSA 구현</div>
+      <div class="focus">보는 것: 시험이 돌리지 않는 Wycheproof 벡터</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-RustCrypto-signatures">
+      <div class="name"><b>RustCrypto signatures</b> <a href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener">RustCrypto/signatures ↗</a></div>
+      <div class="about">Rust 서명 알고리즘 모음(ML-DSA 포함)</div>
+      <div class="focus">보는 것: 시험이 건너뛰는 Wycheproof 벡터</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge merged">머지됨 1</span></div>
+    </article>
+    <article class="repo" id="repo-open-quantum-safe-liboqs">
+      <div class="name"><b>liboqs</b> <a href="https://github.com/open-quantum-safe/liboqs" target="_blank" rel="noopener">open-quantum-safe/liboqs ↗</a></div>
+      <div class="about">양자내성 암호 C 라이브러리(ML-KEM·ML-DSA·SLH-DSA 등)</div>
+      <div class="focus">보는 것: 서명 검증에 Wycheproof 벡터·잘못된 길이 넣기</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-open-quantum-safe-oqs-provider">
+      <div class="name"><b>oqs-provider</b> <a href="https://github.com/open-quantum-safe/oqs-provider" target="_blank" rel="noopener">open-quantum-safe/oqs-provider ↗</a></div>
+      <div class="about">OpenSSL 3에 양자내성 알고리즘을 붙이는 provider</div>
+      <div class="focus">보는 것: 지우지 않고 해제하는 개인키 사본</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-Mbed-TLS-TF-PSA-Crypto">
+      <div class="name"><b>TF-PSA-Crypto</b> <a href="https://github.com/Mbed-TLS/TF-PSA-Crypto" target="_blank" rel="noopener">Mbed-TLS/TF-PSA-Crypto ↗</a></div>
+      <div class="about">Mbed TLS에서 떼어 낸 PSA 암호 API 구현</div>
+      <div class="focus">보는 것: 지우지 않고 해제하는 큰 수 임시 버퍼</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-Mbed-TLS-mbedtls">
+      <div class="name"><b>Mbed TLS</b> <a href="https://github.com/Mbed-TLS/mbedtls" target="_blank" rel="noopener">Mbed-TLS/mbedtls ↗</a></div>
+      <div class="about">임베디드용 TLS·X.509 라이브러리</div>
+      <div class="focus">보는 것: X.509 확장 해석</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+    </article>
+    <article class="repo" id="repo-mitmproxy-mitmproxy">
+      <div class="name"><b>mitmproxy</b> <a href="https://github.com/mitmproxy/mitmproxy" target="_blank" rel="noopener">mitmproxy/mitmproxy ↗</a></div>
+      <div class="about">HTTPS 통신을 풀어 보는 프록시(Python)</div>
+      <div class="focus">보는 것: 인증서·설정 처리</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+    </article></div>
+  </section>
+
   <footer>2026-11-01 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
 <script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-11-01 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "groups": {"merged": "done", "approved": "done", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
@@ -352,6 +443,10 @@
   function show(name) {
     if (!tabs.some((t) => t.dataset.tab === name && !t.hidden)) name = "all";
     for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.tab === name));
+    /* the Repositories tab shows its own panel instead of the entries */
+    document.getElementById("panel-prs").hidden = name === "repos";
+    document.getElementById("panel-repos").hidden = name !== "repos";
+    if (name === "repos") return;
     let shown = 0;
     for (const e of entries()) {
       const on = name === "all" || e.dataset.group === name;
