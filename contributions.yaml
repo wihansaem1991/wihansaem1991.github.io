@@ -528,6 +528,105 @@ entries:
         새 시험 `test_rsa_oaep_decrypt`가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개
         파일에서 실패합니다.
 
+  - project: OpenVPN for Android
+    repo: schwabe/ics-openvpn
+    pr: 1936
+    title:
+      en: "Fix duplicated character before a backslash in config lines"
+      ko: "설정 줄에서 백슬래시 앞 글자가 두 번 들어가는 문제 수정"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        The `.ovpn` importer's tokenizer kept the previous character across loop iterations, so the character before a backslash was stored twice: `ca foo\ bar.crt` became `fooo bar.crt`.
+      ko: >-
+        `.ovpn` 가져오기의 토큰 분리기가 이전 글자를 반복 사이에 들고 있어서, 백슬래시 앞 글자가 두 번 저장됐습니다. `ca foo\ bar.crt`가 `fooo bar.crt`로 들어갔습니다.
+    background:
+      en: >-
+        OpenVPN's own option tokenizer (`parse_line()` in `options_parse.c`) is the reference the app's Java port has to match.
+      ko: >-
+        앱의 Java 이식본이 따라야 할 기준은 OpenVPN 본체의 옵션 토큰 분리기(`options_parse.c`의 `parse_line()`)입니다.
+    found_by:
+      en: >-
+        Differential testing of the Java tokenizer against OpenVPN's real `parse_line()` on random option lines.
+      ko: >-
+        무작위 옵션 줄을 Java 토큰 분리기와 OpenVPN의 실제 `parse_line()`에 함께 넣어 비교해 찾았습니다.
+    fix:
+      en: >-
+        Reset the stored character every iteration, as OpenVPN does; lines split differently by the two dropped from 504 to 0.
+      ko: >-
+        OpenVPN처럼 매 반복마다 저장 글자를 비웠습니다. 두 쪽이 다르게 나누던 줄이 504개에서 0개가 됐습니다.
+
+  - project: OpenVPN for Android
+    repo: schwabe/ics-openvpn
+    pr: 1937
+    title:
+      en: "Report malformed auth-retry, compat-mode and ifconfig as import errors"
+      ko: "잘못된 auth-retry·compat-mode·ifconfig를 가져오기 오류로 알리기"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        Four malformed option values made the importer throw an uncaught runtime exception, which crashes the app instead of showing an import error.
+      ko: >-
+        잘못된 옵션 값 네 가지에서 가져오기가 잡히지 않는 런타임 예외를 던져, 오류 안내 대신 앱이 죽었습니다.
+    background:
+      en: >-
+        Robustness of a parser that reads untrusted profile files from users and VPN providers.
+      ko: >-
+        사용자와 VPN 제공자가 주는, 믿을 수 없는 프로필 파일을 읽는 파서의 견고성 문제입니다.
+    found_by:
+      en: >-
+        Fuzzing the importer with random configs on a plain JVM; 30,000 configs hit 9 crash sites.
+      ko: >-
+        일반 JVM에서 무작위 설정으로 가져오기를 퍼징해 찾았습니다. 설정 3만 개에서 크래시 지점 9곳이 나왔습니다.
+    fix:
+      en: >-
+        A one-character typo fix plus two ConfigParseError conversions; crash sites went to 0.
+      ko: >-
+        오타 한 글자를 고치고 두 곳을 ConfigParseError로 바꿨습니다. 크래시 지점이 0이 됐습니다.
+
+  - project: OpenVPN for Android
+    repo: schwabe/ics-openvpn
+    pr: 1938
+    title:
+      en: "Keep leading zero groups in IPv6 address strings"
+      ko: "IPv6 주소 문자열에서 앞쪽 0 그룹 유지"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-01
+    decided: null
+    defect:
+      en: >-
+        IPv6 addresses with leading zero groups were printed without them (`::1` as `1`, `::2:0` as `2::`). On Android below 13 that string is used to install VPN routes.
+      ko: >-
+        앞쪽 0 그룹이 있는 IPv6 주소가 그 그룹 없이 출력됐습니다(`::1`이 `1`, `::2:0`이 `2::`). 안드로이드 13 미만에서는 이 문자열로 VPN 경로를 설치합니다.
+    background:
+      en: >-
+        IPv6 text representation (RFC 4291/5952) and Android's `VpnService.Builder.addRoute()` route installation.
+      ko: >-
+        IPv6 문자 표기(RFC 4291/5952)와 안드로이드 `VpnService.Builder.addRoute()`의 경로 설치 방식을 썼습니다.
+    found_by:
+      en: >-
+        Comparing the app's address formatting with Python's `ipaddress` on random addresses.
+      ko: >-
+        무작위 주소로 앱의 주소 출력과 Python `ipaddress`를 비교해 찾았습니다.
+    fix:
+      en: >-
+        Walk all eight groups instead of stopping at zero; mismatches went from 1,524 to 0 and existing test strings are unchanged.
+      ko: >-
+        0에서 멈추지 않고 여덟 그룹을 모두 돌게 했습니다. 불일치가 1,524건에서 0건이 됐고 기존 시험의 문자열은 그대로입니다.
+
   - project: liboqs
     repo: open-quantum-safe/liboqs
     pr: 2665

@@ -42,8 +42,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 10,
-    "pending": 2
+    "pass": 12,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
@@ -309,5 +309,62 @@
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33471"
+ },
+ "schwabe/ics-openvpn#1936": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 2,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/schwabe/ics-openvpn/pull/1936"
+ },
+ "schwabe/ics-openvpn#1937": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 2,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/schwabe/ics-openvpn/pull/1937"
+ },
+ "schwabe/ics-openvpn#1938": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 2,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/schwabe/ics-openvpn/pull/1938"
  }
 }
