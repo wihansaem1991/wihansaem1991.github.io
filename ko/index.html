@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 30건 · 취약점 보고 8건 · 메인테이너 응답 11건 · CVE 0건</div>
+  <div class="summary">제출 PR 30건 · 취약점 보고 8건 · 메인테이너 응답 14건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">7</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">9</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">2</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -122,6 +122,17 @@
       <dl><dt>문제</dt><dd><code>rsa</code> 크레이트의 Wycheproof 시험은 PKCS#1 v1.5·PSS 서명만 돌렸습니다. OAEP 패딩 검사 세 가지(첫 바이트 0, 구분자 0x01 앞의 0 아닌 바이트, 구분자 없음) 중 하나를 빼도 시험이 모두 통과했습니다.</dd><dt>배경 지식</dt><dd>RSA-OAEP(RFC 8017) 복호화는 잘못된 패딩을 어느 검사에서 걸렸는지 드러내지 않고 거부해야 합니다. Wycheproof OAEP 파일에 바로 그런 잘못된 암호문이 들어 있습니다.</dd><dt>찾은 방법</dt><dd>변이 시험으로 찾았습니다. 패딩 검사를 하나씩 빼고 기존 시험을 돌린 뒤, 같은 변경을 Wycheproof OAEP 벡터로 다시 돌렸습니다.</dd><dt>수정</dt><dd>새 시험 <code>test_rsa_oaep_decrypt</code>가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개 파일에서 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">PR 원문 #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/RSA/pull/740#pullrequestreview-5730252760" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/RSA/commit/8f823d4a479ab4f4905897196b180c9a3781f5f8" target="_blank" rel="noopener">머지 커밋 8f823d4a47 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="done">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge merged" data-pr="openssl-projects/pkcs11-provider#814">머지됨</span></span>
+      <span class="line2">CKR_BUFFER_TOO_SMALL 뒤 서명 작업 취소</span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓50</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #814 · 버그 수정 · 머지됨 2026-11-02 ↗</a></div>
+      <dl><dt>문제</dt><dd>너무 작은 버퍼로 서명을 한 번 하면 풀에 있는 PKCS#11 세션에 서명 작업이 열린 채 남았습니다. 그 세션을 받은 다음 서명은 모두 <code>CKR_OPERATION_ACTIVE</code>로 실패했습니다. NSS softokn에서 2048비트 RSA 키로 255바이트 버퍼에 한 번 서명하자, 그 프로세스의 RSA·RSA-PSS·ECDSA·DigestSign 서명이 전부 멈췄습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 세션 규약 지식이 필요했습니다. <code>C_Sign()</code>이 <code>CKR_BUFFER_TOO_SMALL</code>을 돌려주면 더 큰 버퍼로 다시 부를 수 있게 작업을 열어 둡니다. 세션을 풀로 돌려쓰는 provider는 돌려주기 전에 그 작업을 끝내야 합니다.</dd><dt>찾은 방법</dt><dd>버퍼 크기 측정으로 찾았습니다. pkcs11-provider의 서명·파생·복호화 경로마다 필요한 것보다 작고 큰 버퍼를 넣은 뒤, 이어서 정상 호출을 해 세션이 아직 쓸 수 있는지 봤습니다.</dd><dt>수정</dt><dd>열린 작업을 정리하던 기존 코드를 함수로 빼서, <code>CKR_BUFFER_TOO_SMALL</code>이면 세션을 돌려주기 전에 부릅니다. 새 <code>sigbuf</code> 시험은 수정 전에 실패하고 수정 후에 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">PR 원문 #814 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814#pullrequestreview-5738072405" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/ed9cb506b2a1fae556ca9ac4fd2cf539743c726d" target="_blank" rel="noopener">머지 커밋 ed9cb506b2 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="RustCrypto-formats-2501" data-group="done">
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/formats#2501">머지됨</span></span>
@@ -131,6 +142,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">RustCrypto/formats #2501 · 버그 수정 · 머지됨 2026-11-01 ↗</a></div>
       <dl><dt>문제</dt><dd>#2483이 잘린 내용을 고친 뒤에도 <code>der</code> 크레이트의 ASN.1 REAL(<code>f64</code>) 해석기는 가수가 8옥텟을 넘으면 패닉했고, 가수가 0이거나 지수가 범위를 벗어나면 디버그 빌드에서 패닉했습니다. 릴리스 빌드에서는 뒤의 둘이 NaN과 엉뚱한 값(지수 0x7fff → 0.5)이 됐습니다.</dd><dt>배경 지식</dt><dd>X.690 이진 REAL 인코딩(부호·밑수·배율 F·지수 옥텟·가수 옥텟)을 썼습니다. 0은 내용 옥텟이 없어야 하고(8.5.2), 이 해석기가 IEEE-754 double로 옮기려면 지수가 -1023..=1023 안에 있어야 합니다.</dd><dt>찾은 방법</dt><dd>#2483 뒤의 해석기 코드에서 검사 없이 남은 산술을 찾고, 입력마다 master와 <code>der</code> 0.8.3에서 디버그·릴리스 빌드로 재현했습니다.</dd><dt>수정</dt><dd>세 경우 모두 값 오류를 돌려줍니다. 새 시험이 그 입력들을 다루고, 검사 셋 중 하나만 빼도 실패합니다. <code>der</code> 시험 120개가 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">PR 원문 #2501 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2501/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/formats/pull/2501#pullrequestreview-5730274250" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/ae28c9f4168b32f8096f70b2562ba7d2120a11d4" target="_blank" rel="noopener">머지 커밋 ae28c9f416 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="OpenVPN-openvpn-2077" data-group="done">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge merged" data-pr="OpenVPN/openvpn#2077">머지됨</span></span>
+      <span class="line2">crypto_openssl: PEM에서 디코딩한 키 데이터를 해제 전에 지우기</span>
+      <span class="line3">제출 2026-11-01 · 1일째 · 첫 응답 2026-11-01 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2077 · 보안 강화 · 머지됨 2026-11-02 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>crypto_pem_decode()</code>는 tls-crypt-v2 클라이언트·서버 키와 auth-token 키를 디코딩하는데, 디코딩한 키 바이트를 <code>OPENSSL_free()</code>로 그냥 해제해 해제된 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)입니다. OpenVPN은 OpenSSL과 LibreSSL 둘 다로 빌드되므로 지우는 함수가 두 라이브러리에 모두 있어야 합니다.</dd><dt>찾은 방법</dt><dd>tls-crypt 단위 시험이 해제하는 블록에서 시험 키를 찾았습니다.</dd><dt>수정</dt><dd><code>OPENSSL_cleanse()</code>로 지운 뒤 <code>OPENSSL_free()</code>로 해제합니다. 첫 패치는 LibreSSL에 없는 <code>OPENSSL_clear_free()</code>를 썼고, 두 번째 패치는 LibreSSL 4.3.4와 OpenSSL 3.5.9 모두에서 <code>--enable-werror</code>로 빌드되며 키가 남은 해제 블록이 2개에서 0개가 됐습니다.</dd><dt>리뷰</dt><dd>Steffan Karger가 승인한 뒤 Gert Doering이 LibreSSL 빌드 실패를 찾아 두 줄 형태를 제안했고, 두 번째 패치가 그대로 반영해 다시 리뷰를 기다립니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="RustCrypto-AEADs-894" data-group="done">
@@ -144,6 +166,17 @@
       <dl><dt>문제</dt><dd><code>eax</code> 크레이트의 실패 벡터 파일이 비어 있어, 틀린 태그를 거부하는지 보는 시험이 없었습니다. 태그 비교를 항상 통과로 바꿔도 모든 시험이 통과했고, AES-192·AES-256은 시험 벡터가 하나도 없었습니다.</dd><dt>배경 지식</dt><dd>암호모듈 검증(KCMVP)의 기지 답 시험과 같은 방식으로, 공개 시험 벡터(Wycheproof)를 돌리고 위조한 태그를 거부하는지 확인했습니다.</dd><dt>찾은 방법</dt><dd>Wycheproof AES-CCM·AES-EAX 벡터 전부(672개, 불일치 0)를 크레이트에 돌린 뒤 크레이트 시험이 무엇을 덮는지 봤습니다. 태그 검사를 끈 변이가 기존 시험을 통과했습니다.</dd><dt>수정</dt><dd>AES-128·192·256 Wycheproof 186개(유효 105·무효 81)를 <code>aead</code> 시험 매크로로 넣었습니다. 태그 검사를 끄면 새 실패 시험 3개가 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">PR 원문 #894 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/894/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/commit/e3cee8a2eff8dc5f25326c5cbc743eb4b9723647" target="_blank" rel="noopener">머지 커밋 e3cee8a2ef ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="RustCrypto-formats-2502" data-group="done">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/formats#2502">머지됨</span></span>
+      <span class="line2">pkcs5: <code>MAX_LEN</code>보다 긴 솔트에 <code>Salt::new</code>가 패닉 대신 오류를 돌려줌</span>
+      <span class="line3">제출 2026-11-02 · 0일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓11</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">RustCrypto/formats #2502 · 버그 수정 · 머지됨 2026-11-02 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>pkcs5::pbes2::Salt::new</code>는 32바이트보다 긴 솔트에 오류를 돌려준다고 문서에 적혀 있지만, #2295에서 길이 검사가 빠졌습니다. 33바이트 솔트를 <code>Salt::new</code>, <code>Pbkdf2Params::hmac_sha256</code>, <code>ScryptParams::from_params_and_salt</code>에 넘기면 오류 대신 범위 밖 인덱스로 패닉했습니다. 배포판 0.8.0과 0.8.1에 이 회귀가 들어 있습니다.</dd><dt>배경 지식</dt><dd>PKCS #5 PBES2(RFC 8018)를 썼습니다. PBKDF2와 scrypt 매개변수는 솔트를 OCTET STRING으로 담고, 이 크레이트는 할당자 없이도 돌도록 솔트를 고정 32바이트 버퍼에 담습니다.</dd><dt>찾은 방법</dt><dd><code>formats</code>의 해석기와 생성자를 libFuzzer로 퍼징해 찾았습니다. 해석기는 길이를 검사하지만 호출자가 솔트를 넘기는 생성자는 검사하지 않았고, <code>git log -p</code>로 검사가 빠진 커밋 #2295를 찾았습니다.</dd><dt>수정</dt><dd>길이 검사를 되살렸습니다. 새 시험은 33바이트 솔트(수정을 빼면 실패)와 32바이트 솔트를 다루고, <code>pkcs5</code> 시험·clippy·rustfmt가 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">PR 원문 #2502 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2502/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/formats/pull/2502#pullrequestreview-5738605197" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/9960cb7b85862cc2a708ee97da9656afd863db23" target="_blank" rel="noopener">머지 커밋 9960cb7b85 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="OpenVPN-openvpn-2076" data-group="done">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2076">승인</span></span>
@@ -153,17 +186,6 @@
     <div class="body">
       <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2076 · 보안 강화 · 승인 2026-11-02 ↗</a></div>
       <dl><dt>문제</dt><dd><code>auth_token_init_secret()</code>은 auth-token 서버 키를 2048바이트 버퍼로 읽고, 스택의 <code>struct key</code>와 <code>struct key_parameters</code>로 옮긴 뒤 버퍼를 지우지 않고 해제했습니다. 서버 키 사본 세 개가 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 함수가 만드는 사본 하나하나에 대조했습니다. <code>tls_crypt_v2_init_server_key()</code>는 이미 사본을 지우는데 이 함수는 지우지 않았습니다.</dd><dt>찾은 방법</dt><dd><code>test_auth_token</code>이 쓰는 키를 해제된 힙 블록에서 찾았습니다.</dd><dt>수정</dt><dd><code>struct key</code>와 <code>struct key_parameters</code>를 <code>secure_memzero()</code>로 지우고, <code>free_buf()</code> 앞에 <code>buf_clear()</code>를 넣었습니다. 두 번째 패치에서 리뷰어가 짚은 <code>struct key_parameters</code> 사본을 더했고, 같은 질문에서 나머지 함수를 고치는 후속 변경(Gerrit 2078)이 나왔습니다.</dd><dt>리뷰</dt><dd>두 번째 패치에서 Steffan Karger가 승인했습니다(Code-Review +2).</dd><dt>증빙</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a> · 승인한 리뷰어: <a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Steffan Karger ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — 리뷰어<br><span class="tr">(번역) 더 이상 쓰지 않는 키 데이터를 지우는 것은 좋은 습관이고, 더 일관되게 해야 합니다.</span></blockquote>
-    </div>
-  </details>
-  <details class="entry" id="OpenVPN-openvpn-2077" data-group="done">
-    <summary>
-      <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2077">승인</span></span>
-      <span class="line2">crypto_openssl: PEM에서 디코딩한 키 데이터를 해제 전에 지우기</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 첫 응답 2026-11-01 · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2077 · 보안 강화 · 승인 2026-11-02 ↗</a></div>
-      <dl><dt>문제</dt><dd><code>crypto_pem_decode()</code>는 tls-crypt-v2 클라이언트·서버 키와 auth-token 키를 디코딩하는데, 디코딩한 키 바이트를 <code>OPENSSL_free()</code>로 그냥 해제해 해제된 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)입니다. OpenVPN은 OpenSSL과 LibreSSL 둘 다로 빌드되므로 지우는 함수가 두 라이브러리에 모두 있어야 합니다.</dd><dt>찾은 방법</dt><dd>tls-crypt 단위 시험이 해제하는 블록에서 시험 키를 찾았습니다.</dd><dt>수정</dt><dd><code>OPENSSL_cleanse()</code>로 지운 뒤 <code>OPENSSL_free()</code>로 해제합니다. 첫 패치는 LibreSSL에 없는 <code>OPENSSL_clear_free()</code>를 썼고, 두 번째 패치는 LibreSSL 4.3.4와 OpenSSL 3.5.9 모두에서 <code>--enable-werror</code>로 빌드되며 키가 남은 해제 블록이 2개에서 0개가 됐습니다.</dd><dt>리뷰</dt><dd>Steffan Karger가 승인한 뒤 Gert Doering이 LibreSSL 빌드 실패를 찾아 두 줄 형태를 제안했고, 두 번째 패치가 그대로 반영해 다시 리뷰를 기다립니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a> · 승인한 리뷰어: <a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Steffan Karger ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="OpenVPN-openvpn-2079" data-group="done">
@@ -181,7 +203,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge approved_pending" data-pr="openssl/openssl#33430">승인, 추가 리뷰 대기</span></span>
       <span class="line2"><code>EVP_ENCODE_CTX</code>를 해제할 때 지우기</span>
-      <span class="line3">제출 2026-10-28 · 5일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓97</span></span>
+      <span class="line3">제출 2026-10-28 · 6일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓97</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · 보안 강화 ↗</a></div>
@@ -192,18 +214,29 @@
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">수정 반영, 재리뷰 대기</span></span>
       <span class="line2">큰 버퍼에도 ECDH 공유 비밀값만 돌려주기</span>
-      <span class="line3">제출 2026-10-30 · 3일째 · 첫 응답 2026-10-30 · CI <span class="wait">⏸11</span></span>
+      <span class="line3">제출 2026-10-30 · 4일째 · 첫 응답 2026-10-30 · CI <span class="ok">✓50</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · 버그 수정 ↗</a></div>
       <dl><dt>문제</dt><dd>PKCS#11 토큰을 쓰면 <code>EVP_PKEY_derive()</code>가 공유 비밀값 크기가 아니라 호출자 버퍼 크기만큼 토큰에 요청했습니다. NSS softokn은 P-256 비밀값 앞을 0으로 채워 돌려줘서, 64바이트 버퍼에는 0 32개 뒤에 비밀값이 들어갔고 ECDH 양쪽 값이 서로 달라졌습니다.</dd><dt>배경 지식</dt><dd>PKCS#11·HSM 연동 지식이 필요했습니다. ECDH 파생(<code>CKM_ECDH1_DERIVE</code>, <code>CKD_NULL</code>)은 출력 길이를 키 템플릿의 <code>CKA_VALUE_LEN</code>에서 가져오고, OpenSSL <code>EVP_PKEY_derive()</code>는 길이를 버퍼 크기로 받아 실제로 쓴 바이트 수를 돌려줍니다. 두 규약이 어긋나는 지점이었습니다.</dd><dt>찾은 방법</dt><dd>차등 시험으로 찾았습니다. 같은 ECDH 파생을 OpenSSL 기본 provider와 NSS softokn 토큰 위의 pkcs11-provider에 여러 크기의 출력 버퍼로 넣어 결과를 비교했습니다.</dd><dt>수정</dt><dd>요청 길이를 키 크기로 제한했습니다. 새 회귀 시험이 오래된 누수도 드러냈습니다. 한 문맥에서 두 번 파생하면 상대 공개점 사본을 덮어써 앞 사본이 새는 문제로, Address Sanitizer 시험이 잡았고 같은 PR에서 고쳤습니다.</dd><dt>리뷰</dt><dd>메인테이너가 승인한 뒤 회귀 시험 구조 정리와 Address Sanitizer 실패 해결을 요청했고, 두 가지 모두 새 커밋으로 반영했습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">PR 원문 #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-815" data-group="review">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge changes" data-pr="openssl-projects/pkcs11-provider#815">수정 요청</span></span>
+      <span class="line2">RSA 무패딩 서명 입력을 버퍼 크기가 아니라 모듈러스와 비교</span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓50</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #815 · 버그 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd>토큰 키로 RSA 무패딩(<code>RSA_NO_PADDING</code>) 서명을 하면, 입력이 맞아도 출력 버퍼가 모듈러스보다 크기만 하면 실패했습니다. 기본 provider는 같은 입력·같은 버퍼로 서명하고 모듈러스 크기를 돌려줍니다.</dd><dt>배경 지식</dt><dd>RSA와 OpenSSL provider API 지식이 필요했습니다. <code>EVP_PKEY_sign()</code>은 <code>*siglen</code>으로 버퍼 크기를 받고, 무패딩 RSA(PKCS#11의 <code>CKM_RSA_X_509</code>)는 입력이 모듈러스와 정확히 같은 길이여야 합니다.</dd><dt>찾은 방법</dt><dd>같은 버퍼 크기 측정에서 pkcs11-provider와 OpenSSL 기본 provider를 비교해 찾았습니다. 257·512·8448바이트 버퍼가 토큰에서는 실패하고 기본 provider에서는 성공했습니다.</dd><dt>수정</dt><dd>입력 길이를 호출자 버퍼 크기가 아니라 키의 모듈러스 크기와 비교합니다. 새 <code>rsaraw</code> 시험은 두 provider를 모두 확인하고, 토큰 서명에서 원래 데이터를 되살려 보며, 모듈러스보다 짧은 입력은 여전히 거부하는지 봅니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">PR 원문 #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-openssl-33426" data-group="review">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33426">리뷰 대기</span></span>
       <span class="line2">키 형식별(type-specific) 개인키 DER를 지운 뒤 해제</span>
-      <span class="line3">제출 2026-10-28 · 5일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-10-28 · 6일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">openssl/openssl #33426 · 보안 강화 ↗</a></div>
@@ -214,7 +247,7 @@
     <summary>
       <span class="line1"><b>Mbed TLS</b> <span class="badge review" data-pr="Mbed-TLS/mbedtls#11036">리뷰 대기</span></span>
       <span class="line2">파서가 없는 X.509 확장이 중복돼도 거부</span>
-      <span class="line3">제출 2026-10-30 · 3일째 · 응답 아직 · CI <span class="ok">✓2</span></span>
+      <span class="line3">제출 2026-10-30 · 4일째 · 응답 아직 · CI <span class="ok">✓2</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Mbed-TLS/mbedtls #11036 · 버그 수정 ↗</a></div>
@@ -225,7 +258,7 @@
     <summary>
       <span class="line1"><b>mitmproxy</b> <span class="badge review" data-pr="mitmproxy/mitmproxy#8548">리뷰 대기</span></span>
       <span class="line2"><code>--set confdir</code>에서도 설정 파일 옵션을 먼저 적용</span>
-      <span class="line3">제출 2026-10-31 · 2일째 · 응답 아직 · CI <span class="ok">✓26</span></span>
+      <span class="line3">제출 2026-10-31 · 3일째 · 응답 아직 · CI <span class="ok">✓26</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy/mitmproxy #8548 · 버그 수정 ↗</a></div>
@@ -236,7 +269,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33470">리뷰 대기</span></span>
       <span class="line2"><code>EVP_PKEY_derive_SKEY()</code>가 실패할 때 파생된 공유 비밀 지우기</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">openssl/openssl #33470 · 보안 강화 ↗</a></div>
@@ -247,7 +280,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33471">리뷰 대기</span></span>
       <span class="line2">DHKEM IKM을 바꿀 때 이전 IKM 지우기</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · 보안 강화 ↗</a></div>
@@ -258,7 +291,7 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1382">리뷰 대기</span></span>
       <span class="line2">BoxedUint: &quot;0&quot;을 limb 1개짜리 0으로 읽기</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓33</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓33</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1382 · 버그 수정 ↗</a></div>
@@ -269,7 +302,7 @@
     <summary>
       <span class="line1"><b>TF-PSA-Crypto</b> <span class="badge review" data-pr="Mbed-TLS/TF-PSA-Crypto#960">리뷰 대기</span></span>
       <span class="line2">mbedtls_mpi_gcd_modinv_odd() 임시 버퍼 소거</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓1</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="ok">✓1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">Mbed-TLS/TF-PSA-Crypto #960 · 보안 강화 ↗</a></div>
@@ -280,7 +313,7 @@
     <summary>
       <span class="line1"><b>tpm2-tss</b> <span class="badge review" data-pr="tpm2-software/tpm2-tss#3198">리뷰 대기</span></span>
       <span class="line2">mu: TPMS_EMPTY 마샬링 함수가 NULL offset을 받게 고침</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓31</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓31</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">tpm2-software/tpm2-tss #3198 · 버그 수정 ↗</a></div>
@@ -291,7 +324,7 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1383">리뷰 대기</span></span>
       <span class="line2">BoxedUint: from_*e_slice가 정밀도 위 비트를 버린다고 문서 고침</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓33</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓33</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1383 · 문서 수정 ↗</a></div>
@@ -302,7 +335,7 @@
     <summary>
       <span class="line1"><b>OpenSC</b> <span class="badge review" data-pr="OpenSC/OpenSC#3917">리뷰 대기</span></span>
       <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓68</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓68</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · 버그 수정 ↗</a></div>
@@ -313,7 +346,7 @@
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2075">리뷰 대기</span></span>
       <span class="line2">ssl: key_state_free()에서 키 원재료 지우기</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="none">—</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="none">—</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2075" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2075 · 보안 강화 ↗</a></div>
@@ -324,7 +357,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33476">리뷰 대기</span></span>
       <span class="line2">PBKDF1 derive_skey 버퍼를 0으로 채우지 않고 할당</span>
-      <span class="line3">제출 2026-11-02 · 0일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-11-02 · 1일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · 코드 정리 ↗</a></div>
@@ -335,29 +368,18 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33477">리뷰 대기</span></span>
       <span class="line2">해제된 메모리에 남은 비밀값을 찾는 시험 도우미</span>
-      <span class="line3">제출 2026-11-02 · 0일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-11-02 · 1일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">openssl/openssl #33477 · 시험 보강 ↗</a></div>
       <dl><dt>문제</dt><dd>비밀값을 지운 뒤 해제하는지 보는 시험마다 할당 함수 가로채기 코드를 따로 들고 있었고, openssl-4.0 이하에서는 시험 도중에 할당 함수를 바꿀 수 없어 그 검사가 돌지 못했습니다.</dd><dt>배경 지식</dt><dd>핵심 보안 매개변수 제로화 검사(ISO/IEC 19790, FIPS 140-3·KCMVP)를 다시 쓸 수 있는 시험으로 만들었습니다. #33444 리뷰어가 가로채기 코드를 일반화하자고 했고 4.0 제약도 짚었습니다.</dd><dt>찾은 방법</dt><dd>#33444 리뷰에서 나왔고, 4.0에 대한 리뷰어 지적을 반영해 다시 만들었습니다.</dd><dt>수정</dt><dd>libtestutil에 <code>test_watch_freed_start()</code>/<code>test_watch_freed_stop()</code>을 넣었습니다. <code>OPENSSL_TEST_WATCH_FREED</code>를 켜면 <code>test/testutil/main.c</code>가 시작할 때 가로채기를 설치해, mfail이 있든 없든 검사가 돕니다. <code>test_kdf_pbkdf1_skey</code>가 이 도우미를 쓰고, PBKDF1 키를 지우지 않고 해제하면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">PR 원문 #33477 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33477/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="RustCrypto-formats-2502" data-group="review">
-    <summary>
-      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/formats#2502">리뷰 대기</span></span>
-      <span class="line2">pkcs5: <code>MAX_LEN</code>보다 긴 솔트에 <code>Salt::new</code>가 패닉 대신 오류를 돌려줌</span>
-      <span class="line3">제출 2026-11-02 · 0일째 · 응답 아직 · CI <span class="ok">✓8</span> <span class="wait">…3</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">RustCrypto/formats #2502 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd><code>pkcs5::pbes2::Salt::new</code>는 32바이트보다 긴 솔트에 오류를 돌려준다고 문서에 적혀 있지만, #2295에서 길이 검사가 빠졌습니다. 33바이트 솔트를 <code>Salt::new</code>, <code>Pbkdf2Params::hmac_sha256</code>, <code>ScryptParams::from_params_and_salt</code>에 넘기면 오류 대신 범위 밖 인덱스로 패닉했습니다. 배포판 0.8.0과 0.8.1에 이 회귀가 들어 있습니다.</dd><dt>배경 지식</dt><dd>PKCS #5 PBES2(RFC 8018)를 썼습니다. PBKDF2와 scrypt 매개변수는 솔트를 OCTET STRING으로 담고, 이 크레이트는 할당자 없이도 돌도록 솔트를 고정 32바이트 버퍼에 담습니다.</dd><dt>찾은 방법</dt><dd><code>formats</code>의 해석기와 생성자를 libFuzzer로 퍼징해 찾았습니다. 해석기는 길이를 검사하지만 호출자가 솔트를 넘기는 생성자는 검사하지 않았고, <code>git log -p</code>로 검사가 빠진 커밋 #2295를 찾았습니다.</dd><dt>수정</dt><dd>길이 검사를 되살렸습니다. 새 시험은 33바이트 솔트(수정을 빼면 실패)와 32바이트 솔트를 다루고, <code>pkcs5</code> 시험·clippy·rustfmt가 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">PR 원문 #2502 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2502/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="OpenVPN-openvpn-2078" data-group="review">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2078">리뷰 대기</span></span>
       <span class="line2">crypto: struct key_parameters 사본을 쓴 뒤 지우기</span>
-      <span class="line3">제출 2026-11-02 · 0일째 · 응답 아직 · CI <span class="none">—</span></span>
+      <span class="line3">제출 2026-11-02 · 1일째 · 응답 아직 · CI <span class="none">—</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2078" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2078 · 보안 강화 ↗</a></div>
@@ -368,7 +390,7 @@
     <summary>
       <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">CI 실행 허가 대기</span></span>
       <span class="line2">개인키 사본을 지운 뒤 해제</span>
-      <span class="line3">제출 2026-10-29 · 4일째 · 응답 아직 · CI <span class="ok">✓2</span> <span class="wait">⏸5</span></span>
+      <span class="line3">제출 2026-10-29 · 5일째 · 응답 아직 · CI <span class="ok">✓2</span> <span class="wait">⏸5</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">open-quantum-safe/oqs-provider #861 · 보안 강화 ↗</a></div>
@@ -379,33 +401,11 @@
     <summary>
       <span class="line1"><b>liboqs</b> <span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">CI 실행 허가 대기</span></span>
       <span class="line2">잘못된 길이의 ML-DSA Wycheproof 검증 벡터가 라이브러리까지 가도록</span>
-      <span class="line3">제출 2026-10-31 · 2일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
+      <span class="line3">제출 2026-10-31 · 3일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · 시험 보강 ↗</a></div>
       <dl><dt>문제</dt><dd>liboqs 시험 하네스가 길이가 틀린 ML-DSA 서명과 255바이트를 넘는 context를 라이브러리 호출 전에 걸렀고, 실행기는 이를 통과로 셌습니다. 그래서 Wycheproof <code>IncorrectSignatureLength</code>·<code>InvalidContext</code> 벡터가 liboqs에 닿지 않았고, liboqs ML-DSA 연결 코드의 서명 길이 검사를 꺼도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 매개변수 집합마다 서명 길이를 고정합니다. liboqs는 mldsa-native 구현을 자체 연결 코드로 감싸므로, 공개 API에서 이 길이를 지키는 책임이 그 연결 코드에 있습니다.</dd><dt>찾은 방법</dt><dd>암호 라이브러리 9곳의 Wycheproof 시험 하네스에서 건너뛰는 벡터를 훑은 뒤, liboqs에서 변이 시험으로 확인했습니다.</dd><dt>수정</dt><dd>ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결 코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">PR 원문 #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="ci">
-    <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge ci_approval" data-pr="openssl-projects/pkcs11-provider#814">CI 실행 허가 대기</span></span>
-      <span class="line2">CKR_BUFFER_TOO_SMALL 뒤 서명 작업 취소</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="wait">⏸11</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #814 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>너무 작은 버퍼로 서명을 한 번 하면 풀에 있는 PKCS#11 세션에 서명 작업이 열린 채 남았습니다. 그 세션을 받은 다음 서명은 모두 <code>CKR_OPERATION_ACTIVE</code>로 실패했습니다. NSS softokn에서 2048비트 RSA 키로 255바이트 버퍼에 한 번 서명하자, 그 프로세스의 RSA·RSA-PSS·ECDSA·DigestSign 서명이 전부 멈췄습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 세션 규약 지식이 필요했습니다. <code>C_Sign()</code>이 <code>CKR_BUFFER_TOO_SMALL</code>을 돌려주면 더 큰 버퍼로 다시 부를 수 있게 작업을 열어 둡니다. 세션을 풀로 돌려쓰는 provider는 돌려주기 전에 그 작업을 끝내야 합니다.</dd><dt>찾은 방법</dt><dd>버퍼 크기 측정으로 찾았습니다. pkcs11-provider의 서명·파생·복호화 경로마다 필요한 것보다 작고 큰 버퍼를 넣은 뒤, 이어서 정상 호출을 해 세션이 아직 쓸 수 있는지 봤습니다.</dd><dt>수정</dt><dd>열린 작업을 정리하던 기존 코드를 함수로 빼서, <code>CKR_BUFFER_TOO_SMALL</code>이면 세션을 돌려주기 전에 부릅니다. 새 <code>sigbuf</code> 시험은 수정 전에 실패하고 수정 후에 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">PR 원문 #814 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-projects-pkcs11-provider-815" data-group="ci">
-    <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge ci_approval" data-pr="openssl-projects/pkcs11-provider#815">CI 실행 허가 대기</span></span>
-      <span class="line2">RSA 무패딩 서명 입력을 버퍼 크기가 아니라 모듈러스와 비교</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="wait">⏸11</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #815 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>토큰 키로 RSA 무패딩(<code>RSA_NO_PADDING</code>) 서명을 하면, 입력이 맞아도 출력 버퍼가 모듈러스보다 크기만 하면 실패했습니다. 기본 provider는 같은 입력·같은 버퍼로 서명하고 모듈러스 크기를 돌려줍니다.</dd><dt>배경 지식</dt><dd>RSA와 OpenSSL provider API 지식이 필요했습니다. <code>EVP_PKEY_sign()</code>은 <code>*siglen</code>으로 버퍼 크기를 받고, 무패딩 RSA(PKCS#11의 <code>CKM_RSA_X_509</code>)는 입력이 모듈러스와 정확히 같은 길이여야 합니다.</dd><dt>찾은 방법</dt><dd>같은 버퍼 크기 측정에서 pkcs11-provider와 OpenSSL 기본 provider를 비교해 찾았습니다. 257·512·8448바이트 버퍼가 토큰에서는 실패하고 기본 provider에서는 성공했습니다.</dd><dt>수정</dt><dd>입력 길이를 호출자 버퍼 크기가 아니라 키의 모듈러스 크기와 비교합니다. 새 <code>rsaraw</code> 시험은 두 provider를 모두 확인하고, 토큰 서명에서 원래 데이터를 되살려 보며, 모듈러스보다 짧은 입력은 여전히 거부하는지 봅니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">PR 원문 #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33444" data-group="closed">
@@ -510,13 +510,13 @@
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
       <div class="about">OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider</div>
       <div class="focus">보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조</div>
-      <div class="prs"><span>PR 3건</span> <span class="badge rereview">수정 반영, 재리뷰 대기 1</span> <span class="badge ci_approval">CI 실행 허가 대기 2</span></div>
+      <div class="prs"><span>PR 3건</span> <span class="badge merged">머지됨 1</span> <span class="badge rereview">수정 반영, 재리뷰 대기 1</span> <span class="badge changes">수정 요청 1</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
       <div class="about">OpenVPN 본체(C), 패치는 Gerrit으로 제출</div>
       <div class="focus">보는 것: 지우지 않고 해제하는 키 재료</div>
-      <div class="prs"><span>PR 5건</span> <span class="badge approved">승인 3</span> <span class="badge review">리뷰 대기 2</span></div>
+      <div class="prs"><span>PR 5건</span> <span class="badge merged">머지됨 1</span> <span class="badge approved">승인 2</span> <span class="badge review">리뷰 대기 2</span></div>
     </article>
     <article class="repo" id="repo-randombit-botan">
       <div class="name"><b>Botan</b> <a href="https://github.com/randombit/botan" target="_blank" rel="noopener">randombit/botan ↗</a></div>
@@ -588,7 +588,7 @@
       <div class="name"><b>RustCrypto formats</b> <a href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener">RustCrypto/formats ↗</a></div>
       <div class="about">Rust용 DER·PEM·X.509 등 형식 크레이트 모음</div>
       <div class="focus">보는 것: 잘못된 DER 값 해석</div>
-      <div class="prs"><span>PR 2건</span> <span class="badge merged">머지됨 1</span> <span class="badge review">리뷰 대기 1</span></div>
+      <div class="prs"><span>PR 2건</span> <span class="badge merged">머지됨 2</span></div>
     </article>
     <article class="repo" id="repo-OpenSC-OpenSC">
       <div class="name"><b>OpenSC</b> <a href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener">OpenSC/OpenSC ↗</a></div>
@@ -598,9 +598,9 @@
     </article></div>
   </section>
 
-  <footer>2026-11-02 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
+  <footer>2026-11-03 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
-<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "approved_pending": "승인, 추가 리뷰 대기", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-11-02 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
+<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "approved_pending": "승인, 추가 리뷰 대기", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-11-03 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
 <script>
 (() => {
   const L = JSON.parse(document.getElementById("labels").textContent);

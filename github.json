@@ -101,13 +101,7 @@
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2076"
  },
  "OpenVPN/openvpn#2077": {
-  "approvals": [
-   {
-    "by": "Steffan Karger",
-    "date": "2026-11-02",
-    "url": "https://gerrit.openvpn.net/c/openvpn/+/2077"
-   }
-  ],
+  "approvals": [],
   "live": {
    "checks": {
     "fail": 0,
@@ -116,11 +110,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-02",
    "first_response": "2026-11-01",
    "last_response": "2026-11-02",
    "opened": "2026-11-01",
-   "stage": "approved"
+   "stage": "merged"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2077"
@@ -286,22 +280,31 @@
   "url": "https://github.com/RustCrypto/formats/pull/2501"
  },
  "RustCrypto/formats#2502": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "tarcieri",
+    "date": "2026-11-02",
+    "url": "https://github.com/RustCrypto/formats/pull/2502#pullrequestreview-5738605197"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 8,
-    "pending": 3
+    "pass": 11,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-02",
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-02",
    "opened": "2026-11-02",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "9960cb7b85862cc2a708ee97da9656afd863db23",
+   "url": "https://github.com/RustCrypto/formats/commit/9960cb7b85862cc2a708ee97da9656afd863db23"
+  },
   "url": "https://github.com/RustCrypto/formats/pull/2502"
  },
  "RustCrypto/signatures#1493": {
@@ -400,14 +403,14 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 50,
     "pending": 0
    },
-   "ci_waiting": 11,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": "2026-10-30",
-   "last_response": "2026-10-30",
+   "last_response": "2026-11-02",
    "opened": "2026-10-30",
    "stage": "rereview"
   },
@@ -415,22 +418,31 @@
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813"
  },
  "openssl-projects/pkcs11-provider#814": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "simo5",
+    "date": "2026-11-02",
+    "url": "https://github.com/openssl-projects/pkcs11-provider/pull/814#pullrequestreview-5738072405"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 50,
     "pending": 0
    },
-   "ci_waiting": 11,
+   "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-02",
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-02",
    "opened": "2026-10-31",
-   "stage": "ci_approval"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "ed9cb506b2a1fae556ca9ac4fd2cf539743c726d",
+   "url": "https://github.com/openssl-projects/pkcs11-provider/commit/ed9cb506b2a1fae556ca9ac4fd2cf539743c726d"
+  },
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/814"
  },
  "openssl-projects/pkcs11-provider#815": {
@@ -438,16 +450,16 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 50,
     "pending": 0
    },
-   "ci_waiting": 11,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-02",
    "opened": "2026-10-31",
-   "stage": "ci_approval"
+   "stage": "changes"
   },
   "merge": null,
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/815"

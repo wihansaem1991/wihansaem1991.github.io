@@ -786,9 +786,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-02
     defect:
       en: >-
         One signature into a buffer that was too small left the signing operation active on a pooled
@@ -1052,9 +1052,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-02
-    decided: null
+    decided: 2026-11-02
     defect:
       en: >-
         `pkcs5::pbes2::Salt::new` is documented to return an error for a salt longer than 32 bytes,
@@ -1245,7 +1245,7 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-01
     decided: 2026-11-02
     defect:
