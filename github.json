@@ -56,6 +56,25 @@
   "merge": null,
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
  },
+ "RustCrypto/AEADs#894": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 11,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-02",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/RustCrypto/AEADs/pull/894"
+ },
  "RustCrypto/RSA#740": {
   "approvals": [
    {
@@ -206,7 +225,7 @@
     "pending": 0
    },
    "ci_waiting": 1,
-   "draft": true,
+   "draft": false,
    "ended": null,
    "first_response": "2026-11-01",
    "last_response": "2026-11-01",
@@ -225,7 +244,7 @@
     "pending": 0
    },
    "ci_waiting": 5,
-   "draft": true,
+   "draft": false,
    "ended": null,
    "first_response": null,
    "last_response": null,
@@ -303,27 +322,33 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 1,
+    "pass": 95,
     "pending": 0
    },
-   "ci_waiting": 13,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": null,
    "last_response": null,
    "opened": "2026-10-28",
-   "stage": "ci_approval"
+   "stage": "review"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33426"
  },
  "openssl/openssl#33430": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "esyr",
+    "date": "2026-11-02",
+    "url": "https://github.com/openssl/openssl/pull/33430#pullrequestreview-5731464751"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 87,
-    "pending": 10
+    "pass": 97,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
@@ -371,16 +396,16 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 1,
+    "pass": 95,
     "pending": 0
    },
-   "ci_waiting": 13,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": null,
    "last_response": null,
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "review"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33470"
@@ -390,19 +415,57 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 1,
+    "pass": 95,
     "pending": 0
    },
-   "ci_waiting": 13,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": null,
    "last_response": null,
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "review"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33471"
+ },
+ "openssl/openssl#33476": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 95,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-02",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33476"
+ },
+ "openssl/openssl#33477": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 95,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-02",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33477"
  },
  "randombit/botan#6082": {
   "approvals": [],

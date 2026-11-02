@@ -95,7 +95,7 @@
   <div class="summary">27 pull requests and 7 vulnerability reports · 8 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">34</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">12</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">17</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">34</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">15</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">7</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">17</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -144,15 +144,26 @@
       <dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">Pull request #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="openssl-openssl-33426" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33426">Awaiting review</span></span>
+      <span class="line2">Clear type-specific private key DER before freeing it</span>
+      <span class="line3">submitted 2026-10-28 · 5 days · no reply yet · CI <span class="ok">✓95</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">openssl/openssl #33426 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>key_to_type_specific_der_bio()</code> freed the DER produced by the key&#x27;s i2d function with <code>OPENSSL_free()</code>. For a private key that buffer holds the whole key, so every <code>i2d_PrivateKey()</code> or &quot;type-specific&quot; DER encoding of an RSA, EC, DSA or SM2 key left it in freed memory. The PEM path already cleared its copy.</dd><dt>Background</dt><dd>The zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP) and how OpenSSL 3 encoders hand key material between <code>i2d</code> functions and BIOs.</dd><dt>How it was found</dt><dd>The freed-block measurement program, which swaps OpenSSL&#x27;s allocator and looks for key bytes in every freed block, run over the key encoders.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> for the encoded buffer. <code>test_type_specific_der_cleanse</code> encodes an RSA key both ways under a watching allocator and fails without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">Pull request #33426 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33426/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-openssl-33430" data-group="review">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33430">Awaiting review</span></span>
       <span class="line2">Clear the <code>EVP_ENCODE_CTX</code> when freeing it</span>
-      <span class="line3">submitted 2026-10-28 · 5 days · first reply 2026-11-02 · CI <span class="ok">✓87</span> <span class="wait">…10</span></span>
+      <span class="line3">submitted 2026-10-28 · 5 days · first reply 2026-11-02 · CI <span class="ok">✓97</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · Hardening ↗</a></div>
-      <dl><dt>Problem</dt><dd>The base64 context keeps the last partial line of its input and was freed without clearing it. <code>PEM_write_bio()</code> encodes private key DER through such a context, so the last (length mod 48) bytes of the key stayed in freed memory: the end of <code>iqmp</code> for RSA, private key bytes for Ed448, ML-DSA and ML-KEM. Reading PEM left base64 text the same way.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) followed through the PEM and base64 layers: <code>EVP_ENCODE_CTX</code> has been opaque since OpenSSL 1.1.0 and is always allocated by <code>EVP_ENCODE_CTX_new()</code>, so clearing it on free covers PEM reading, PEM writing and <code>BIO_f_base64</code>.</dd><dt>How it was found</dt><dd>The same freed-block measurement program, run over PEM encoding of private keys.</dd><dt>Fix</dt><dd>Clear the context in <code>EVP_ENCODE_CTX_free()</code>. <code>test_encode_ctx_free_clears_input</code> leaves a partial block in a context, swaps the free function and fails if the freed context still holds the input.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">Pull request #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+      <dl><dt>Problem</dt><dd>The base64 context keeps the last partial line of its input and was freed without clearing it. <code>PEM_write_bio()</code> encodes private key DER through such a context, so the last (length mod 48) bytes of the key stayed in freed memory: the end of <code>iqmp</code> for RSA, private key bytes for Ed448, ML-DSA and ML-KEM. Reading PEM left base64 text the same way.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) followed through the PEM and base64 layers: <code>EVP_ENCODE_CTX</code> has been opaque since OpenSSL 1.1.0 and is always allocated by <code>EVP_ENCODE_CTX_new()</code>, so clearing it on free covers PEM reading, PEM writing and <code>BIO_f_base64</code>.</dd><dt>How it was found</dt><dd>The same freed-block measurement program, run over PEM encoding of private keys.</dd><dt>Fix</dt><dd>Clear the context in <code>EVP_ENCODE_CTX_free()</code>. <code>test_encode_ctx_free_clears_input</code> leaves a partial block in a context, swaps the free function and fails if the freed context still holds the input.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">Pull request #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33430#pullrequestreview-5731464751" target="_blank" rel="noopener">esyr ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-mbedtls-11036" data-group="review">
@@ -175,6 +186,28 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy/mitmproxy #8548 · Bug fix ↗</a></div>
       <dl><dt>Problem</dt><dd>With <code>--set confdir=...</code>, mitmproxy loaded the CA from that directory before reading <code>cert_passphrase</code> from the directory&#x27;s <code>config.yaml</code>. An encrypted CA key then failed to load and mitmproxy exited at startup (issue #6014, open since 2023).</dd><dt>Background</dt><dd>TLS interception: mitmproxy signs certificates on the fly with its own CA, so the CA private key has to load at startup, and an encrypted PKCS#8 key needs its passphrase first. Its option manager notifies addons on every update, so the order of updates decides what an addon sees.</dd><dt>How it was found</dt><dd>Issue #6014 with the maintainer&#x27;s diagnosis, and a stalled pull request from 2023 that had never been reviewed. Reproduced on Linux with an encrypted CA.</dd><dt>Fix</dt><dd>Work out the <code>--set</code> options and the config file on a copy of the options (a copy has no subscribers) and apply the result in one update; precedence is unchanged. A new test runs mitmdump with an encrypted CA and fails with the old order.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">Pull request #8548 ↗</a> · <a href="https://github.com/mitmproxy/mitmproxy/pull/8548/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33470" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33470">Awaiting review</span></span>
+      <span class="line2">Clear the derived secret on <code>EVP_PKEY_derive_SKEY()</code> failure</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="ok">✓95</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">openssl/openssl #33470 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>When the key exchange has no <code>derive_skey</code>, <code>EVP_PKEY_derive_SKEY()</code> derives into a temporary buffer, and its two error paths freed that buffer with <code>OPENSSL_free()</code>. Asking for more bytes than the shared secret has is enough: X25519 and X448 write the real secret, the length check fails, and the shared secret stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation of temporary secrets (ISO/IEC 19790, FIPS 140-3, KCMVP) applied to the new <code>EVP_SKEY</code> key-exchange API. The success path of the same function already used <code>OPENSSL_clear_free()</code>; this is the pattern reviewers accepted in #33444.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing listed the two lines; the freed-block measurement program then confirmed the X25519 and X448 secrets left at <code>exchange.c:553</code>, with nothing left when the requested length matched.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both error paths. <code>test_derive_skey_clears_on_failure</code> asks for twice the X25519 secret length, watches freed blocks and fails if the change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">Pull request #33470 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33470/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33471" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33471">Awaiting review</span></span>
+      <span class="line2">Clear the previous DHKEM IKM when it is replaced</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="ok">✓95</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>The DHKEM IKM on an EC or X25519/X448 key generation context fixes the private key that will be generated (RFC 9180 DeriveKeyPair). Setting a new IKM freed the previous copy with <code>OPENSSL_free()</code>, so a value that recreates the private key stayed in freed memory.</dd><dt>Background</dt><dd>HPKE key derivation (RFC 9180) and the zeroisation of keying material that determines a key (ISO/IEC 19790, FIPS 140-3, KCMVP). The generation context&#x27;s cleanup already cleared the IKM; only the replace path did not.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing, confirmed with the freed-block measurement program: the old 32-byte IKM was left for X25519, X448 and P-256.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> in <code>ecx_gen_set_params()</code> and in the EC <code>COPY_OCTET_PARAM()</code> macro. <code>test_ikm_cleared_on_reset</code> sets the IKM twice and fails if either change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">Pull request #33471 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33471/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="RustCrypto-crypto-bigint-1382" data-group="review">
@@ -232,20 +265,42 @@
       <dl><dt>Problem</dt><dd>OpenSC&#x27;s PKCS#11 module could verify signatures with a public key but not encrypt with one: <code>C_EncryptInit()</code> on an RSA public key failed with <code>CKR_KEY_TYPE_INCONSISTENT</code> (#3144). The p11test suite also never called <code>C_Encrypt()</code>, because its group setup dropped the flag that enables it.</dd><dt>Background</dt><dd>PKCS#11 object operations and mechanism flags (<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5 and raw RSA encryption, and OpenSC&#x27;s existing software path for <code>C_Verify()</code> through OpenSSL.</dd><dt>How it was found</dt><dd>A maintainer-labelled good first issue. A virtual SmartCard-HSM (pico-hsm emulation behind vsmartcard and a user-mode pcscd) reproduced it, and pkcs11-spy showed p11test never reaching <code>C_Encrypt()</code>.</dd><dt>Fix</dt><dd>Public key objects encrypt with <code>CKM_RSA_PKCS</code> and <code>CKM_RSA_X_509</code> through OpenSSL, and p11test now keeps the flag. Card round trips work for both mechanisms; the CI p11test run matches the updated reference with no differences.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">Pull request #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="openssl-openssl-33426" data-group="ci">
+  <details class="entry" id="openssl-openssl-33476" data-group="review">
     <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33426">Awaiting CI approval</span></span>
-      <span class="line2">Clear type-specific private key DER before freeing it</span>
-      <span class="line3">submitted 2026-10-28 · 5 days · no reply yet · CI <span class="ok">✓1</span> <span class="wait">⏸13</span></span>
+      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33476">Awaiting review</span></span>
+      <span class="line2">Allocate the PBKDF1 derive_skey buffer without zeroing it</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">openssl/openssl #33426 · Hardening ↗</a></div>
-      <dl><dt>Problem</dt><dd><code>key_to_type_specific_der_bio()</code> freed the DER produced by the key&#x27;s i2d function with <code>OPENSSL_free()</code>. For a private key that buffer holds the whole key, so every <code>i2d_PrivateKey()</code> or &quot;type-specific&quot; DER encoding of an RSA, EC, DSA or SM2 key left it in freed memory. The PEM path already cleared its copy.</dd><dt>Background</dt><dd>The zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP) and how OpenSSL 3 encoders hand key material between <code>i2d</code> functions and BIOs.</dd><dt>How it was found</dt><dd>The freed-block measurement program, which swaps OpenSSL&#x27;s allocator and looks for key bytes in every freed block, run over the key encoders.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> for the encoded buffer. <code>test_type_specific_der_cleanse</code> encodes an RSA key both ways under a watching allocator and fails without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">Pull request #33426 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33426/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · Cleanup ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>kdf_pbkdf1_derive_skey()</code> allocated the key buffer with <code>OPENSSL_zalloc()</code>, but nothing reads it before the derivation writes every byte, and on failure it is cleared and freed unread. The zero fill was wasted work.</dd><dt>Background</dt><dd>A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left for a separate change to keep that PR to its scope.</dd><dt>How it was found</dt><dd>Reviewer comment on</dd><dt>Fix</dt><dd><code>OPENSSL_malloc()</code> instead of <code>OPENSSL_zalloc()</code>. Built with <code>--strict-warnings</code>; <code>test_evp_kdf</code> passes, including <code>test_kdf_pbkdf1_skey</code>.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">Pull request #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33477" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33477">Awaiting review</span></span>
+      <span class="line2">A test helper that looks for secrets left in freed memory</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="ok">✓95</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">openssl/openssl #33477 · Test coverage ↗</a></div>
+      <dl><dt>Problem</dt><dd>Each test that checks a secret is cleared before its buffer is freed carried its own copy of an allocator hook, and on openssl-4.0 and older the allocator cannot be replaced in the middle of a test, so such checks could not run there.</dd><dt>Background</dt><dd>Zeroisation checks for critical security parameters (ISO/IEC 19790, FIPS 140-3, KCMVP), turned into a reusable test. A reviewer of #33444 suggested generalising the hook and pointed out the 4.0 limitation.</dd><dt>How it was found</dt><dd>Review of</dd><dt>Fix</dt><dd><code>test_watch_freed_start()</code>/<code>test_watch_freed_stop()</code> in libtestutil. With <code>OPENSSL_TEST_WATCH_FREED</code> set, <code>test/testutil/main.c</code> installs the hooks at startup, so the check runs with or without mfail. <code>test_kdf_pbkdf1_skey</code> uses it and fails if the PBKDF1 key is freed without clearing.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">Pull request #33477 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33477/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-AEADs-894" data-group="review">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/AEADs#894">Awaiting review</span></span>
+      <span class="line2">eax: add Wycheproof test vectors</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="ok">✓11</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">RustCrypto/AEADs #894 · Test coverage ↗</a></div>
+      <dl><dt>Problem</dt><dd>The <code>eax</code> crate&#x27;s only failing-vector file was empty, so no test checked that a wrong tag is rejected: with the tag comparison forced to succeed, every test still passed. AES-192 and AES-256 had no test vectors at all.</dd><dt>Background</dt><dd>Validation test vectors (Wycheproof), the same approach as known-answer testing in cryptographic module validation (KCMVP): run the published vectors and check that a forged tag is refused.</dd><dt>How it was found</dt><dd>Running all Wycheproof AES-CCM and AES-EAX vectors against the crates (672 cases, no mismatch) and then checking which of them the crate&#x27;s own tests cover; a mutant with the tag check disabled passed the existing tests.</dd><dt>Fix</dt><dd>186 Wycheproof cases (105 valid, 81 invalid) for AES-128, AES-192 and AES-256 through the <code>aead</code> test macros. With the tag check disabled, the three new failure tests fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">Pull request #894 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/894/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
     <summary>
-      <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval · draft</span></span>
+      <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval</span></span>
       <span class="line2">Clear private key copies before freeing them</span>
       <span class="line3">submitted 2026-10-29 · 4 days · no reply yet · CI <span class="ok">✓2</span> <span class="wait">⏸5</span></span>
     </summary>
@@ -256,35 +311,13 @@
   </details>
   <details class="entry" id="open-quantum-safe-liboqs-2665" data-group="ci">
     <summary>
-      <span class="line1"><b>liboqs</b> <span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">Awaiting CI approval · draft</span></span>
+      <span class="line1"><b>liboqs</b> <span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">Awaiting CI approval</span></span>
       <span class="line2">Let ML-DSA Wycheproof verify vectors reach the library with wrong lengths</span>
       <span class="line3">submitted 2026-10-31 · 2 days · first reply 2026-11-01 · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · Test coverage ↗</a></div>
       <dl><dt>Problem</dt><dd>liboqs&#x27;s test harness rejected ML-DSA signatures of the wrong length, and contexts longer than 255 bytes, before calling the library, and the runner counted that as a pass. The Wycheproof <code>IncorrectSignatureLength</code> and <code>InvalidContext</code> vectors never reached liboqs: disabling the signature-length check in liboqs&#x27;s ML-DSA glue code left every test passing.</dd><dt>Background</dt><dd>FIPS 204 fixes the ML-DSA signature length for each parameter set. liboqs wraps the mldsa-native implementation in its own glue code, and that glue is what has to enforce the length at the public API.</dd><dt>How it was found</dt><dd>A sweep of the Wycheproof test harnesses of nine cryptography libraries for vectors that are skipped, followed by mutation testing on liboqs.</dd><dt>Fix</dt><dd>For ML-DSA, reject only malformed hex input, as the neighbouring SLH-DSA branch already does, so the vectors exercise the library&#x27;s own checks. Disabling the glue check now fails the Wycheproof tests for all three parameter sets.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">Pull request #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-openssl-33470" data-group="ci">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33470">Awaiting CI approval</span></span>
-      <span class="line2">Clear the derived secret on <code>EVP_PKEY_derive_SKEY()</code> failure</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="ok">✓1</span> <span class="wait">⏸13</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">openssl/openssl #33470 · Hardening ↗</a></div>
-      <dl><dt>Problem</dt><dd>When the key exchange has no <code>derive_skey</code>, <code>EVP_PKEY_derive_SKEY()</code> derives into a temporary buffer, and its two error paths freed that buffer with <code>OPENSSL_free()</code>. Asking for more bytes than the shared secret has is enough: X25519 and X448 write the real secret, the length check fails, and the shared secret stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation of temporary secrets (ISO/IEC 19790, FIPS 140-3, KCMVP) applied to the new <code>EVP_SKEY</code> key-exchange API. The success path of the same function already used <code>OPENSSL_clear_free()</code>; this is the pattern reviewers accepted in #33444.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing listed the two lines; the freed-block measurement program then confirmed the X25519 and X448 secrets left at <code>exchange.c:553</code>, with nothing left when the requested length matched.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both error paths. <code>test_derive_skey_clears_on_failure</code> asks for twice the X25519 secret length, watches freed blocks and fails if the change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">Pull request #33470 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33470/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-openssl-33471" data-group="ci">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33471">Awaiting CI approval</span></span>
-      <span class="line2">Clear the previous DHKEM IKM when it is replaced</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="ok">✓1</span> <span class="wait">⏸13</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · Hardening ↗</a></div>
-      <dl><dt>Problem</dt><dd>The DHKEM IKM on an EC or X25519/X448 key generation context fixes the private key that will be generated (RFC 9180 DeriveKeyPair). Setting a new IKM freed the previous copy with <code>OPENSSL_free()</code>, so a value that recreates the private key stayed in freed memory.</dd><dt>Background</dt><dd>HPKE key derivation (RFC 9180) and the zeroisation of keying material that determines a key (ISO/IEC 19790, FIPS 140-3, KCMVP). The generation context&#x27;s cleanup already cleared the IKM; only the replace path did not.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing, confirmed with the freed-block measurement program: the old 32-byte IKM was left for X25519, X448 and P-256.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> in <code>ecx_gen_set_params()</code> and in the EC <code>COPY_OCTET_PARAM()</code> macro. <code>test_ikm_cleared_on_reset</code> sets the IKM twice and fails if either change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">Pull request #33471 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33471/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="schwabe-ics-openvpn-1936" data-group="ci">
@@ -364,39 +397,6 @@
       <dl><dt>Problem</dt><dd>A Classic McEliece private key of the wrong length, given directly or inside PKCS#8, hit an internal assertion and raised <code>Internal_Error</code>, while the public key path rejected the same mistake as an invalid argument.</dd><dt>Background</dt><dd>Classic McEliece (NIST PQC round 4 KEM) key encodings have fixed sizes per parameter set; a library should report malformed keys as input errors, not as internal failures callers do not expect to catch.</dd><dt>How it was found</dt><dd>Length and mutation sweeps over Botan&#x27;s PQC key decoders (16 million inputs, no memory errors) flagged this as the one inconsistent rejection.</dd><dt>Fix</dt><dd>Check the length in the private key constructor exactly like the public key constructor; a new test fails without the check.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/randombit/botan/pull/6082" target="_blank" rel="noopener">Pull request #6082 ↗</a> · <a href="https://github.com/randombit/botan/pull/6082/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="openssl-openssl-33476" data-group="review">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge open" data-pr="openssl/openssl#33476">Open</span></span>
-      <span class="line2">Allocate the PBKDF1 derive_skey buffer without zeroing it</span>
-      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · Cleanup ↗</a></div>
-      <dl><dt>Problem</dt><dd><code>kdf_pbkdf1_derive_skey()</code> allocated the key buffer with <code>OPENSSL_zalloc()</code>, but nothing reads it before the derivation writes every byte, and on failure it is cleared and freed unread. The zero fill was wasted work.</dd><dt>Background</dt><dd>A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left for a separate change to keep that PR to its scope.</dd><dt>How it was found</dt><dd>Reviewer comment on</dd><dt>Fix</dt><dd><code>OPENSSL_malloc()</code> instead of <code>OPENSSL_zalloc()</code>. Built with <code>--strict-warnings</code>; <code>test_evp_kdf</code> passes, including <code>test_kdf_pbkdf1_skey</code>.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">Pull request #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-openssl-33477" data-group="review">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge open" data-pr="openssl/openssl#33477">Open</span></span>
-      <span class="line2">A test helper that looks for secrets left in freed memory</span>
-      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">openssl/openssl #33477 · Test coverage ↗</a></div>
-      <dl><dt>Problem</dt><dd>Each test that checks a secret is cleared before its buffer is freed carried its own copy of an allocator hook, and on openssl-4.0 and older the allocator cannot be replaced in the middle of a test, so such checks could not run there.</dd><dt>Background</dt><dd>Zeroisation checks for critical security parameters (ISO/IEC 19790, FIPS 140-3, KCMVP), turned into a reusable test. A reviewer of #33444 suggested generalising the hook and pointed out the 4.0 limitation.</dd><dt>How it was found</dt><dd>Review of</dd><dt>Fix</dt><dd><code>test_watch_freed_start()</code>/<code>test_watch_freed_stop()</code> in libtestutil. With <code>OPENSSL_TEST_WATCH_FREED</code> set, <code>test/testutil/main.c</code> installs the hooks at startup, so the check runs with or without mfail. <code>test_kdf_pbkdf1_skey</code> uses it and fails if the PBKDF1 key is freed without clearing.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">Pull request #33477 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33477/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="RustCrypto-AEADs-894" data-group="review">
-    <summary>
-      <span class="line1"><b>RustCrypto</b> <span class="badge open" data-pr="RustCrypto/AEADs#894">Open</span></span>
-      <span class="line2">eax: add Wycheproof test vectors</span>
-      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">RustCrypto/AEADs #894 · Test coverage ↗</a></div>
-      <dl><dt>Problem</dt><dd>The <code>eax</code> crate&#x27;s only failing-vector file was empty, so no test checked that a wrong tag is rejected: with the tag comparison forced to succeed, every test still passed. AES-192 and AES-256 had no test vectors at all.</dd><dt>Background</dt><dd>Validation test vectors (Wycheproof), the same approach as known-answer testing in cryptographic module validation (KCMVP): run the published vectors and check that a forged tag is refused.</dd><dt>How it was found</dt><dd>Running all Wycheproof AES-CCM and AES-EAX vectors against the crates (672 cases, no mismatch) and then checking which of them the crate&#x27;s own tests cover; a mutant with the tag check disabled passed the existing tests.</dd><dt>Fix</dt><dd>186 Wycheproof cases (105 valid, 81 invalid) for AES-128, AES-192 and AES-256 through the <code>aead</code> test macros. With the tag check disabled, the three new failure tests fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">Pull request #894 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/894/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="VR-1" data-group="cve">
     <summary>
       <span class="line1"><b>Vulnerability report VR-1</b> <span class="badge vuln">Vulnerability</span> <span class="badge v-triage">Under triage</span></span>
@@ -463,7 +463,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">The most widely deployed TLS and cryptography library, in C</div>
       <div class="focus">Looking at: Secrets left in freed memory, measured by hooking the allocator</div>
-      <div class="prs"><span>7 pull requests</span> <span class="badge review">Awaiting review 1</span> <span class="badge ci_approval">Awaiting CI approval 3</span> <span class="badge closed">Closed 1</span> <span class="badge open">Open 2</span></div>
+      <div class="prs"><span>7 pull requests</span> <span class="badge review">Awaiting review 6</span> <span class="badge closed">Closed 1</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -505,7 +505,7 @@
       <div class="name"><b>RustCrypto AEADs</b> <a href="https://github.com/RustCrypto/AEADs" target="_blank" rel="noopener">RustCrypto/AEADs ↗</a></div>
       <div class="about">Authenticated encryption for Rust (AES-GCM, ChaCha20-Poly1305, CCM, EAX and more)</div>
       <div class="focus">Looking at: Wycheproof vectors the test suite does not run, rejection of forged tags</div>
-      <div class="prs"><span>1 pull requests</span> <span class="badge open">Open 1</span></div>
+      <div class="prs"><span>1 pull requests</span> <span class="badge review">Awaiting review 1</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-signatures">
       <div class="name"><b>RustCrypto signatures</b> <a href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener">RustCrypto/signatures ↗</a></div>
