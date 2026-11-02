@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 32건 · 취약점 보고 7건 · 메인테이너 응답 12건 · CVE 0건</div>
+  <div class="summary">제출 PR 29건 · 취약점 보고 8건 · 메인테이너 응답 11건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">39</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">5</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">17</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">37</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">5</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -408,39 +408,6 @@
       <dl><dt>문제</dt><dd>파생 키를 <code>EVP_SKEY</code>로 가져온 뒤 임시 버퍼를 <code>OPENSSL_free()</code>로 해제해서, 키 전체가 해제된 힙 메모리에 그대로 남았습니다.</dd><dt>배경 지식</dt><dd>FIPS 140-3와 KCMVP 검증의 바탕인 ISO/IEC 19790은 다 쓴 키를 지우도록(제로화) 요구합니다. 파생 키도 비밀값이라 메모리를 돌려주기 전에 지워야 하고, OpenSSL은 이를 위해 <code>OPENSSL_clear_free()</code>를 둡니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제되는 블록마다 키 바이트가 남았는지 재는 측정 프로그램으로 찾았습니다. <code>pbkdf1.c:318</code>에서 해제되는 20바이트 블록에 키 전체가 들어 있었습니다.</dd><dt>수정</dt><dd>두 경로 모두 <code>OPENSSL_clear_free()</code>로 바꿨습니다. 기존 시험 <code>test_kdf_pbkdf1_skey</code>가 이제 해제 블록을 감시하고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>리뷰어 두 명이 승인했고, FIPS와 관련된 버그로 분류됐습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">PR 원문 #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — 리뷰어<br><span class="tr">(번역) 꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.</span></blockquote>
     </div>
   </details>
-  <details class="entry" id="schwabe-ics-openvpn-1936" data-group="closed">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1936">닫힘</span></span>
-      <span class="line2">설정 줄에서 백슬래시 앞 글자가 두 번 들어가는 문제 수정</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">schwabe/ics-openvpn #1936 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd><code>.ovpn</code> 가져오기의 토큰 분리기가 이전 글자를 반복 사이에 들고 있어서, 백슬래시 앞 글자가 두 번 저장됐습니다. <code>ca foo\ bar.crt</code>가 <code>fooo bar.crt</code>로 들어갔습니다.</dd><dt>배경 지식</dt><dd>앱의 Java 이식본이 따라야 할 기준은 OpenVPN 본체의 옵션 토큰 분리기(<code>options_parse.c</code>의 <code>parse_line()</code>)입니다.</dd><dt>찾은 방법</dt><dd>무작위 옵션 줄을 Java 토큰 분리기와 OpenVPN의 실제 <code>parse_line()</code>에 함께 넣어 비교해 찾았습니다.</dd><dt>수정</dt><dd>OpenVPN처럼 매 반복마다 저장 글자를 비웠습니다. 두 쪽이 다르게 나누던 줄이 504개에서 0개가 됐습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">PR 원문 #1936 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1936/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="schwabe-ics-openvpn-1937" data-group="closed">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1937">닫힘</span></span>
-      <span class="line2">잘못된 auth-retry·compat-mode·ifconfig를 가져오기 오류로 알리기</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">schwabe/ics-openvpn #1937 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>잘못된 옵션 값 네 가지에서 가져오기가 잡히지 않는 런타임 예외를 던져, 오류 안내 대신 앱이 죽었습니다.</dd><dt>배경 지식</dt><dd>사용자와 VPN 제공자가 주는, 믿을 수 없는 프로필 파일을 읽는 파서의 견고성 문제입니다.</dd><dt>찾은 방법</dt><dd>일반 JVM에서 무작위 설정으로 가져오기를 퍼징해 찾았습니다. 설정 3만 개에서 크래시 지점 9곳이 나왔습니다.</dd><dt>수정</dt><dd>오타 한 글자를 고치고 두 곳을 ConfigParseError로 바꿨습니다. 크래시 지점이 0이 됐습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">PR 원문 #1937 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1937/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="schwabe-ics-openvpn-1938" data-group="closed">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1938">닫힘</span></span>
-      <span class="line2">IPv6 주소 문자열에서 앞쪽 0 그룹 유지</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 첫 응답 2026-11-02 · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">schwabe/ics-openvpn #1938 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>앞쪽 0 그룹이 있는 IPv6 주소가 그 그룹 없이 출력됐습니다(<code>::1</code>이 <code>1</code>, <code>::2:0</code>이 <code>2::</code>). 안드로이드 13 미만에서는 이 문자열로 VPN 경로를 설치합니다.</dd><dt>배경 지식</dt><dd>IPv6 문자 표기(RFC 4291/5952)와 안드로이드 <code>VpnService.Builder.addRoute()</code>의 경로 설치 방식을 썼습니다.</dd><dt>찾은 방법</dt><dd>무작위 주소로 앱의 주소 출력과 Python <code>ipaddress</code>를 비교해 찾았습니다.</dd><dt>수정</dt><dd>0에서 멈추지 않고 여덟 그룹을 모두 돌게 했습니다. 불일치가 1,524건에서 0건이 됐고 기존 시험의 문자열은 그대로입니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">PR 원문 #1938 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1938/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="randombit-botan-6082" data-group="closed">
     <summary>
       <span class="line1"><b>Botan</b> <span class="badge closed" data-pr="randombit/botan#6082">닫힘</span></span>
@@ -508,6 +475,14 @@
     </summary>
     <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
   </details>
+  <details class="entry" id="VR-8" data-group="cve">
+    <summary>
+      <span class="line1"><b>취약점 보고 VR-8</b> <span class="badge vuln">취약점</span> <span class="badge v-triage">분류 중</span></span>
+      <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
+      <span class="line3">제출 2026-11-02 · 프로젝트 보안 메일(PGP 암호화) · CVE 아직 없음</span>
+    </summary>
+    <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
+  </details>
     <p class="empty" id="empty" hidden>지금은 해당 항목이 없습니다.</p>
   </section>
 
@@ -525,12 +500,6 @@
       <div class="about">OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider</div>
       <div class="focus">보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조</div>
       <div class="prs"><span>PR 3건</span> <span class="badge rereview">수정 반영, 재리뷰 대기 1</span> <span class="badge ci_approval">CI 실행 허가 대기 2</span></div>
-    </article>
-    <article class="repo" id="repo-schwabe-ics-openvpn">
-      <div class="name"><b>OpenVPN for Android</b> <a href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener">schwabe/ics-openvpn ↗</a></div>
-      <div class="about">안드로이드용 OpenVPN 앱</div>
-      <div class="focus">보는 것: 가져온 설정 파일 해석</div>
-      <div class="prs"><span>PR 3건</span> <span class="badge closed">닫힘 3</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
