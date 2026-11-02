@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 26건 · 취약점 보고 7건 · 메인테이너 응답 8건 · CVE 0건</div>
+  <div class="summary">제출 PR 27건 · 취약점 보고 7건 · 메인테이너 응답 8건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">33</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">11</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">34</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">12</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">17</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -386,6 +386,17 @@
       <dl><dt>문제</dt><dd>비밀값을 지운 뒤 해제하는지 보는 시험마다 할당 함수 가로채기 코드를 따로 들고 있었고, openssl-4.0 이하에서는 시험 도중에 할당 함수를 바꿀 수 없어 그 검사가 돌지 못했습니다.</dd><dt>배경 지식</dt><dd>핵심 보안 매개변수 제로화 검사(ISO/IEC 19790, FIPS 140-3·KCMVP)를 다시 쓸 수 있는 시험으로 만들었습니다. #33444 리뷰어가 가로채기 코드를 일반화하자고 했고 4.0 제약도 짚었습니다.</dd><dt>찾은 방법</dt><dd>#33444 리뷰에서 나왔고, 4.0에 대한 리뷰어 지적을 반영해 다시 만들었습니다.</dd><dt>수정</dt><dd>libtestutil에 <code>test_watch_freed_start()</code>/<code>test_watch_freed_stop()</code>을 넣었습니다. <code>OPENSSL_TEST_WATCH_FREED</code>를 켜면 <code>test/testutil/main.c</code>가 시작할 때 가로채기를 설치해, mfail이 있든 없든 검사가 돕니다. <code>test_kdf_pbkdf1_skey</code>가 이 도우미를 쓰고, PBKDF1 키를 지우지 않고 해제하면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">PR 원문 #33477 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33477/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="RustCrypto-AEADs-894" data-group="review">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge open" data-pr="RustCrypto/AEADs#894">열림</span></span>
+      <span class="line2">eax: Wycheproof 시험 벡터 추가</span>
+      <span class="line3">제출 2026-11-02 · 0일째 · 응답 아직 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">RustCrypto/AEADs #894 · 시험 보강 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>eax</code> 크레이트의 실패 벡터 파일이 비어 있어, 틀린 태그를 거부하는지 보는 시험이 없었습니다. 태그 비교를 항상 통과로 바꿔도 모든 시험이 통과했고, AES-192·AES-256은 시험 벡터가 하나도 없었습니다.</dd><dt>배경 지식</dt><dd>암호모듈 검증(KCMVP)의 기지 답 시험과 같은 방식으로, 공개 시험 벡터(Wycheproof)를 돌리고 위조한 태그를 거부하는지 확인했습니다.</dd><dt>찾은 방법</dt><dd>Wycheproof AES-CCM·AES-EAX 벡터 전부(672개, 불일치 0)를 크레이트에 돌린 뒤 크레이트 시험이 무엇을 덮는지 봤습니다. 태그 검사를 끈 변이가 기존 시험을 통과했습니다.</dd><dt>수정</dt><dd>AES-128·192·256 Wycheproof 186개(유효 105·무효 81)를 <code>aead</code> 시험 매크로로 넣었습니다. 태그 검사를 끄면 새 실패 시험 3개가 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">PR 원문 #894 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/894/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="VR-1" data-group="cve">
     <summary>
       <span class="line1"><b>취약점 보고 VR-1</b> <span class="badge vuln">취약점</span> <span class="badge v-triage">분류 중</span></span>
@@ -489,6 +500,12 @@
       <div class="about">순수 Rust RSA 구현</div>
       <div class="focus">보는 것: 시험이 돌리지 않는 Wycheproof 벡터</div>
       <div class="prs"><span>PR 1건</span> <span class="badge merged">머지됨 1</span></div>
+    </article>
+    <article class="repo" id="repo-RustCrypto-AEADs">
+      <div class="name"><b>RustCrypto AEADs</b> <a href="https://github.com/RustCrypto/AEADs" target="_blank" rel="noopener">RustCrypto/AEADs ↗</a></div>
+      <div class="about">Rust 인증 암호 모음(AES-GCM·ChaCha20-Poly1305·CCM·EAX 등)</div>
+      <div class="focus">보는 것: 시험이 돌리지 않는 Wycheproof 벡터, 위조 태그 거부</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge open">열림 1</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-signatures">
       <div class="name"><b>RustCrypto signatures</b> <a href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener">RustCrypto/signatures ↗</a></div>
