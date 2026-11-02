@@ -1220,10 +1220,10 @@ repos:
       ko: 가져온 설정 파일 해석
   - project: OpenVPN
     repo: OpenVPN/openvpn
-    link: https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078
+    link: https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079
     status:
-      en: 4 changes on Gerrit (2075, 2076, 2077, 2078)
-      ko: Gerrit 변경 4건(2075·2076·2077·2078)
+      en: 5 changes on Gerrit (2075 to 2079)
+      ko: Gerrit 변경 5건(2075~2079)
     about:
       en: OpenVPN itself, in C; patches go through Gerrit
       ko: OpenVPN 본체(C), 패치는 Gerrit으로 제출
