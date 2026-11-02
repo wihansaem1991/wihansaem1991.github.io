@@ -56,6 +56,113 @@
   "merge": null,
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
  },
+ "OpenVPN/openvpn#2075": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-01",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://gerrit.openvpn.net/c/openvpn/+/2075"
+ },
+ "OpenVPN/openvpn#2076": {
+  "approvals": [
+   {
+    "by": "Steffan Karger",
+    "date": "2026-11-02",
+    "url": "https://gerrit.openvpn.net/c/openvpn/+/2076"
+   }
+  ],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": "2026-11-01",
+   "last_response": "2026-11-02",
+   "opened": "2026-11-01",
+   "stage": "approved"
+  },
+  "merge": null,
+  "url": "https://gerrit.openvpn.net/c/openvpn/+/2076"
+ },
+ "OpenVPN/openvpn#2077": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": "2026-11-01",
+   "last_response": "2026-11-02",
+   "opened": "2026-11-01",
+   "stage": "rereview"
+  },
+  "merge": null,
+  "url": "https://gerrit.openvpn.net/c/openvpn/+/2077"
+ },
+ "OpenVPN/openvpn#2078": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-02",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://gerrit.openvpn.net/c/openvpn/+/2078"
+ },
+ "OpenVPN/openvpn#2079": {
+  "approvals": [
+   {
+    "by": "Steffan Karger",
+    "date": "2026-11-02",
+    "url": "https://gerrit.openvpn.net/c/openvpn/+/2079"
+   }
+  ],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-02",
+   "opened": "2026-11-02",
+   "stage": "approved"
+  },
+  "merge": null,
+  "url": "https://gerrit.openvpn.net/c/openvpn/+/2079"
+ },
  "RustCrypto/AEADs#894": {
   "approvals": [],
   "live": {
@@ -356,7 +463,7 @@
    "first_response": "2026-11-02",
    "last_response": "2026-11-02",
    "opened": "2026-10-28",
-   "stage": "review"
+   "stage": "approved_pending"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33430"
@@ -494,13 +601,13 @@
     "pass": 0,
     "pending": 0
    },
-   "ci_waiting": 2,
+   "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-02",
    "first_response": null,
    "last_response": null,
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "closed"
   },
   "merge": null,
   "url": "https://github.com/schwabe/ics-openvpn/pull/1936"
@@ -513,13 +620,13 @@
     "pass": 0,
     "pending": 0
    },
-   "ci_waiting": 2,
+   "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-02",
    "first_response": null,
    "last_response": null,
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "closed"
   },
   "merge": null,
   "url": "https://github.com/schwabe/ics-openvpn/pull/1937"
@@ -532,13 +639,13 @@
     "pass": 0,
     "pending": 0
    },
-   "ci_waiting": 2,
+   "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-02",
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-02",
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "closed"
   },
   "merge": null,
   "url": "https://github.com/schwabe/ics-openvpn/pull/1938"

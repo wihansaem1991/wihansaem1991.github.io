@@ -20,9 +20,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 KST = dt.timezone(dt.timedelta(hours=9))
 DONE = ("approved", "merged")
 # order of the challenge table: finished work first, then what waits on maintainers
-STAGE_ORDER = ["merged", "approved", "rereview", "changes", "review", "ci_approval", "closed"]
+STAGE_ORDER = ["merged", "approved", "approved_pending", "rereview", "changes", "review", "ci_approval", "closed"]
 # tabs: each stage belongs to one group
-GROUP = {"merged": "done", "approved": "done", "rereview": "review", "changes": "review", "review": "review",
+GROUP = {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review",
          "open": "review", "ci_approval": "ci", "closed": "closed"}
 TABS = ["all", "done", "review", "ci", "closed", "cve", "repos"]
 
@@ -44,7 +44,8 @@ UI = {
         "empty_tab": "Nothing here right now.",
         "types": {"hardening": "Hardening", "bugfix": "Bug fix", "test": "Test coverage",
                   "docs": "Documentation", "cleanup": "Cleanup", "vulnerability": "Vulnerability"},
-        "stages": {"merged": "Merged", "approved": "Approved", "rereview": "Updated, awaiting re-review",
+        "stages": {"merged": "Merged", "approved": "Approved", "approved_pending": "Approved, awaiting another review",
+                   "rereview": "Updated, awaiting re-review",
                    "changes": "Changes requested", "review": "Awaiting review",
                    "ci_approval": "Awaiting CI approval", "closed": "Closed", "open": "Open"},
         "vstages": {"triage": "Under triage", "accepted": "Accepted", "fixed": "Fixed",
@@ -80,7 +81,8 @@ UI = {
         "empty_tab": "지금은 해당 항목이 없습니다.",
         "types": {"hardening": "보안 강화", "bugfix": "버그 수정", "test": "시험 보강", "docs": "문서 수정",
                   "cleanup": "코드 정리", "vulnerability": "취약점"},
-        "stages": {"merged": "머지됨", "approved": "승인", "rereview": "수정 반영, 재리뷰 대기",
+        "stages": {"merged": "머지됨", "approved": "승인", "approved_pending": "승인, 추가 리뷰 대기",
+                   "rereview": "수정 반영, 재리뷰 대기",
                    "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기",
                    "closed": "닫힘", "open": "열림"},
         "vstages": {"triage": "분류 중", "accepted": "인정됨", "fixed": "수정됨", "published": "공개됨",
@@ -117,6 +119,15 @@ def ext(url, label):
 
 def key(e):
     return f'{e["repo"]}#{e["pr"]}'
+
+
+def pr_url(e):
+    """The pull request on GitHub, or the change on Gerrit for entries with a `gerrit:` link."""
+    return e.get("gerrit") or f'https://github.com/{e["repo"]}/pull/{e["pr"]}'
+
+
+def pr_label(e):
+    return f'Gerrit {e["pr"]}' if e.get("gerrit") else f'#{e["pr"]}'
 
 
 def anchor(e):
@@ -164,8 +175,11 @@ def ci_cell(e, ev):
 
 def evidence_cell(e, lang, ev):
     t = UI[lang]["ev"]
-    url = f'https://github.com/{e["repo"]}/pull/{e["pr"]}'
-    parts = [ext(url, f'{t["pr"]} #{e["pr"]}'), ext(url + "/files", t["files"])]
+    url = pr_url(e)
+    if e.get("gerrit"):  # the change page on Gerrit shows the description and the files together
+        parts = [ext(url, pr_label(e))]
+    else:
+        parts = [ext(url, f'{t["pr"]} {pr_label(e)}'), ext(url + "/files", t["files"])]
     info = ev.get(key(e)) or {}
     if info.get("approvals"):
         people = ", ".join(ext(a["url"], html.escape(a["by"])) for a in info["approvals"])
@@ -188,12 +202,12 @@ def cve_cell(cve, cvss=None):
 def entry(e, lang, ev, today):
     """One pull request: a summary line that opens into its briefing."""
     t = UI[lang]
-    url = f'https://github.com/{e["repo"]}/pull/{e["pr"]}'
+    url = pr_url(e)
     live = (ev.get(key(e)) or {}).get("live") or {}
     first = live.get("first_response")
     facts = [f'{t["submitted"]} {e["submitted"]}', t["days"].format(n=days(e, ev, today)),
              t["first"].format(d=first) if first else t["no_reply"], f'{t["ci"]} {ci_cell(e, ev)}']
-    meta = [f'{html.escape(e["repo"])} #{e["pr"]}', t["types"].get(e["type"], text(e["type"]))]
+    meta = [f'{html.escape(e["repo"])} {pr_label(e)}', t["types"].get(e["type"], text(e["type"]))]
     if e.get("status") in DONE and e.get("decided"):
         meta.append(f'{t["stages"][e["status"]]} {e["decided"]}')
     if e.get("branches"):
