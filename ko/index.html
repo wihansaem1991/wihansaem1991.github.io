@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 24건 · 취약점 보고 6건 · 메인테이너 응답 8건 · CVE 0건</div>
+  <div class="summary">제출 PR 26건 · 취약점 보고 7건 · 메인테이너 응답 8건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">30</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">9</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">33</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">11</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -364,6 +364,28 @@
       <dl><dt>문제</dt><dd>길이가 틀린 Classic McEliece 비밀키를 직접 넘기거나 PKCS#8 안에 넣으면 내부 단언에 걸려 <code>Internal_Error</code>가 났습니다. 공개키 쪽은 같은 실수를 잘못된 인자로 거부했습니다.</dd><dt>배경 지식</dt><dd>Classic McEliece(NIST PQC 4라운드 KEM)의 키 인코딩은 매개변수마다 크기가 정해져 있습니다. 라이브러리는 잘못된 키를 입력 오류로 알려야 하고, 호출자가 잡을 생각을 하지 않는 내부 오류로 내면 안 됩니다.</dd><dt>찾은 방법</dt><dd>Botan 양자내성 키 디코더에 길이·변형 입력 1,600만 건을 넣은 측정(메모리 오류 0건)에서 유일하게 거부 방식이 어긋난 곳으로 나왔습니다.</dd><dt>수정</dt><dd>비밀키 생성자에서도 공개키 생성자와 똑같이 길이를 검사합니다. 새 시험은 검사를 빼면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/randombit/botan/pull/6082" target="_blank" rel="noopener">PR 원문 #6082 ↗</a> · <a href="https://github.com/randombit/botan/pull/6082/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="openssl-openssl-33476" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge open" data-pr="openssl/openssl#33476">열림</span></span>
+      <span class="line2">PBKDF1 derive_skey 버퍼를 0으로 채우지 않고 할당</span>
+      <span class="line3">제출 2026-11-02 · 0일째 · 응답 아직 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · 코드 정리 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>kdf_pbkdf1_derive_skey()</code>가 키 버퍼를 <code>OPENSSL_zalloc()</code>으로 할당했지만, 유도가 모든 바이트를 쓰기 전에 그 버퍼를 읽는 곳이 없고 실패하면 읽지 않은 채 지우고 해제합니다. 0으로 채우는 일이 쓸모없었습니다.</dd><dt>배경 지식</dt><dd>#33444(PBKDF1 키를 실패 때 지우기) 리뷰에서 리뷰어가 짚었고, 그 PR 범위를 지키려고 따로 낸 변경입니다.</dd><dt>찾은 방법</dt><dd>#33444 리뷰 지적을 <code>kdf_pbkdf1_do_derive()</code>의 버퍼 쓰기 전부와 대조해 확인했습니다.</dd><dt>수정</dt><dd><code>OPENSSL_zalloc()</code> 대신 <code>OPENSSL_malloc()</code>을 씁니다. <code>--strict-warnings</code> 빌드에서 경고 0, <code>test_evp_kdf</code> (<code>test_kdf_pbkdf1_skey</code> 포함) 통과.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">PR 원문 #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33477" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge open" data-pr="openssl/openssl#33477">열림</span></span>
+      <span class="line2">해제된 메모리에 남은 비밀값을 찾는 시험 도우미</span>
+      <span class="line3">제출 2026-11-02 · 0일째 · 응답 아직 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">openssl/openssl #33477 · 시험 보강 ↗</a></div>
+      <dl><dt>문제</dt><dd>비밀값을 지운 뒤 해제하는지 보는 시험마다 할당 함수 가로채기 코드를 따로 들고 있었고, openssl-4.0 이하에서는 시험 도중에 할당 함수를 바꿀 수 없어 그 검사가 돌지 못했습니다.</dd><dt>배경 지식</dt><dd>핵심 보안 매개변수 제로화 검사(ISO/IEC 19790, FIPS 140-3·KCMVP)를 다시 쓸 수 있는 시험으로 만들었습니다. #33444 리뷰어가 가로채기 코드를 일반화하자고 했고 4.0 제약도 짚었습니다.</dd><dt>찾은 방법</dt><dd>#33444 리뷰에서 나왔고, 4.0에 대한 리뷰어 지적을 반영해 다시 만들었습니다.</dd><dt>수정</dt><dd>libtestutil에 <code>test_watch_freed_start()</code>/<code>test_watch_freed_stop()</code>을 넣었습니다. <code>OPENSSL_TEST_WATCH_FREED</code>를 켜면 <code>test/testutil/main.c</code>가 시작할 때 가로채기를 설치해, mfail이 있든 없든 검사가 돕니다. <code>test_kdf_pbkdf1_skey</code>가 이 도우미를 쓰고, PBKDF1 키를 지우지 않고 해제하면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">PR 원문 #33477 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33477/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="VR-1" data-group="cve">
     <summary>
       <span class="line1"><b>취약점 보고 VR-1</b> <span class="badge vuln">취약점</span> <span class="badge v-triage">분류 중</span></span>
@@ -412,6 +434,14 @@
     </summary>
     <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
   </details>
+  <details class="entry" id="VR-7" data-group="cve">
+    <summary>
+      <span class="line1"><b>취약점 보고 VR-7</b> <span class="badge vuln">취약점</span> <span class="badge v-triage">분류 중</span></span>
+      <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
+      <span class="line3">제출 2026-11-02 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
+    </summary>
+    <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
+  </details>
     <p class="empty" id="empty" hidden>지금은 해당 항목이 없습니다.</p>
   </section>
 
@@ -422,7 +452,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">가장 널리 쓰이는 C TLS·암호 라이브러리</div>
       <div class="focus">보는 것: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)</div>
-      <div class="prs"><span>PR 5건</span> <span class="badge review">리뷰 대기 1</span> <span class="badge ci_approval">CI 실행 허가 대기 3</span> <span class="badge closed">닫힘 1</span></div>
+      <div class="prs"><span>PR 7건</span> <span class="badge review">리뷰 대기 1</span> <span class="badge ci_approval">CI 실행 허가 대기 3</span> <span class="badge closed">닫힘 1</span> <span class="badge open">열림 2</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -437,10 +467,10 @@
       <div class="prs"><span>PR 3건</span> <span class="badge ci_approval">CI 실행 허가 대기 3</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
-      <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
+      <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
       <div class="about">OpenVPN 본체(C), 패치는 Gerrit으로 제출</div>
       <div class="focus">보는 것: 지우지 않고 해제하는 키 재료</div>
-      <div class="prs"><span>Gerrit 변경 3건(2075·2076·2077)</span></div>
+      <div class="prs"><span>Gerrit 변경 4건(2075·2076·2077·2078)</span></div>
     </article>
     <article class="repo" id="repo-randombit-botan">
       <div class="name"><b>Botan</b> <a href="https://github.com/randombit/botan" target="_blank" rel="noopener">randombit/botan ↗</a></div>

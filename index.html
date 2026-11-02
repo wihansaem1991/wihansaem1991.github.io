@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">24 pull requests and 6 vulnerability reports · 8 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">26 pull requests and 7 vulnerability reports · 8 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">30</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">9</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">33</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">11</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -364,6 +364,28 @@
       <dl><dt>Problem</dt><dd>A Classic McEliece private key of the wrong length, given directly or inside PKCS#8, hit an internal assertion and raised <code>Internal_Error</code>, while the public key path rejected the same mistake as an invalid argument.</dd><dt>Background</dt><dd>Classic McEliece (NIST PQC round 4 KEM) key encodings have fixed sizes per parameter set; a library should report malformed keys as input errors, not as internal failures callers do not expect to catch.</dd><dt>How it was found</dt><dd>Length and mutation sweeps over Botan&#x27;s PQC key decoders (16 million inputs, no memory errors) flagged this as the one inconsistent rejection.</dd><dt>Fix</dt><dd>Check the length in the private key constructor exactly like the public key constructor; a new test fails without the check.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/randombit/botan/pull/6082" target="_blank" rel="noopener">Pull request #6082 ↗</a> · <a href="https://github.com/randombit/botan/pull/6082/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="openssl-openssl-33476" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge open" data-pr="openssl/openssl#33476">Open</span></span>
+      <span class="line2">Allocate the PBKDF1 derive_skey buffer without zeroing it</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · Cleanup ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>kdf_pbkdf1_derive_skey()</code> allocated the key buffer with <code>OPENSSL_zalloc()</code>, but nothing reads it before the derivation writes every byte, and on failure it is cleared and freed unread. The zero fill was wasted work.</dd><dt>Background</dt><dd>A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left for a separate change to keep that PR to its scope.</dd><dt>How it was found</dt><dd>Reviewer comment on</dd><dt>Fix</dt><dd><code>OPENSSL_malloc()</code> instead of <code>OPENSSL_zalloc()</code>. Built with <code>--strict-warnings</code>; <code>test_evp_kdf</code> passes, including <code>test_kdf_pbkdf1_skey</code>.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">Pull request #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33477" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge open" data-pr="openssl/openssl#33477">Open</span></span>
+      <span class="line2">A test helper that looks for secrets left in freed memory</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">openssl/openssl #33477 · Test coverage ↗</a></div>
+      <dl><dt>Problem</dt><dd>Each test that checks a secret is cleared before its buffer is freed carried its own copy of an allocator hook, and on openssl-4.0 and older the allocator cannot be replaced in the middle of a test, so such checks could not run there.</dd><dt>Background</dt><dd>Zeroisation checks for critical security parameters (ISO/IEC 19790, FIPS 140-3, KCMVP), turned into a reusable test. A reviewer of #33444 suggested generalising the hook and pointed out the 4.0 limitation.</dd><dt>How it was found</dt><dd>Review of</dd><dt>Fix</dt><dd><code>test_watch_freed_start()</code>/<code>test_watch_freed_stop()</code> in libtestutil. With <code>OPENSSL_TEST_WATCH_FREED</code> set, <code>test/testutil/main.c</code> installs the hooks at startup, so the check runs with or without mfail. <code>test_kdf_pbkdf1_skey</code> uses it and fails if the PBKDF1 key is freed without clearing.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">Pull request #33477 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33477/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="VR-1" data-group="cve">
     <summary>
       <span class="line1"><b>Vulnerability report VR-1</b> <span class="badge vuln">Vulnerability</span> <span class="badge v-triage">Under triage</span></span>
@@ -412,6 +434,14 @@
     </summary>
     <div class="body"><p class="none">Reported through the project's private channel. Details follow once the project publishes a fix.</p></div>
   </details>
+  <details class="entry" id="VR-7" data-group="cve">
+    <summary>
+      <span class="line1"><b>Vulnerability report VR-7</b> <span class="badge vuln">Vulnerability</span> <span class="badge v-triage">Under triage</span></span>
+      <span class="line2">Project and details withheld until disclosure</span>
+      <span class="line3">submitted 2026-11-02 · GitHub private vulnerability report · CVE none yet</span>
+    </summary>
+    <div class="body"><p class="none">Reported through the project's private channel. Details follow once the project publishes a fix.</p></div>
+  </details>
     <p class="empty" id="empty" hidden>Nothing here right now.</p>
   </section>
 
@@ -422,7 +452,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">The most widely deployed TLS and cryptography library, in C</div>
       <div class="focus">Looking at: Secrets left in freed memory, measured by hooking the allocator</div>
-      <div class="prs"><span>5 pull requests</span> <span class="badge review">Awaiting review 1</span> <span class="badge ci_approval">Awaiting CI approval 3</span> <span class="badge closed">Closed 1</span></div>
+      <div class="prs"><span>7 pull requests</span> <span class="badge review">Awaiting review 1</span> <span class="badge ci_approval">Awaiting CI approval 3</span> <span class="badge closed">Closed 1</span> <span class="badge open">Open 2</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -437,10 +467,10 @@
       <div class="prs"><span>3 pull requests</span> <span class="badge ci_approval">Awaiting CI approval 3</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
-      <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
+      <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
       <div class="about">OpenVPN itself, in C; patches go through Gerrit</div>
       <div class="focus">Looking at: Key material freed without being cleared</div>
-      <div class="prs"><span>3 changes on Gerrit (2075, 2076, 2077)</span></div>
+      <div class="prs"><span>4 changes on Gerrit (2075, 2076, 2077, 2078)</span></div>
     </article>
     <article class="repo" id="repo-randombit-botan">
       <div class="name"><b>Botan</b> <a href="https://github.com/randombit/botan" target="_blank" rel="noopener">randombit/botan ↗</a></div>
