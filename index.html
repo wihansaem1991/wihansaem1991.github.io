@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">29 pull requests and 8 vulnerability reports · 11 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">30 pull requests and 8 vulnerability reports · 11 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">37</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">5</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">7</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -133,6 +133,17 @@
       <dl><dt>Problem</dt><dd>After #2483 fixed truncated content, the <code>der</code> crate&#x27;s ASN.1 REAL (<code>f64</code>) decoder still panicked on a mantissa longer than eight octets, and on a zero mantissa or an out-of-range exponent in debug builds. In release builds the last two decoded to NaN and to an unrelated value (exponent 0x7fff gave 0.5).</dd><dt>Background</dt><dd>X.690 binary REAL encoding: sign, base, scaling factor F, exponent octets, then mantissa octets; zero has no contents octets (8.5.2). An IEEE-754 double needs the exponent within -1023..=1023 for this decoder&#x27;s mapping.</dd><dt>How it was found</dt><dd>Reading the decoder after #2483 for the remaining unchecked arithmetic, then reproducing each input on master and on <code>der</code> 0.8.3 in debug and release builds.</dd><dt>Fix</dt><dd>Return a value error for each case. A new test covers the inputs and fails when any one of the three checks is removed; <code>der</code> tests pass (120).</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">Pull request #2501 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2501/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/RustCrypto/formats/pull/2501#pullrequestreview-5730274250" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/ae28c9f4168b32f8096f70b2562ba7d2120a11d4" target="_blank" rel="noopener">Merge commit ae28c9f416 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="RustCrypto-AEADs-894" data-group="done">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/AEADs#894">Merged</span></span>
+      <span class="line2">eax: add Wycheproof test vectors</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="ok">✓11</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">RustCrypto/AEADs #894 · Test coverage · Merged 2026-11-02 ↗</a></div>
+      <dl><dt>Problem</dt><dd>The <code>eax</code> crate&#x27;s only failing-vector file was empty, so no test checked that a wrong tag is rejected: with the tag comparison forced to succeed, every test still passed. AES-192 and AES-256 had no test vectors at all.</dd><dt>Background</dt><dd>Validation test vectors (Wycheproof), the same approach as known-answer testing in cryptographic module validation (KCMVP): run the published vectors and check that a forged tag is refused.</dd><dt>How it was found</dt><dd>Running all Wycheproof AES-CCM and AES-EAX vectors against the crates (672 cases, no mismatch) and then checking which of them the crate&#x27;s own tests cover; a mutant with the tag check disabled passed the existing tests.</dd><dt>Fix</dt><dd>186 Wycheproof cases (105 valid, 81 invalid) for AES-128, AES-192 and AES-256 through the <code>aead</code> test macros. With the tag check disabled, the three new failure tests fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">Pull request #894 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/894/files" target="_blank" rel="noopener">Changed files ↗</a> · <a href="https://github.com/RustCrypto/AEADs/commit/e3cee8a2eff8dc5f25326c5cbc743eb4b9723647" target="_blank" rel="noopener">Merge commit e3cee8a2ef ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="OpenVPN-openvpn-2076" data-group="done">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2076">Approved</span></span>
@@ -142,6 +153,17 @@
     <div class="body">
       <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2076 · Hardening · Approved 2026-11-02 ↗</a></div>
       <dl><dt>Problem</dt><dd><code>auth_token_init_secret()</code> reads the auth-token server key into a 2048-byte buffer, copies it into a <code>struct key</code> and then a <code>struct key_parameters</code> on the stack, and freed the buffer without clearing it, so three copies of the server key stayed in memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), checked against every copy a function makes: <code>tls_crypt_v2_init_server_key()</code> already clears its copy, this function did not.</dd><dt>How it was found</dt><dd>Scanning freed heap blocks for the key used by <code>test_auth_token</code>.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the <code>struct key</code> and the <code>struct key_parameters</code>, and <code>buf_clear()</code> before <code>free_buf()</code>. The second patch set added the <code>struct key_parameters</code> copy, which a reviewer pointed out; the same question led to a follow-up change for the other functions (Gerrit 2078).</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger on the second patch set.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a> · Approved by: <a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Steffan Karger ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — reviewer</blockquote>
+    </div>
+  </details>
+  <details class="entry" id="OpenVPN-openvpn-2077" data-group="done">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2077">Approved</span></span>
+      <span class="line2">crypto_openssl: Clear PEM decoded key data before freeing it</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · first reply 2026-11-01 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2077 · Hardening · Approved 2026-11-02 ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>crypto_pem_decode()</code> decodes the tls-crypt-v2 client and server keys and the auth-token key, and freed the decoded key bytes with <code>OPENSSL_free()</code>, so they stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) in a project that builds with both OpenSSL and LibreSSL, so the clearing call has to exist in both.</dd><dt>How it was found</dt><dd>Scanning the blocks freed during the tls-crypt unit tests for the test key.</dd><dt>Fix</dt><dd><code>OPENSSL_cleanse()</code> and then <code>OPENSSL_free()</code>. The first patch set used <code>OPENSSL_clear_free()</code>, which LibreSSL does not have; the second builds with <code>--enable-werror</code> against LibreSSL 4.3.4 and OpenSSL 3.5.9, and the freed blocks holding key bytes go from 2 to 0.</dd><dt>Review</dt><dd>Approved by Steffan Karger, then Gert Doering found the LibreSSL build failure and suggested the two-line form; the second patch set does exactly that and waits for another look.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a> · Approved by: <a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Steffan Karger ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="OpenVPN-openvpn-2079" data-group="done">
@@ -175,17 +197,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · Bug fix ↗</a></div>
       <dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">Pull request #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="OpenVPN-openvpn-2077" data-group="review">
-    <summary>
-      <span class="line1"><b>OpenVPN</b> <span class="badge rereview" data-pr="OpenVPN/openvpn#2077">Updated, awaiting re-review</span></span>
-      <span class="line2">crypto_openssl: Clear PEM decoded key data before freeing it</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · first reply 2026-11-01 · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2077 · Hardening ↗</a></div>
-      <dl><dt>Problem</dt><dd><code>crypto_pem_decode()</code> decodes the tls-crypt-v2 client and server keys and the auth-token key, and freed the decoded key bytes with <code>OPENSSL_free()</code>, so they stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) in a project that builds with both OpenSSL and LibreSSL, so the clearing call has to exist in both.</dd><dt>How it was found</dt><dd>Scanning the blocks freed during the tls-crypt unit tests for the test key.</dd><dt>Fix</dt><dd><code>OPENSSL_cleanse()</code> and then <code>OPENSSL_free()</code>. The first patch set used <code>OPENSSL_clear_free()</code>, which LibreSSL does not have; the second builds with <code>--enable-werror</code> against LibreSSL 4.3.4 and OpenSSL 3.5.9, and the freed blocks holding key bytes go from 2 to 0.</dd><dt>Review</dt><dd>Approved by Steffan Karger, then Gert Doering found the LibreSSL build failure and suggested the two-line form; the second patch set does exactly that and waits for another look.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33426" data-group="review">
@@ -331,15 +342,15 @@
       <dl><dt>Problem</dt><dd>Each test that checks a secret is cleared before its buffer is freed carried its own copy of an allocator hook, and on openssl-4.0 and older the allocator cannot be replaced in the middle of a test, so such checks could not run there.</dd><dt>Background</dt><dd>Zeroisation checks for critical security parameters (ISO/IEC 19790, FIPS 140-3, KCMVP), turned into a reusable test. A reviewer of #33444 suggested generalising the hook and pointed out the 4.0 limitation.</dd><dt>How it was found</dt><dd>Review of</dd><dt>Fix</dt><dd><code>test_watch_freed_start()</code>/<code>test_watch_freed_stop()</code> in libtestutil. With <code>OPENSSL_TEST_WATCH_FREED</code> set, <code>test/testutil/main.c</code> installs the hooks at startup, so the check runs with or without mfail. <code>test_kdf_pbkdf1_skey</code> uses it and fails if the PBKDF1 key is freed without clearing.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">Pull request #33477 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33477/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="RustCrypto-AEADs-894" data-group="review">
+  <details class="entry" id="RustCrypto-formats-2502" data-group="review">
     <summary>
-      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/AEADs#894">Awaiting review</span></span>
-      <span class="line2">eax: add Wycheproof test vectors</span>
-      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="ok">✓11</span></span>
+      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/formats#2502">Awaiting review</span></span>
+      <span class="line2">pkcs5: return an error from <code>Salt::new</code> for salts longer than <code>MAX_LEN</code></span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="ok">✓8</span> <span class="wait">…3</span></span>
     </summary>
     <div class="body">
-      <div class="meta"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">RustCrypto/AEADs #894 · Test coverage ↗</a></div>
-      <dl><dt>Problem</dt><dd>The <code>eax</code> crate&#x27;s only failing-vector file was empty, so no test checked that a wrong tag is rejected: with the tag comparison forced to succeed, every test still passed. AES-192 and AES-256 had no test vectors at all.</dd><dt>Background</dt><dd>Validation test vectors (Wycheproof), the same approach as known-answer testing in cryptographic module validation (KCMVP): run the published vectors and check that a forged tag is refused.</dd><dt>How it was found</dt><dd>Running all Wycheproof AES-CCM and AES-EAX vectors against the crates (672 cases, no mismatch) and then checking which of them the crate&#x27;s own tests cover; a mutant with the tag check disabled passed the existing tests.</dd><dt>Fix</dt><dd>186 Wycheproof cases (105 valid, 81 invalid) for AES-128, AES-192 and AES-256 through the <code>aead</code> test macros. With the tag check disabled, the three new failure tests fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">Pull request #894 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/894/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+      <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">RustCrypto/formats #2502 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>pkcs5::pbes2::Salt::new</code> is documented to return an error for a salt longer than 32 bytes, but the length check was dropped in #2295. A 33-byte salt passed to <code>Salt::new</code>, <code>Pbkdf2Params::hmac_sha256</code> or <code>ScryptParams::from_params_and_salt</code> panicked with an index out of bounds instead. Released versions 0.8.0 and 0.8.1 contain the regression.</dd><dt>Background</dt><dd>PKCS #5 PBES2 (RFC 8018): PBKDF2 and scrypt parameters carry the salt as an OCTET STRING. This crate stores it in a fixed 32-byte buffer so it works without an allocator.</dd><dt>How it was found</dt><dd>Fuzzing the <code>formats</code> decoders and constructors with libFuzzer. The decoder checks the length; the caller-supplied constructor did not. <code>git log -p</code> traced the missing check to #2295.</dd><dt>Fix</dt><dd>Restore the length check. New tests cover a 33-byte salt (fails without the fix) and a 32-byte salt; <code>pkcs5</code> tests, clippy and rustfmt pass.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">Pull request #2502 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2502/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="OpenVPN-openvpn-2078" data-group="review">
@@ -505,7 +516,7 @@
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
       <div class="about">OpenVPN itself, in C; patches go through Gerrit</div>
       <div class="focus">Looking at: Key material freed without being cleared</div>
-      <div class="prs"><span>5 pull requests</span> <span class="badge approved">Approved 2</span> <span class="badge rereview">Updated, awaiting re-review 1</span> <span class="badge review">Awaiting review 2</span></div>
+      <div class="prs"><span>5 pull requests</span> <span class="badge approved">Approved 3</span> <span class="badge review">Awaiting review 2</span></div>
     </article>
     <article class="repo" id="repo-randombit-botan">
       <div class="name"><b>Botan</b> <a href="https://github.com/randombit/botan" target="_blank" rel="noopener">randombit/botan ↗</a></div>
@@ -529,7 +540,7 @@
       <div class="name"><b>RustCrypto AEADs</b> <a href="https://github.com/RustCrypto/AEADs" target="_blank" rel="noopener">RustCrypto/AEADs ↗</a></div>
       <div class="about">Authenticated encryption for Rust (AES-GCM, ChaCha20-Poly1305, CCM, EAX and more)</div>
       <div class="focus">Looking at: Wycheproof vectors the test suite does not run, rejection of forged tags</div>
-      <div class="prs"><span>1 pull requests</span> <span class="badge review">Awaiting review 1</span></div>
+      <div class="prs"><span>1 pull requests</span> <span class="badge merged">Merged 1</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-signatures">
       <div class="name"><b>RustCrypto signatures</b> <a href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener">RustCrypto/signatures ↗</a></div>
@@ -577,7 +588,7 @@
       <div class="name"><b>RustCrypto formats</b> <a href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener">RustCrypto/formats ↗</a></div>
       <div class="about">DER, PEM, X.509 and other format crates for Rust</div>
       <div class="focus">Looking at: Decoding of malformed DER values</div>
-      <div class="prs"><span>1 pull requests</span> <span class="badge merged">Merged 1</span></div>
+      <div class="prs"><span>2 pull requests</span> <span class="badge merged">Merged 1</span> <span class="badge review">Awaiting review 1</span></div>
     </article>
     <article class="repo" id="repo-OpenSC-OpenSC">
       <div class="name"><b>OpenSC</b> <a href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener">OpenSC/OpenSC ↗</a></div>

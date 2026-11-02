@@ -533,9 +533,9 @@ entries:
     type: test
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-02
-    decided: null
+    decided: 2026-11-02
     defect:
       en: >-
         The `eax` crate's only failing-vector file was empty, so no test checked that a wrong tag
@@ -1043,6 +1043,51 @@ entries:
         세 경우 모두 값 오류를 돌려줍니다. 새 시험이 그 입력들을 다루고, 검사 셋 중 하나만 빼도 실패합니다.
         `der` 시험 120개가 통과합니다.
 
+  - project: RustCrypto
+    repo: RustCrypto/formats
+    pr: 2502
+    title:
+      en: "pkcs5: return an error from `Salt::new` for salts longer than `MAX_LEN`"
+      ko: "pkcs5: `MAX_LEN`보다 긴 솔트에 `Salt::new`가 패닉 대신 오류를 돌려줌"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-02
+    decided: null
+    defect:
+      en: >-
+        `pkcs5::pbes2::Salt::new` is documented to return an error for a salt longer than 32 bytes,
+        but the length check was dropped in #2295. A 33-byte salt passed to `Salt::new`,
+        `Pbkdf2Params::hmac_sha256` or `ScryptParams::from_params_and_salt` panicked with an index
+        out of bounds instead. Released versions 0.8.0 and 0.8.1 contain the regression.
+      ko: >-
+        `pkcs5::pbes2::Salt::new`는 32바이트보다 긴 솔트에 오류를 돌려준다고 문서에 적혀 있지만, #2295에서
+        길이 검사가 빠졌습니다. 33바이트 솔트를 `Salt::new`, `Pbkdf2Params::hmac_sha256`,
+        `ScryptParams::from_params_and_salt`에 넘기면 오류 대신 범위 밖 인덱스로 패닉했습니다. 배포판
+        0.8.0과 0.8.1에 이 회귀가 들어 있습니다.
+    background:
+      en: >-
+        PKCS #5 PBES2 (RFC 8018): PBKDF2 and scrypt parameters carry the salt as an OCTET STRING.
+        This crate stores it in a fixed 32-byte buffer so it works without an allocator.
+      ko: >-
+        PKCS #5 PBES2(RFC 8018)를 썼습니다. PBKDF2와 scrypt 매개변수는 솔트를 OCTET STRING으로 담고, 이
+        크레이트는 할당자 없이도 돌도록 솔트를 고정 32바이트 버퍼에 담습니다.
+    found_by:
+      en: >-
+        Fuzzing the `formats` decoders and constructors with libFuzzer. The decoder checks the
+        length; the caller-supplied constructor did not. `git log -p` traced the missing check to #2295.
+      ko: >-
+        `formats`의 해석기와 생성자를 libFuzzer로 퍼징해 찾았습니다. 해석기는 길이를 검사하지만 호출자가
+        솔트를 넘기는 생성자는 검사하지 않았고, `git log -p`로 검사가 빠진 커밋 #2295를 찾았습니다.
+    fix:
+      en: >-
+        Restore the length check. New tests cover a 33-byte salt (fails without the fix) and a
+        32-byte salt; `pkcs5` tests, clippy and rustfmt pass.
+      ko: >-
+        길이 검사를 되살렸습니다. 새 시험은 33바이트 솔트(수정을 빼면 실패)와 32바이트 솔트를 다루고,
+        `pkcs5` 시험·clippy·rustfmt가 통과합니다.
+
   - project: OpenSC
     repo: OpenSC/OpenSC
     pr: 3917
@@ -1200,9 +1245,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-02
     defect:
       en: >-
         `crypto_pem_decode()` decodes the tls-crypt-v2 client and server keys and the auth-token key,

@@ -101,7 +101,13 @@
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2076"
  },
  "OpenVPN/openvpn#2077": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "Steffan Karger",
+    "date": "2026-11-02",
+    "url": "https://gerrit.openvpn.net/c/openvpn/+/2077"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -114,7 +120,7 @@
    "first_response": "2026-11-01",
    "last_response": "2026-11-02",
    "opened": "2026-11-01",
-   "stage": "rereview"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2077"
@@ -173,13 +179,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-02",
    "first_response": null,
    "last_response": null,
    "opened": "2026-11-02",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "e3cee8a2eff8dc5f25326c5cbc743eb4b9723647",
+   "url": "https://github.com/RustCrypto/AEADs/commit/e3cee8a2eff8dc5f25326c5cbc743eb4b9723647"
+  },
   "url": "https://github.com/RustCrypto/AEADs/pull/894"
  },
  "RustCrypto/RSA#740": {
@@ -275,6 +284,25 @@
    "url": "https://github.com/RustCrypto/formats/commit/ae28c9f4168b32f8096f70b2562ba7d2120a11d4"
   },
   "url": "https://github.com/RustCrypto/formats/pull/2501"
+ },
+ "RustCrypto/formats#2502": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 8,
+    "pending": 3
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-02",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/RustCrypto/formats/pull/2502"
  },
  "RustCrypto/signatures#1493": {
   "approvals": [
