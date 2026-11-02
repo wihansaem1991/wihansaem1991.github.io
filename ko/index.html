@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 24건 · 취약점 보고 6건 · 메인테이너 응답 5건 · CVE 0건</div>
+  <div class="summary">제출 PR 24건 · 취약점 보고 6건 · 메인테이너 응답 8건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">30</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">1</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">9</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">12</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">30</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">9</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">10</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">6</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -111,6 +111,28 @@
       <dl><dt>문제</dt><dd>ML-DSA Wycheproof 검증 시험이 context 문자열이 있는 경우를 모두 건너뛰었습니다. 그래서 255바이트보다 긴 context를 거부하는 검사를 지워도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 서명과 검증에서 255바이트보다 긴 context를 거부하도록 정합니다. C2SP Wycheproof 벡터는 7·255·256바이트 context로 바로 이 점을 시험합니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ML-DSA 벡터를 이 크레이트에 돌려 보고 변이 시험을 했습니다. 길이 검사를 지워도 기존 시험이 하나도 실패하지 않았습니다.</dd><dt>수정</dt><dd>context가 있는 경우를 <code>verify_with_context()</code>로 돌립니다. 이제 길이 검사를 지우면 ML-DSA-44·65·87 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">PR 원문 #1493 ↗</a> · <a href="https://github.com/RustCrypto/signatures/pull/1493/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/signatures/pull/1493#pullrequestreview-5725286433" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/signatures/commit/ebee8f9a79e8c7cd22254059791acd5121596fa4" target="_blank" rel="noopener">머지 커밋 ebee8f9a79 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="RustCrypto-RSA-740" data-group="done">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/RSA#740">머지됨</span></span>
+      <span class="line2">wycheproof: OAEP 복호화 벡터 시험 추가</span>
+      <span class="line3">제출 2026-11-01 · 0일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓12</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · 시험 보강 · 머지됨 2026-11-01 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>rsa</code> 크레이트의 Wycheproof 시험은 PKCS#1 v1.5·PSS 서명만 돌렸습니다. OAEP 패딩 검사 세 가지(첫 바이트 0, 구분자 0x01 앞의 0 아닌 바이트, 구분자 없음) 중 하나를 빼도 시험이 모두 통과했습니다.</dd><dt>배경 지식</dt><dd>RSA-OAEP(RFC 8017) 복호화는 잘못된 패딩을 어느 검사에서 걸렸는지 드러내지 않고 거부해야 합니다. Wycheproof OAEP 파일에 바로 그런 잘못된 암호문이 들어 있습니다.</dd><dt>찾은 방법</dt><dd>변이 시험으로 찾았습니다. 패딩 검사를 하나씩 빼고 기존 시험을 돌린 뒤, 같은 변경을 Wycheproof OAEP 벡터로 다시 돌렸습니다.</dd><dt>수정</dt><dd>새 시험 <code>test_rsa_oaep_decrypt</code>가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개 파일에서 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">PR 원문 #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/RSA/pull/740#pullrequestreview-5730252760" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/RSA/commit/8f823d4a479ab4f4905897196b180c9a3781f5f8" target="_blank" rel="noopener">머지 커밋 8f823d4a47 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-formats-2501" data-group="done">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/formats#2501">머지됨</span></span>
+      <span class="line2">der: 잘못된 이진 REAL 값을 패닉 대신 오류로 거부</span>
+      <span class="line3">제출 2026-11-01 · 0일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓110</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">RustCrypto/formats #2501 · 버그 수정 · 머지됨 2026-11-01 ↗</a></div>
+      <dl><dt>문제</dt><dd>#2483이 잘린 내용을 고친 뒤에도 <code>der</code> 크레이트의 ASN.1 REAL(<code>f64</code>) 해석기는 가수가 8옥텟을 넘으면 패닉했고, 가수가 0이거나 지수가 범위를 벗어나면 디버그 빌드에서 패닉했습니다. 릴리스 빌드에서는 뒤의 둘이 NaN과 엉뚱한 값(지수 0x7fff → 0.5)이 됐습니다.</dd><dt>배경 지식</dt><dd>X.690 이진 REAL 인코딩(부호·밑수·배율 F·지수 옥텟·가수 옥텟)을 썼습니다. 0은 내용 옥텟이 없어야 하고(8.5.2), 이 해석기가 IEEE-754 double로 옮기려면 지수가 -1023..=1023 안에 있어야 합니다.</dd><dt>찾은 방법</dt><dd>#2483 뒤의 해석기 코드에서 검사 없이 남은 산술을 찾고, 입력마다 master와 <code>der</code> 0.8.3에서 디버그·릴리스 빌드로 재현했습니다.</dd><dt>수정</dt><dd>세 경우 모두 값 오류를 돌려줍니다. 새 시험이 그 입력들을 다루고, 검사 셋 중 하나만 빼도 실패합니다. <code>der</code> 시험 120개가 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">PR 원문 #2501 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2501/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/formats/pull/2501#pullrequestreview-5730274250" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/ae28c9f4168b32f8096f70b2562ba7d2120a11d4" target="_blank" rel="noopener">머지 커밋 ae28c9f416 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-813" data-group="review">
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">수정 반영, 재리뷰 대기</span></span>
@@ -120,6 +142,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · 버그 수정 ↗</a></div>
       <dl><dt>문제</dt><dd>PKCS#11 토큰을 쓰면 <code>EVP_PKEY_derive()</code>가 공유 비밀값 크기가 아니라 호출자 버퍼 크기만큼 토큰에 요청했습니다. NSS softokn은 P-256 비밀값 앞을 0으로 채워 돌려줘서, 64바이트 버퍼에는 0 32개 뒤에 비밀값이 들어갔고 ECDH 양쪽 값이 서로 달라졌습니다.</dd><dt>배경 지식</dt><dd>PKCS#11·HSM 연동 지식이 필요했습니다. ECDH 파생(<code>CKM_ECDH1_DERIVE</code>, <code>CKD_NULL</code>)은 출력 길이를 키 템플릿의 <code>CKA_VALUE_LEN</code>에서 가져오고, OpenSSL <code>EVP_PKEY_derive()</code>는 길이를 버퍼 크기로 받아 실제로 쓴 바이트 수를 돌려줍니다. 두 규약이 어긋나는 지점이었습니다.</dd><dt>찾은 방법</dt><dd>차등 시험으로 찾았습니다. 같은 ECDH 파생을 OpenSSL 기본 provider와 NSS softokn 토큰 위의 pkcs11-provider에 여러 크기의 출력 버퍼로 넣어 결과를 비교했습니다.</dd><dt>수정</dt><dd>요청 길이를 키 크기로 제한했습니다. 새 회귀 시험이 오래된 누수도 드러냈습니다. 한 문맥에서 두 번 파생하면 상대 공개점 사본을 덮어써 앞 사본이 새는 문제로, Address Sanitizer 시험이 잡았고 같은 PR에서 고쳤습니다.</dd><dt>리뷰</dt><dd>메인테이너가 승인한 뒤 회귀 시험 구조 정리와 Address Sanitizer 실패 해결을 요청했고, 두 가지 모두 새 커밋으로 반영했습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">PR 원문 #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33430" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33430">리뷰 대기</span></span>
+      <span class="line2"><code>EVP_ENCODE_CTX</code>를 해제할 때 지우기</span>
+      <span class="line3">제출 2026-10-28 · 5일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓87</span> <span class="wait">…10</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · 보안 강화 ↗</a></div>
+      <dl><dt>문제</dt><dd>base64 문맥은 입력의 마지막 부분 줄을 들고 있는데, 지우지 않고 해제했습니다. <code>PEM_write_bio()</code>는 개인키 DER를 이 문맥으로 인코딩하므로 키의 마지막 (길이 mod 48)바이트가 해제된 메모리에 남았습니다. RSA라면 <code>iqmp</code> 끝부분, Ed448·ML-DSA·ML-KEM이라면 개인키 바이트입니다. PEM을 읽을 때도 base64 문자열이 같은 식으로 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 PEM·base64 계층까지 따라갔습니다. <code>EVP_ENCODE_CTX</code>는 OpenSSL 1.1.0부터 불투명 구조체라 항상 <code>EVP_ENCODE_CTX_new()</code>로 만들어지므로, 해제할 때 지우면 PEM 읽기·쓰기와 <code>BIO_f_base64</code>가 모두 해결됩니다.</dd><dt>찾은 방법</dt><dd>같은 해제 블록 측정 프로그램을 개인키 PEM 인코딩에 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>EVP_ENCODE_CTX_free()</code>에서 문맥을 지웁니다. 새 시험 <code>test_encode_ctx_free_clears_input</code>은 문맥에 부분 블록을 남긴 채 해제 함수를 바꿔 끼우고, 해제된 문맥에 입력이 남아 있으면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">PR 원문 #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-mbedtls-11036" data-group="review">
@@ -142,17 +175,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy/mitmproxy #8548 · 버그 수정 ↗</a></div>
       <dl><dt>문제</dt><dd><code>--set confdir=...</code>을 주면 mitmproxy가 그 폴더의 <code>config.yaml</code>에서 <code>cert_passphrase</code>를 읽기 전에 CA부터 불러왔습니다. 그래서 암호가 걸린 CA 키를 읽지 못해 시작하자마자 종료됐습니다(2023년부터 열린 이슈 #6014).</dd><dt>배경 지식</dt><dd>TLS 가로채기 구조를 알아야 했습니다. mitmproxy는 자체 CA로 인증서를 즉석에서 서명하므로 시작할 때 CA 개인키를 읽어야 하고, 암호화된 PKCS#8 키는 암호가 먼저 있어야 합니다. 옵션 관리자는 갱신할 때마다 애드온에 알리므로, 갱신 순서가 애드온이 보는 값을 정합니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 원인을 짚어 둔 이슈 #6014와, 2023년 이후 리뷰 없이 멈춘 PR을 보고 골랐습니다. 암호 걸린 CA로 리눅스에서 재현했습니다.</dd><dt>수정</dt><dd><code>--set</code> 옵션과 설정 파일을 옵션 사본(구독자가 없음)에서 먼저 합친 뒤 결과를 한 번에 적용합니다. 우선순위는 그대로입니다. 새 시험은 암호 걸린 CA로 mitmdump를 띄우고, 예전 순서로 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">PR 원문 #8548 ↗</a> · <a href="https://github.com/mitmproxy/mitmproxy/pull/8548/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="RustCrypto-RSA-740" data-group="review">
-    <summary>
-      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/RSA#740">리뷰 대기</span></span>
-      <span class="line2">wycheproof: OAEP 복호화 벡터 시험 추가</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓12</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · 시험 보강 ↗</a></div>
-      <dl><dt>문제</dt><dd><code>rsa</code> 크레이트의 Wycheproof 시험은 PKCS#1 v1.5·PSS 서명만 돌렸습니다. OAEP 패딩 검사 세 가지(첫 바이트 0, 구분자 0x01 앞의 0 아닌 바이트, 구분자 없음) 중 하나를 빼도 시험이 모두 통과했습니다.</dd><dt>배경 지식</dt><dd>RSA-OAEP(RFC 8017) 복호화는 잘못된 패딩을 어느 검사에서 걸렸는지 드러내지 않고 거부해야 합니다. Wycheproof OAEP 파일에 바로 그런 잘못된 암호문이 들어 있습니다.</dd><dt>찾은 방법</dt><dd>변이 시험으로 찾았습니다. 패딩 검사를 하나씩 빼고 기존 시험을 돌린 뒤, 같은 변경을 Wycheproof OAEP 벡터로 다시 돌렸습니다.</dd><dt>수정</dt><dd>새 시험 <code>test_rsa_oaep_decrypt</code>가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개 파일에서 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">PR 원문 #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="RustCrypto-crypto-bigint-1382" data-group="review">
@@ -199,15 +221,15 @@
       <dl><dt>문제</dt><dd><code>BoxedUint::from_be_slice</code>·<code>from_le_slice</code> 문서는 값이 <code>bits_precision</code>보다 넓으면 <code>DecodeError::Precision</code>을 돌려준다고 적었습니다. #1266 뒤로 두 함수는 그 비트를 지우고 <code>Ok</code>를 돌려주고, 그 PR이 시험도 그렇게 바꿨습니다.</dd><dt>배경 지식</dt><dd>고정 정밀도 정수 타입은 정밀도보다 넓은 입력을 거부할지, RFC 6979 <code>bits2int</code>처럼 잘라 받을지 밝혀야 합니다. 비밀값을 읽는 호출자가 그 약속에 기댑니다.</dd><dt>찾은 방법</dt><dd>문서에 적힌 오류마다 실제 코드 경로와 맞춰 보고, <code>git log -S</code>로 어긋난 시점을 #1266까지 거슬러 찾았습니다.</dd><dt>수정</dt><dd>잘라 받는 동작을 적고 오류는 <code>DecodeError::InputSize</code>만 남겼습니다. 메인테이너가 옛 오류를 되살리기를 원하면 그쪽으로 바꾸겠다고 PR에 적었습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">PR 원문 #1383 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1383/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="RustCrypto-formats-2501" data-group="review">
+  <details class="entry" id="OpenSC-OpenSC-3917" data-group="review">
     <summary>
-      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/formats#2501">리뷰 대기</span></span>
-      <span class="line2">der: 잘못된 이진 REAL 값을 패닉 대신 오류로 거부</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓110</span></span>
+      <span class="line1"><b>OpenSC</b> <span class="badge review" data-pr="OpenSC/OpenSC#3917">리뷰 대기</span></span>
+      <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
+      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="ok">✓68</span></span>
     </summary>
     <div class="body">
-      <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">RustCrypto/formats #2501 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>#2483이 잘린 내용을 고친 뒤에도 <code>der</code> 크레이트의 ASN.1 REAL(<code>f64</code>) 해석기는 가수가 8옥텟을 넘으면 패닉했고, 가수가 0이거나 지수가 범위를 벗어나면 디버그 빌드에서 패닉했습니다. 릴리스 빌드에서는 뒤의 둘이 NaN과 엉뚱한 값(지수 0x7fff → 0.5)이 됐습니다.</dd><dt>배경 지식</dt><dd>X.690 이진 REAL 인코딩(부호·밑수·배율 F·지수 옥텟·가수 옥텟)을 썼습니다. 0은 내용 옥텟이 없어야 하고(8.5.2), 이 해석기가 IEEE-754 double로 옮기려면 지수가 -1023..=1023 안에 있어야 합니다.</dd><dt>찾은 방법</dt><dd>#2483 뒤의 해석기 코드에서 검사 없이 남은 산술을 찾고, 입력마다 master와 <code>der</code> 0.8.3에서 디버그·릴리스 빌드로 재현했습니다.</dd><dt>수정</dt><dd>세 경우 모두 값 오류를 돌려줍니다. 새 시험이 그 입력들을 다루고, 검사 셋 중 하나만 빼도 실패합니다. <code>der</code> 시험 120개가 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">PR 원문 #2501 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2501/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+      <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · 버그 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd>OpenSC PKCS#11 모듈은 공개키로 서명 검증은 했지만 암호화는 못 했습니다. RSA 공개키로 <code>C_EncryptInit()</code>을 부르면 <code>CKR_KEY_TYPE_INCONSISTENT</code>로 실패했습니다(#3144). 시험 도구 p11test도 그 기능을 켜는 값을 시험 준비 단계에서 빠뜨려 <code>C_Encrypt()</code>를 한 번도 부르지 않았습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 객체 연산과 메커니즘 표시(<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5·패딩 없는 RSA 암호화, 그리고 OpenSC가 <code>C_Verify()</code>를 OpenSSL로 처리하는 기존 소프트웨어 경로를 썼습니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 입문 과제로 표시한 이슈입니다. 가상 SmartCard-HSM(pico-hsm 에뮬레이션 + vsmartcard + 사용자 모드 pcscd)으로 재현했고, pkcs11-spy로 p11test가 <code>C_Encrypt()</code>까지 가지 않는 것을 찾았습니다.</dd><dt>수정</dt><dd>공개키 객체가 OpenSSL로 <code>CKM_RSA_PKCS</code>·<code>CKM_RSA_X_509</code> 암호화를 하고, p11test가 그 값을 넘기게 고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이 같습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">PR 원문 #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33426" data-group="ci">
@@ -219,17 +241,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">openssl/openssl #33426 · 보안 강화 ↗</a></div>
       <dl><dt>문제</dt><dd><code>key_to_type_specific_der_bio()</code>가 키의 i2d 함수가 만든 DER를 <code>OPENSSL_free()</code>로 해제했습니다. 개인키라면 이 버퍼에 키 전체가 들어 있어서, RSA·EC·DSA·SM2 키를 <code>i2d_PrivateKey()</code>나 &quot;type-specific&quot; DER로 인코딩할 때마다 키가 해제된 메모리에 남았습니다. PEM 경로는 이미 사본을 지우고 있었습니다.</dd><dt>배경 지식</dt><dd>ISO/IEC 19790(FIPS 140-3·KCMVP)의 제로화 요건과, OpenSSL 3 인코더가 <code>i2d</code> 함수와 BIO 사이에서 키를 넘기는 방식을 바탕으로 봤습니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제 블록마다 키 바이트를 찾는 측정 프로그램을 키 인코더에 돌려 찾았습니다.</dd><dt>수정</dt><dd>인코딩 버퍼를 <code>OPENSSL_clear_free()</code>로 해제합니다. 새 시험 <code>test_type_specific_der_cleanse</code>는 감시 할당자를 건 채 RSA 키를 두 방식으로 인코딩하고, 수정이 없으면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">PR 원문 #33426 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33426/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-openssl-33430" data-group="ci">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge ci_approval" data-pr="openssl/openssl#33430">CI 실행 허가 대기</span></span>
-      <span class="line2"><code>EVP_ENCODE_CTX</code>를 해제할 때 지우기</span>
-      <span class="line3">제출 2026-10-28 · 5일째 · 응답 아직 · CI <span class="ok">✓1</span> <span class="wait">⏸13</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · 보안 강화 ↗</a></div>
-      <dl><dt>문제</dt><dd>base64 문맥은 입력의 마지막 부분 줄을 들고 있는데, 지우지 않고 해제했습니다. <code>PEM_write_bio()</code>는 개인키 DER를 이 문맥으로 인코딩하므로 키의 마지막 (길이 mod 48)바이트가 해제된 메모리에 남았습니다. RSA라면 <code>iqmp</code> 끝부분, Ed448·ML-DSA·ML-KEM이라면 개인키 바이트입니다. PEM을 읽을 때도 base64 문자열이 같은 식으로 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 PEM·base64 계층까지 따라갔습니다. <code>EVP_ENCODE_CTX</code>는 OpenSSL 1.1.0부터 불투명 구조체라 항상 <code>EVP_ENCODE_CTX_new()</code>로 만들어지므로, 해제할 때 지우면 PEM 읽기·쓰기와 <code>BIO_f_base64</code>가 모두 해결됩니다.</dd><dt>찾은 방법</dt><dd>같은 해제 블록 측정 프로그램을 개인키 PEM 인코딩에 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>EVP_ENCODE_CTX_free()</code>에서 문맥을 지웁니다. 새 시험 <code>test_encode_ctx_free_clears_input</code>은 문맥에 부분 블록을 남긴 채 해제 함수를 바꿔 끼우고, 해제된 문맥에 입력이 남아 있으면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">PR 원문 #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
@@ -331,17 +342,6 @@
       <dl><dt>문제</dt><dd>토큰 키로 RSA 무패딩(<code>RSA_NO_PADDING</code>) 서명을 하면, 입력이 맞아도 출력 버퍼가 모듈러스보다 크기만 하면 실패했습니다. 기본 provider는 같은 입력·같은 버퍼로 서명하고 모듈러스 크기를 돌려줍니다.</dd><dt>배경 지식</dt><dd>RSA와 OpenSSL provider API 지식이 필요했습니다. <code>EVP_PKEY_sign()</code>은 <code>*siglen</code>으로 버퍼 크기를 받고, 무패딩 RSA(PKCS#11의 <code>CKM_RSA_X_509</code>)는 입력이 모듈러스와 정확히 같은 길이여야 합니다.</dd><dt>찾은 방법</dt><dd>같은 버퍼 크기 측정에서 pkcs11-provider와 OpenSSL 기본 provider를 비교해 찾았습니다. 257·512·8448바이트 버퍼가 토큰에서는 실패하고 기본 provider에서는 성공했습니다.</dd><dt>수정</dt><dd>입력 길이를 호출자 버퍼 크기가 아니라 키의 모듈러스 크기와 비교합니다. 새 <code>rsaraw</code> 시험은 두 provider를 모두 확인하고, 토큰 서명에서 원래 데이터를 되살려 보며, 모듈러스보다 짧은 입력은 여전히 거부하는지 봅니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">PR 원문 #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="OpenSC-OpenSC-3917" data-group="ci">
-    <summary>
-      <span class="line1"><b>OpenSC</b> <span class="badge ci_approval" data-pr="OpenSC/OpenSC#3917">CI 실행 허가 대기</span></span>
-      <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 응답 아직 · CI <span class="wait">⏸12</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>OpenSC PKCS#11 모듈은 공개키로 서명 검증은 했지만 암호화는 못 했습니다. RSA 공개키로 <code>C_EncryptInit()</code>을 부르면 <code>CKR_KEY_TYPE_INCONSISTENT</code>로 실패했습니다(#3144). 시험 도구 p11test도 그 기능을 켜는 값을 시험 준비 단계에서 빠뜨려 <code>C_Encrypt()</code>를 한 번도 부르지 않았습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 객체 연산과 메커니즘 표시(<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5·패딩 없는 RSA 암호화, 그리고 OpenSC가 <code>C_Verify()</code>를 OpenSSL로 처리하는 기존 소프트웨어 경로를 썼습니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 입문 과제로 표시한 이슈입니다. 가상 SmartCard-HSM(pico-hsm 에뮬레이션 + vsmartcard + 사용자 모드 pcscd)으로 재현했고, pkcs11-spy로 p11test가 <code>C_Encrypt()</code>까지 가지 않는 것을 찾았습니다.</dd><dt>수정</dt><dd>공개키 객체가 OpenSSL로 <code>CKM_RSA_PKCS</code>·<code>CKM_RSA_X_509</code> 암호화를 하고, p11test가 그 값을 넘기게 고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이 같습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">PR 원문 #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="openssl-openssl-33444" data-group="closed">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge closed" data-pr="openssl/openssl#33444">닫힘</span></span>
@@ -422,7 +422,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">가장 널리 쓰이는 C TLS·암호 라이브러리</div>
       <div class="focus">보는 것: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)</div>
-      <div class="prs"><span>PR 5건</span> <span class="badge ci_approval">CI 실행 허가 대기 4</span> <span class="badge closed">닫힘 1</span></div>
+      <div class="prs"><span>PR 5건</span> <span class="badge review">리뷰 대기 1</span> <span class="badge ci_approval">CI 실행 허가 대기 3</span> <span class="badge closed">닫힘 1</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -458,7 +458,7 @@
       <div class="name"><b>RustCrypto RSA</b> <a href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener">RustCrypto/RSA ↗</a></div>
       <div class="about">순수 Rust RSA 구현</div>
       <div class="focus">보는 것: 시험이 돌리지 않는 Wycheproof 벡터</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+      <div class="prs"><span>PR 1건</span> <span class="badge merged">머지됨 1</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-signatures">
       <div class="name"><b>RustCrypto signatures</b> <a href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener">RustCrypto/signatures ↗</a></div>
@@ -506,13 +506,13 @@
       <div class="name"><b>RustCrypto formats</b> <a href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener">RustCrypto/formats ↗</a></div>
       <div class="about">Rust용 DER·PEM·X.509 등 형식 크레이트 모음</div>
       <div class="focus">보는 것: 잘못된 DER 값 해석</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+      <div class="prs"><span>PR 1건</span> <span class="badge merged">머지됨 1</span></div>
     </article>
     <article class="repo" id="repo-OpenSC-OpenSC">
       <div class="name"><b>OpenSC</b> <a href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener">OpenSC/OpenSC ↗</a></div>
       <div class="about">스마트카드 도구와 PKCS#11 모듈</div>
       <div class="focus">보는 것: PKCS#11 모듈의 빠진 기능(가상 카드로 시험)</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
+      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
     </article></div>
   </section>
 

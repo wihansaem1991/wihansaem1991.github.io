@@ -42,26 +42,7 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
-    "pending": 0
-   },
-   "ci_waiting": 12,
-   "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
-   "opened": "2026-11-01",
-   "stage": "ci_approval"
-  },
-  "merge": null,
-  "url": "https://github.com/OpenSC/OpenSC/pull/3917"
- },
- "RustCrypto/RSA#740": {
-  "approvals": [],
-  "live": {
-   "checks": {
-    "fail": 0,
-    "pass": 12,
+    "pass": 68,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -73,6 +54,34 @@
    "stage": "review"
   },
   "merge": null,
+  "url": "https://github.com/OpenSC/OpenSC/pull/3917"
+ },
+ "RustCrypto/RSA#740": {
+  "approvals": [
+   {
+    "by": "tarcieri",
+    "date": "2026-11-01",
+    "url": "https://github.com/RustCrypto/RSA/pull/740#pullrequestreview-5730252760"
+   }
+  ],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 12,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": "2026-11-01",
+   "first_response": "2026-11-01",
+   "last_response": "2026-11-01",
+   "opened": "2026-11-01",
+   "stage": "merged"
+  },
+  "merge": {
+   "sha": "8f823d4a479ab4f4905897196b180c9a3781f5f8",
+   "url": "https://github.com/RustCrypto/RSA/commit/8f823d4a479ab4f4905897196b180c9a3781f5f8"
+  },
   "url": "https://github.com/RustCrypto/RSA/pull/740"
  },
  "RustCrypto/crypto-bigint#1382": {
@@ -114,7 +123,13 @@
   "url": "https://github.com/RustCrypto/crypto-bigint/pull/1383"
  },
  "RustCrypto/formats#2501": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "tarcieri",
+    "date": "2026-11-01",
+    "url": "https://github.com/RustCrypto/formats/pull/2501#pullrequestreview-5730274250"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -123,13 +138,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-01",
+   "first_response": "2026-11-01",
+   "last_response": "2026-11-01",
    "opened": "2026-11-01",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "ae28c9f4168b32f8096f70b2562ba7d2120a11d4",
+   "url": "https://github.com/RustCrypto/formats/commit/ae28c9f4168b32f8096f70b2562ba7d2120a11d4"
+  },
   "url": "https://github.com/RustCrypto/formats/pull/2501"
  },
  "RustCrypto/signatures#1493": {
@@ -304,16 +322,16 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 1,
-    "pending": 0
+    "pass": 87,
+    "pending": 10
    },
-   "ci_waiting": 13,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-02",
    "opened": "2026-10-28",
-   "stage": "ci_approval"
+   "stage": "review"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33430"

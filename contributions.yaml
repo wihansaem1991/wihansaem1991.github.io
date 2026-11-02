@@ -495,9 +495,9 @@ entries:
     type: test
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-01
     defect:
       en: >-
         The `rsa` crate's Wycheproof tests covered only PKCS#1 v1.5 and PSS signatures. Removing
@@ -983,9 +983,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-01
     defect:
       en: >-
         After #2483 fixed truncated content, the `der` crate's ASN.1 REAL (`f64`) decoder still
