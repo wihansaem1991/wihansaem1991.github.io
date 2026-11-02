@@ -604,8 +604,14 @@
     try { history.replaceState(null, "", "#tab-" + t.dataset.tab); } catch (e) { /* file:// pages */ }
   });
   /* a link to one entry (#owner-repo-123) opens it in the All tab */
-  const target = location.hash && !location.hash.startsWith("#tab-") ? document.getElementById(location.hash.slice(1)) : null;
-  if (target && target.tagName === "DETAILS") { target.open = true; show("all"); } else show(current());
+  function follow() {
+    const target = location.hash && !location.hash.startsWith("#tab-") ? document.getElementById(location.hash.slice(1)) : null;
+    if (target && target.tagName === "DETAILS") { target.open = true; show("all"); target.scrollIntoView(); } else show(current());
+  }
+  follow();
+  /* the page is not reloaded when only the #fragment changes (an address pasted into a tab
+     that already shows this page, a link within it), so follow those changes too */
+  window.addEventListener("hashchange", follow);
 
   /* Re-read merged, closed and approved pull requests from the GitHub search API on every load,
      so a refresh shows them without waiting for the next rebuild. Three unauthenticated
