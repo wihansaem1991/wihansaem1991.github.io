@@ -593,63 +593,6 @@
   "merge": null,
   "url": "https://github.com/randombit/botan/pull/6082"
  },
- "schwabe/ics-openvpn#1936": {
-  "approvals": [],
-  "live": {
-   "checks": {
-    "fail": 0,
-    "pass": 0,
-    "pending": 0
-   },
-   "ci_waiting": 0,
-   "draft": false,
-   "ended": "2026-11-02",
-   "first_response": null,
-   "last_response": null,
-   "opened": "2026-11-01",
-   "stage": "closed"
-  },
-  "merge": null,
-  "url": "https://github.com/schwabe/ics-openvpn/pull/1936"
- },
- "schwabe/ics-openvpn#1937": {
-  "approvals": [],
-  "live": {
-   "checks": {
-    "fail": 0,
-    "pass": 0,
-    "pending": 0
-   },
-   "ci_waiting": 0,
-   "draft": false,
-   "ended": "2026-11-02",
-   "first_response": null,
-   "last_response": null,
-   "opened": "2026-11-01",
-   "stage": "closed"
-  },
-  "merge": null,
-  "url": "https://github.com/schwabe/ics-openvpn/pull/1937"
- },
- "schwabe/ics-openvpn#1938": {
-  "approvals": [],
-  "live": {
-   "checks": {
-    "fail": 0,
-    "pass": 0,
-    "pending": 0
-   },
-   "ci_waiting": 0,
-   "draft": false,
-   "ended": "2026-11-02",
-   "first_response": "2026-11-02",
-   "last_response": "2026-11-02",
-   "opened": "2026-11-01",
-   "stage": "closed"
-  },
-  "merge": null,
-  "url": "https://github.com/schwabe/ics-openvpn/pull/1938"
- },
  "tpm2-software/tpm2-tss#3198": {
   "approvals": [],
   "live": {

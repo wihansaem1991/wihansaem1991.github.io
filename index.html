@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">32 pull requests and 7 vulnerability reports · 12 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">29 pull requests and 7 vulnerability reports · 11 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">39</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">5</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">17</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">36</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">5</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -408,39 +408,6 @@
       <dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Pull request #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
     </div>
   </details>
-  <details class="entry" id="schwabe-ics-openvpn-1936" data-group="closed">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1936">Closed</span></span>
-      <span class="line2">Fix duplicated character before a backslash in config lines</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">schwabe/ics-openvpn #1936 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>The <code>.ovpn</code> importer&#x27;s tokenizer kept the previous character across loop iterations, so the character before a backslash was stored twice: <code>ca foo\ bar.crt</code> became <code>fooo bar.crt</code>.</dd><dt>Background</dt><dd>OpenVPN&#x27;s own option tokenizer (<code>parse_line()</code> in <code>options_parse.c</code>) is the reference the app&#x27;s Java port has to match.</dd><dt>How it was found</dt><dd>Differential testing of the Java tokenizer against OpenVPN&#x27;s real <code>parse_line()</code> on random option lines.</dd><dt>Fix</dt><dd>Reset the stored character every iteration, as OpenVPN does; lines split differently by the two dropped from 504 to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">Pull request #1936 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1936/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="schwabe-ics-openvpn-1937" data-group="closed">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1937">Closed</span></span>
-      <span class="line2">Report malformed auth-retry, compat-mode and ifconfig as import errors</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">schwabe/ics-openvpn #1937 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>Four malformed option values made the importer throw an uncaught runtime exception, which crashes the app instead of showing an import error.</dd><dt>Background</dt><dd>Robustness of a parser that reads untrusted profile files from users and VPN providers.</dd><dt>How it was found</dt><dd>Fuzzing the importer with random configs on a plain JVM; 30,000 configs hit 9 crash sites.</dd><dt>Fix</dt><dd>A one-character typo fix plus two ConfigParseError conversions; crash sites went to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">Pull request #1937 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1937/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="schwabe-ics-openvpn-1938" data-group="closed">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1938">Closed</span></span>
-      <span class="line2">Keep leading zero groups in IPv6 address strings</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · first reply 2026-11-02 · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">schwabe/ics-openvpn #1938 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>IPv6 addresses with leading zero groups were printed without them (<code>::1</code> as <code>1</code>, <code>::2:0</code> as <code>2::</code>). On Android below 13 that string is used to install VPN routes.</dd><dt>Background</dt><dd>IPv6 text representation (RFC 4291/5952) and Android&#x27;s <code>VpnService.Builder.addRoute()</code> route installation.</dd><dt>How it was found</dt><dd>Comparing the app&#x27;s address formatting with Python&#x27;s <code>ipaddress</code> on random addresses.</dd><dt>Fix</dt><dd>Walk all eight groups instead of stopping at zero; mismatches went from 1,524 to 0 and existing test strings are unchanged.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">Pull request #1938 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1938/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="randombit-botan-6082" data-group="closed">
     <summary>
       <span class="line1"><b>Botan</b> <span class="badge closed" data-pr="randombit/botan#6082">Closed</span></span>
@@ -525,12 +492,6 @@
       <div class="about">OpenSSL 3 provider for PKCS#11 tokens and HSMs</div>
       <div class="focus">Looking at: Output-buffer length rules of signing, key derivation and ECDH, compared with OpenSSL&#x27;s default provider</div>
       <div class="prs"><span>3 pull requests</span> <span class="badge rereview">Updated, awaiting re-review 1</span> <span class="badge ci_approval">Awaiting CI approval 2</span></div>
-    </article>
-    <article class="repo" id="repo-schwabe-ics-openvpn">
-      <div class="name"><b>OpenVPN for Android</b> <a href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener">schwabe/ics-openvpn ↗</a></div>
-      <div class="about">The OpenVPN client app for Android</div>
-      <div class="focus">Looking at: Parsing of imported configuration files</div>
-      <div class="prs"><span>3 pull requests</span> <span class="badge closed">Closed 3</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
