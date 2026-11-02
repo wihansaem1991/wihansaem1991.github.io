@@ -59,7 +59,7 @@
   .evidence a { white-space:nowrap; }
   .cvss { color:var(--muted); font-size:12px; }
   .badge { display:inline-block; font-size:12px; font-weight:600; border-radius:999px; padding:0 10px; white-space:nowrap; border:1px solid var(--muted); color:var(--muted); vertical-align: 1px; }
-  .badge.approved, .badge.v-fixed { color:var(--ok); border-color:var(--ok); }
+  .badge.approved, .badge.approved_pending, .badge.v-fixed { color:var(--ok); border-color:var(--ok); }
   .badge.merged, .badge.v-published { color:var(--merged); border-color:var(--merged); }
   .badge.changes { color:var(--bad); border-color:var(--bad); }
   .badge.vuln { color:var(--bad); border-color:var(--bad); }
@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">27 pull requests and 7 vulnerability reports · 8 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">32 pull requests and 7 vulnerability reports · 12 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">34</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">3</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">15</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">7</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">17</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">39</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">5</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">7</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">17</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -133,6 +133,39 @@
       <dl><dt>Problem</dt><dd>After #2483 fixed truncated content, the <code>der</code> crate&#x27;s ASN.1 REAL (<code>f64</code>) decoder still panicked on a mantissa longer than eight octets, and on a zero mantissa or an out-of-range exponent in debug builds. In release builds the last two decoded to NaN and to an unrelated value (exponent 0x7fff gave 0.5).</dd><dt>Background</dt><dd>X.690 binary REAL encoding: sign, base, scaling factor F, exponent octets, then mantissa octets; zero has no contents octets (8.5.2). An IEEE-754 double needs the exponent within -1023..=1023 for this decoder&#x27;s mapping.</dd><dt>How it was found</dt><dd>Reading the decoder after #2483 for the remaining unchecked arithmetic, then reproducing each input on master and on <code>der</code> 0.8.3 in debug and release builds.</dd><dt>Fix</dt><dd>Return a value error for each case. A new test covers the inputs and fails when any one of the three checks is removed; <code>der</code> tests pass (120).</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">Pull request #2501 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2501/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/RustCrypto/formats/pull/2501#pullrequestreview-5730274250" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/ae28c9f4168b32f8096f70b2562ba7d2120a11d4" target="_blank" rel="noopener">Merge commit ae28c9f416 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="OpenVPN-openvpn-2076" data-group="done">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2076">Approved</span></span>
+      <span class="line2">auth_token: Wipe the server secret key after loading it</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · first reply 2026-11-01 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2076 · Hardening · Approved 2026-11-02 ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>auth_token_init_secret()</code> reads the auth-token server key into a 2048-byte buffer, copies it into a <code>struct key</code> and then a <code>struct key_parameters</code> on the stack, and freed the buffer without clearing it, so three copies of the server key stayed in memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), checked against every copy a function makes: <code>tls_crypt_v2_init_server_key()</code> already clears its copy, this function did not.</dd><dt>How it was found</dt><dd>Scanning freed heap blocks for the key used by <code>test_auth_token</code>.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the <code>struct key</code> and the <code>struct key_parameters</code>, and <code>buf_clear()</code> before <code>free_buf()</code>. The second patch set added the <code>struct key_parameters</code> copy, which a reviewer pointed out; the same question led to a follow-up change for the other functions (Gerrit 2078).</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger on the second patch set.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a> · Approved by: <a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Steffan Karger ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — reviewer</blockquote>
+    </div>
+  </details>
+  <details class="entry" id="OpenVPN-openvpn-2079" data-group="done">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2079">Approved</span></span>
+      <span class="line2">tls_crypt: Wipe the tls-crypt-v2 client key copies</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · first reply 2026-11-02 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2079 · Hardening · Approved 2026-11-02 ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>tls_crypt_v2_init_client_key()</code> left a stack copy of the client key at every client start, and <code>tls_crypt_v2_write_client_key_file()</code> freed the key data and the wrapped key buffer without clearing them.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), matched to the project&#x27;s own precedents: <code>crypto_read_openvpn_key()</code> already clears the same stack copy and <code>do_close_free_key_schedule()</code> the same kind of buffer.</dd><dt>How it was found</dt><dd>A stack residue measurement and a freed-block scan with a marked test client key.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the stack copies and <code>buf_clear()</code> before <code>free_buf()</code>. Together with Gerrit 2078 the stack copies go from 2 to 0, and the two freed blocks from key generation disappear.</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">Gerrit 2079 ↗</a> · Approved by: <a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">Steffan Karger ↗</a></dd></dl><blockquote>"Welcome hardening." — reviewer</blockquote>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33430" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge approved_pending" data-pr="openssl/openssl#33430">Approved, awaiting another review</span></span>
+      <span class="line2">Clear the <code>EVP_ENCODE_CTX</code> when freeing it</span>
+      <span class="line3">submitted 2026-10-28 · 5 days · first reply 2026-11-02 · CI <span class="ok">✓97</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>The base64 context keeps the last partial line of its input and was freed without clearing it. <code>PEM_write_bio()</code> encodes private key DER through such a context, so the last (length mod 48) bytes of the key stayed in freed memory: the end of <code>iqmp</code> for RSA, private key bytes for Ed448, ML-DSA and ML-KEM. Reading PEM left base64 text the same way.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) followed through the PEM and base64 layers: <code>EVP_ENCODE_CTX</code> has been opaque since OpenSSL 1.1.0 and is always allocated by <code>EVP_ENCODE_CTX_new()</code>, so clearing it on free covers PEM reading, PEM writing and <code>BIO_f_base64</code>.</dd><dt>How it was found</dt><dd>The same freed-block measurement program, run over PEM encoding of private keys.</dd><dt>Fix</dt><dd>Clear the context in <code>EVP_ENCODE_CTX_free()</code>. <code>test_encode_ctx_free_clears_input</code> leaves a partial block in a context, swaps the free function and fails if the freed context still holds the input.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">Pull request #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33430#pullrequestreview-5731464751" target="_blank" rel="noopener">esyr ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-813" data-group="review">
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">Updated, awaiting re-review</span></span>
@@ -144,6 +177,17 @@
       <dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">Pull request #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="OpenVPN-openvpn-2077" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge rereview" data-pr="OpenVPN/openvpn#2077">Updated, awaiting re-review</span></span>
+      <span class="line2">crypto_openssl: Clear PEM decoded key data before freeing it</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · first reply 2026-11-01 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2077 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>crypto_pem_decode()</code> decodes the tls-crypt-v2 client and server keys and the auth-token key, and freed the decoded key bytes with <code>OPENSSL_free()</code>, so they stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) in a project that builds with both OpenSSL and LibreSSL, so the clearing call has to exist in both.</dd><dt>How it was found</dt><dd>Scanning the blocks freed during the tls-crypt unit tests for the test key.</dd><dt>Fix</dt><dd><code>OPENSSL_cleanse()</code> and then <code>OPENSSL_free()</code>. The first patch set used <code>OPENSSL_clear_free()</code>, which LibreSSL does not have; the second builds with <code>--enable-werror</code> against LibreSSL 4.3.4 and OpenSSL 3.5.9, and the freed blocks holding key bytes go from 2 to 0.</dd><dt>Review</dt><dd>Approved by Steffan Karger, then Gert Doering found the LibreSSL build failure and suggested the two-line form; the second patch set does exactly that and waits for another look.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-openssl-33426" data-group="review">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33426">Awaiting review</span></span>
@@ -153,17 +197,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">openssl/openssl #33426 · Hardening ↗</a></div>
       <dl><dt>Problem</dt><dd><code>key_to_type_specific_der_bio()</code> freed the DER produced by the key&#x27;s i2d function with <code>OPENSSL_free()</code>. For a private key that buffer holds the whole key, so every <code>i2d_PrivateKey()</code> or &quot;type-specific&quot; DER encoding of an RSA, EC, DSA or SM2 key left it in freed memory. The PEM path already cleared its copy.</dd><dt>Background</dt><dd>The zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP) and how OpenSSL 3 encoders hand key material between <code>i2d</code> functions and BIOs.</dd><dt>How it was found</dt><dd>The freed-block measurement program, which swaps OpenSSL&#x27;s allocator and looks for key bytes in every freed block, run over the key encoders.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> for the encoded buffer. <code>test_type_specific_der_cleanse</code> encodes an RSA key both ways under a watching allocator and fails without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">Pull request #33426 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33426/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-openssl-33430" data-group="review">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33430">Awaiting review</span></span>
-      <span class="line2">Clear the <code>EVP_ENCODE_CTX</code> when freeing it</span>
-      <span class="line3">submitted 2026-10-28 · 5 days · first reply 2026-11-02 · CI <span class="ok">✓97</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · Hardening ↗</a></div>
-      <dl><dt>Problem</dt><dd>The base64 context keeps the last partial line of its input and was freed without clearing it. <code>PEM_write_bio()</code> encodes private key DER through such a context, so the last (length mod 48) bytes of the key stayed in freed memory: the end of <code>iqmp</code> for RSA, private key bytes for Ed448, ML-DSA and ML-KEM. Reading PEM left base64 text the same way.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) followed through the PEM and base64 layers: <code>EVP_ENCODE_CTX</code> has been opaque since OpenSSL 1.1.0 and is always allocated by <code>EVP_ENCODE_CTX_new()</code>, so clearing it on free covers PEM reading, PEM writing and <code>BIO_f_base64</code>.</dd><dt>How it was found</dt><dd>The same freed-block measurement program, run over PEM encoding of private keys.</dd><dt>Fix</dt><dd>Clear the context in <code>EVP_ENCODE_CTX_free()</code>. <code>test_encode_ctx_free_clears_input</code> leaves a partial block in a context, swaps the free function and fails if the freed context still holds the input.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">Pull request #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33430#pullrequestreview-5731464751" target="_blank" rel="noopener">esyr ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-mbedtls-11036" data-group="review">
@@ -265,6 +298,17 @@
       <dl><dt>Problem</dt><dd>OpenSC&#x27;s PKCS#11 module could verify signatures with a public key but not encrypt with one: <code>C_EncryptInit()</code> on an RSA public key failed with <code>CKR_KEY_TYPE_INCONSISTENT</code> (#3144). The p11test suite also never called <code>C_Encrypt()</code>, because its group setup dropped the flag that enables it.</dd><dt>Background</dt><dd>PKCS#11 object operations and mechanism flags (<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5 and raw RSA encryption, and OpenSC&#x27;s existing software path for <code>C_Verify()</code> through OpenSSL.</dd><dt>How it was found</dt><dd>A maintainer-labelled good first issue. A virtual SmartCard-HSM (pico-hsm emulation behind vsmartcard and a user-mode pcscd) reproduced it, and pkcs11-spy showed p11test never reaching <code>C_Encrypt()</code>.</dd><dt>Fix</dt><dd>Public key objects encrypt with <code>CKM_RSA_PKCS</code> and <code>CKM_RSA_X_509</code> through OpenSSL, and p11test now keeps the flag. Card round trips work for both mechanisms; the CI p11test run matches the updated reference with no differences.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">Pull request #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="OpenVPN-openvpn-2075" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2075">Awaiting review</span></span>
+      <span class="line2">ssl: Wipe the key source material in key_state_free()</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2075" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2075 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>ks-&gt;key_src</code> holds the pre-master secret and the random values the peers exchange in key method 2. It is wiped once the data channel keys are generated, but when a key state is freed before that, for example because an <code>--auth-user-pass-verify</code> or client-connect script rejects the client, <code>key_state_free()</code> freed it with plain <code>free()</code> and the key material stayed in freed memory on both the server and the client.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP): key material has to be cleared when it is no longer needed, on the error paths as well as the normal one.</dd><dt>How it was found</dt><dd>A real server and client with an <code>LD_PRELOAD</code> scanner that checks every freed block for the key material: nothing on a normal connection, hits on both sides when an authentication or client-connect script rejects the client.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> before the free in <code>key_state_free()</code>. The same rejected connections then leave nothing behind.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2075" target="_blank" rel="noopener">Gerrit 2075 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-openssl-33476" data-group="review">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33476">Awaiting review</span></span>
@@ -298,6 +342,17 @@
       <dl><dt>Problem</dt><dd>The <code>eax</code> crate&#x27;s only failing-vector file was empty, so no test checked that a wrong tag is rejected: with the tag comparison forced to succeed, every test still passed. AES-192 and AES-256 had no test vectors at all.</dd><dt>Background</dt><dd>Validation test vectors (Wycheproof), the same approach as known-answer testing in cryptographic module validation (KCMVP): run the published vectors and check that a forged tag is refused.</dd><dt>How it was found</dt><dd>Running all Wycheproof AES-CCM and AES-EAX vectors against the crates (672 cases, no mismatch) and then checking which of them the crate&#x27;s own tests cover; a mutant with the tag check disabled passed the existing tests.</dd><dt>Fix</dt><dd>186 Wycheproof cases (105 valid, 81 invalid) for AES-128, AES-192 and AES-256 through the <code>aead</code> test macros. With the tag check disabled, the three new failure tests fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">Pull request #894 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/894/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="OpenVPN-openvpn-2078" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2078">Awaiting review</span></span>
+      <span class="line2">crypto: Wipe the struct key_parameters copies after use</span>
+      <span class="line3">submitted 2026-11-02 · 0 days · no reply yet · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2078" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2078 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>init_key_ctx_bi()</code> and <code>tls_crypt_v2_init_server_key()</code> convert the key into a <code>struct key_parameters</code> on the stack and returned without clearing it. <code>init_key_ctx_bi()</code> sets up the data channel keys (when epoch keys are not used), tls-auth, tls-crypt and static keys, so cipher and HMAC keys stayed on the stack after every key setup.</dd><dt>Background</dt><dd>A reviewer&#x27;s question on Gerrit 2076 (&quot;Should we not also clear struct key_params?&quot;), followed through every function that fills that struct; <code>epoch_init_send_key()</code> and <code>epoch_init_recv_key()</code> already clear it.</dd><dt>How it was found</dt><dd>A stack residue measurement with a positive control: cipher and HMAC key bytes were found after <code>init_key_ctx_bi()</code> (2 and 2) and <code>tls_crypt_v2_init_server_key()</code> (1 and 1).</dd><dt>Fix</dt><dd>Clear the struct after use in both functions, as the epoch key functions do. The same measurement finds nothing afterwards.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2078" target="_blank" rel="noopener">Gerrit 2078 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
     <summary>
       <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval</span></span>
@@ -318,39 +373,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · Test coverage ↗</a></div>
       <dl><dt>Problem</dt><dd>liboqs&#x27;s test harness rejected ML-DSA signatures of the wrong length, and contexts longer than 255 bytes, before calling the library, and the runner counted that as a pass. The Wycheproof <code>IncorrectSignatureLength</code> and <code>InvalidContext</code> vectors never reached liboqs: disabling the signature-length check in liboqs&#x27;s ML-DSA glue code left every test passing.</dd><dt>Background</dt><dd>FIPS 204 fixes the ML-DSA signature length for each parameter set. liboqs wraps the mldsa-native implementation in its own glue code, and that glue is what has to enforce the length at the public API.</dd><dt>How it was found</dt><dd>A sweep of the Wycheproof test harnesses of nine cryptography libraries for vectors that are skipped, followed by mutation testing on liboqs.</dd><dt>Fix</dt><dd>For ML-DSA, reject only malformed hex input, as the neighbouring SLH-DSA branch already does, so the vectors exercise the library&#x27;s own checks. Disabling the glue check now fails the Wycheproof tests for all three parameter sets.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">Pull request #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="schwabe-ics-openvpn-1936" data-group="ci">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge ci_approval" data-pr="schwabe/ics-openvpn#1936">Awaiting CI approval</span></span>
-      <span class="line2">Fix duplicated character before a backslash in config lines</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="wait">⏸2</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">schwabe/ics-openvpn #1936 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>The <code>.ovpn</code> importer&#x27;s tokenizer kept the previous character across loop iterations, so the character before a backslash was stored twice: <code>ca foo\ bar.crt</code> became <code>fooo bar.crt</code>.</dd><dt>Background</dt><dd>OpenVPN&#x27;s own option tokenizer (<code>parse_line()</code> in <code>options_parse.c</code>) is the reference the app&#x27;s Java port has to match.</dd><dt>How it was found</dt><dd>Differential testing of the Java tokenizer against OpenVPN&#x27;s real <code>parse_line()</code> on random option lines.</dd><dt>Fix</dt><dd>Reset the stored character every iteration, as OpenVPN does; lines split differently by the two dropped from 504 to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">Pull request #1936 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1936/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="schwabe-ics-openvpn-1937" data-group="ci">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge ci_approval" data-pr="schwabe/ics-openvpn#1937">Awaiting CI approval</span></span>
-      <span class="line2">Report malformed auth-retry, compat-mode and ifconfig as import errors</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="wait">⏸2</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">schwabe/ics-openvpn #1937 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>Four malformed option values made the importer throw an uncaught runtime exception, which crashes the app instead of showing an import error.</dd><dt>Background</dt><dd>Robustness of a parser that reads untrusted profile files from users and VPN providers.</dd><dt>How it was found</dt><dd>Fuzzing the importer with random configs on a plain JVM; 30,000 configs hit 9 crash sites.</dd><dt>Fix</dt><dd>A one-character typo fix plus two ConfigParseError conversions; crash sites went to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">Pull request #1937 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1937/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="schwabe-ics-openvpn-1938" data-group="ci">
-    <summary>
-      <span class="line1"><b>OpenVPN for Android</b> <span class="badge ci_approval" data-pr="schwabe/ics-openvpn#1938">Awaiting CI approval</span></span>
-      <span class="line2">Keep leading zero groups in IPv6 address strings</span>
-      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="wait">⏸2</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">schwabe/ics-openvpn #1938 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>IPv6 addresses with leading zero groups were printed without them (<code>::1</code> as <code>1</code>, <code>::2:0</code> as <code>2::</code>). On Android below 13 that string is used to install VPN routes.</dd><dt>Background</dt><dd>IPv6 text representation (RFC 4291/5952) and Android&#x27;s <code>VpnService.Builder.addRoute()</code> route installation.</dd><dt>How it was found</dt><dd>Comparing the app&#x27;s address formatting with Python&#x27;s <code>ipaddress</code> on random addresses.</dd><dt>Fix</dt><dd>Walk all eight groups instead of stopping at zero; mismatches went from 1,524 to 0 and existing test strings are unchanged.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">Pull request #1938 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1938/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="ci">
@@ -384,6 +406,39 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">openssl/openssl #33444 · Hardening · Approved 2026-10-30 · master, 3.6, 4.0, 4.1 ↗</a></div>
       <dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Pull request #33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5707391986" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33444#pullrequestreview-5710185151" target="_blank" rel="noopener">fwh-dc ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote>
+    </div>
+  </details>
+  <details class="entry" id="schwabe-ics-openvpn-1936" data-group="closed">
+    <summary>
+      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1936">Closed</span></span>
+      <span class="line2">Fix duplicated character before a backslash in config lines</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">schwabe/ics-openvpn #1936 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>The <code>.ovpn</code> importer&#x27;s tokenizer kept the previous character across loop iterations, so the character before a backslash was stored twice: <code>ca foo\ bar.crt</code> became <code>fooo bar.crt</code>.</dd><dt>Background</dt><dd>OpenVPN&#x27;s own option tokenizer (<code>parse_line()</code> in <code>options_parse.c</code>) is the reference the app&#x27;s Java port has to match.</dd><dt>How it was found</dt><dd>Differential testing of the Java tokenizer against OpenVPN&#x27;s real <code>parse_line()</code> on random option lines.</dd><dt>Fix</dt><dd>Reset the stored character every iteration, as OpenVPN does; lines split differently by the two dropped from 504 to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1936" target="_blank" rel="noopener">Pull request #1936 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1936/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="schwabe-ics-openvpn-1937" data-group="closed">
+    <summary>
+      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1937">Closed</span></span>
+      <span class="line2">Report malformed auth-retry, compat-mode and ifconfig as import errors</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · no reply yet · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">schwabe/ics-openvpn #1937 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>Four malformed option values made the importer throw an uncaught runtime exception, which crashes the app instead of showing an import error.</dd><dt>Background</dt><dd>Robustness of a parser that reads untrusted profile files from users and VPN providers.</dd><dt>How it was found</dt><dd>Fuzzing the importer with random configs on a plain JVM; 30,000 configs hit 9 crash sites.</dd><dt>Fix</dt><dd>A one-character typo fix plus two ConfigParseError conversions; crash sites went to 0.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1937" target="_blank" rel="noopener">Pull request #1937 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1937/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="schwabe-ics-openvpn-1938" data-group="closed">
+    <summary>
+      <span class="line1"><b>OpenVPN for Android</b> <span class="badge closed" data-pr="schwabe/ics-openvpn#1938">Closed</span></span>
+      <span class="line2">Keep leading zero groups in IPv6 address strings</span>
+      <span class="line3">submitted 2026-11-01 · 1 days · first reply 2026-11-02 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">schwabe/ics-openvpn #1938 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>IPv6 addresses with leading zero groups were printed without them (<code>::1</code> as <code>1</code>, <code>::2:0</code> as <code>2::</code>). On Android below 13 that string is used to install VPN routes.</dd><dt>Background</dt><dd>IPv6 text representation (RFC 4291/5952) and Android&#x27;s <code>VpnService.Builder.addRoute()</code> route installation.</dd><dt>How it was found</dt><dd>Comparing the app&#x27;s address formatting with Python&#x27;s <code>ipaddress</code> on random addresses.</dd><dt>Fix</dt><dd>Walk all eight groups instead of stopping at zero; mismatches went from 1,524 to 0 and existing test strings are unchanged.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">Pull request #1938 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1938/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="randombit-botan-6082" data-group="closed">
@@ -463,7 +518,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">The most widely deployed TLS and cryptography library, in C</div>
       <div class="focus">Looking at: Secrets left in freed memory, measured by hooking the allocator</div>
-      <div class="prs"><span>7 pull requests</span> <span class="badge review">Awaiting review 6</span> <span class="badge closed">Closed 1</span></div>
+      <div class="prs"><span>7 pull requests</span> <span class="badge approved_pending">Approved, awaiting another review 1</span> <span class="badge review">Awaiting review 5</span> <span class="badge closed">Closed 1</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -475,13 +530,13 @@
       <div class="name"><b>OpenVPN for Android</b> <a href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener">schwabe/ics-openvpn ↗</a></div>
       <div class="about">The OpenVPN client app for Android</div>
       <div class="focus">Looking at: Parsing of imported configuration files</div>
-      <div class="prs"><span>3 pull requests</span> <span class="badge ci_approval">Awaiting CI approval 3</span></div>
+      <div class="prs"><span>3 pull requests</span> <span class="badge closed">Closed 3</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
       <div class="about">OpenVPN itself, in C; patches go through Gerrit</div>
       <div class="focus">Looking at: Key material freed without being cleared</div>
-      <div class="prs"><span>5 changes on Gerrit (2075 to 2079)</span></div>
+      <div class="prs"><span>5 pull requests</span> <span class="badge approved">Approved 2</span> <span class="badge rereview">Updated, awaiting re-review 1</span> <span class="badge review">Awaiting review 2</span></div>
     </article>
     <article class="repo" id="repo-randombit-botan">
       <div class="name"><b>Botan</b> <a href="https://github.com/randombit/botan" target="_blank" rel="noopener">randombit/botan ↗</a></div>
@@ -565,7 +620,7 @@
 
   <footer>Updated 2026-11-02; refreshed from GitHub every hour, and merged, closed and approved stages are re-read on every page load. Private vulnerability reports show only their stage until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
 </main>
-<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "Merged", "approved": "Approved", "rereview": "Updated, awaiting re-review", "changes": "Changes requested", "review": "Awaiting review", "ci_approval": "Awaiting CI approval", "closed": "Closed", "open": "Open"}, "live": "Stages read from GitHub just now ({t}).", "loading": "Reading current stages from GitHub…", "snapshot": "Showing the snapshot of 2026-11-02; GitHub could not be reached from this browser.", "groups": {"merged": "done", "approved": "done", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
+<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "Merged", "approved": "Approved", "approved_pending": "Approved, awaiting another review", "rereview": "Updated, awaiting re-review", "changes": "Changes requested", "review": "Awaiting review", "ci_approval": "Awaiting CI approval", "closed": "Closed", "open": "Open"}, "live": "Stages read from GitHub just now ({t}).", "loading": "Reading current stages from GitHub…", "snapshot": "Showing the snapshot of 2026-11-02; GitHub could not be reached from this browser.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
 <script>
 (() => {
   const L = JSON.parse(document.getElementById("labels").textContent);

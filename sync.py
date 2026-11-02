@@ -8,6 +8,9 @@ For every pull request entry:
   the latest approving review);
 - github.json gets the evidence links (the PR, each approving review, the merge commit) and the
   live state shown on the page: stage, CI summary, first and last maintainer response.
+Entries with a `gerrit:` link are changes on a Gerrit server instead of GitHub pull requests; they
+are read from that server's public REST API (Code-Review +2 is approved, +1 approved and awaiting
+another review, a negative vote asks for changes).
 Pull requests by the owner that are approved or merged but have no entry yet are listed, since
 their briefings have to be written by hand.
 
@@ -21,6 +24,8 @@ import os
 import re
 import subprocess
 import sys
+import urllib.parse
+import urllib.request
 
 import yaml
 
@@ -37,6 +42,85 @@ ADVISORY_STAGE = {"triage": "triage", "draft": "accepted", "published": "publish
 def gh(*args):
     out = subprocess.run(["gh", *args], capture_output=True, text=True, check=True).stdout
     return json.loads(out)
+
+
+_GERRIT = {}
+
+
+def gerrit(e):
+    """The change behind a `gerrit:` link (https://host/c/project/+/123), from the public REST API."""
+    if e["gerrit"] in _GERRIT:
+        return _GERRIT[e["gerrit"]]
+    u = urllib.parse.urlsplit(e["gerrit"])
+    url = (f"{u.scheme}://{u.netloc}/changes/{int(e['pr'])}"
+           "?o=DETAILED_LABELS&o=DETAILED_ACCOUNTS&o=MESSAGES&o=ALL_REVISIONS")
+    with urllib.request.urlopen(url, timeout=30) as r:
+        body = r.read().decode("utf-8")
+    _GERRIT[e["gerrit"]] = json.loads(body.split("\n", 1)[1])  # the reply starts with )]}'
+    return _GERRIT[e["gerrit"]]
+
+
+def gerrit_votes(c):
+    """[(value, name, date)] of the Code-Review votes on the current patch set. A vote copied to a
+    new patch set carries the copy time, so the date is taken from the voter's last message that
+    cast a Code-Review vote."""
+    cast = {}
+    for m in c.get("messages") or []:
+        who = (m.get("author") or {}).get("_account_id")
+        if who and re.search(r"Code-Review[+-]\d", m.get("message") or ""):
+            cast[who] = m["date"]
+    return [(v["value"], v.get("name") or v.get("username") or "", cast.get(v.get("_account_id"), v.get("date") or ""))
+            for v in (c.get("labels") or {}).get("Code-Review", {}).get("all") or [] if v.get("value")]
+
+
+def gerrit_state(e):
+    c = gerrit(e)
+    if c["status"] == "MERGED":
+        return "merged", (c.get("submitted") or c["updated"])[:10], c["subject"]
+    plus = [d for v, _, d in gerrit_votes(c) if v >= 2]
+    if c["status"] == "NEW" and plus and min(v for v, _, _ in gerrit_votes(c)) > 0:
+        return "approved", max(plus)[:10], c["subject"]
+    return ("closed" if c["status"] == "ABANDONED" else "open"), None, c["subject"]
+
+
+def gerrit_evidence(e):
+    c = gerrit(e)
+    approvals = [{"by": name, "url": e["gerrit"], "date": d[:10]} for v, name, d in gerrit_votes(c) if v >= 2]
+    return {"url": e["gerrit"], "approvals": approvals, "merge": None}
+
+
+def gerrit_live(e):
+    c = gerrit(e)
+    me = (c.get("owner") or {}).get("_account_id")
+    replies = sorted(m["date"] for m in c.get("messages") or []
+                     if (m.get("author") or {}).get("_account_id") not in (None, me)
+                     and not BOT.search((m.get("author") or {}).get("name") or ""))
+    votes = gerrit_votes(c)
+    uploaded = max(r["created"] for r in c["revisions"].values())
+    if c["status"] == "MERGED":
+        stage = "merged"
+    elif c["status"] == "ABANDONED":
+        stage = "closed"
+    elif votes and min(v for v, _, _ in votes) < 0:
+        last_no = max(d for v, _, d in votes if v < 0)
+        stage = "rereview" if uploaded > last_no else "changes"
+    elif votes and max(v for v, _, _ in votes) >= 2:
+        stage = "approved"
+    elif votes:
+        stage = "approved_pending"
+    else:
+        stage = "review"
+    end = c.get("submitted") if stage == "merged" else (c["updated"] if stage == "closed" else None)
+    return {
+        "stage": stage,
+        "draft": bool(c.get("work_in_progress")),
+        "opened": c["created"][:10],
+        "ended": end[:10] if end else None,
+        "first_response": replies[0][:10] if replies else None,
+        "last_response": replies[-1][:10] if replies else None,
+        "checks": {"pass": 0, "fail": 0, "pending": 0},
+        "ci_waiting": 0,
+    }
 
 
 def pr_state(repo, number):
@@ -92,6 +176,11 @@ def live(repo, number, owner):
     own = sorted(t for t, by in activity if t and by == owner)
     changes = sorted(r["submittedAt"] for r in d.get("reviews") or []
                      if r.get("state") == "CHANGES_REQUESTED" and r.get("submittedAt"))
+    # each reviewer's latest verdict; an approval counts until that reviewer changes it
+    verdict = {}
+    for r in sorted(d.get("reviews") or [], key=lambda r: r.get("submittedAt") or ""):
+        if r.get("state") in ("APPROVED", "CHANGES_REQUESTED", "DISMISSED") and who(r) != owner:
+            verdict[who(r)] = r["state"]
     runs = gh("api", f"repos/{repo}/actions/runs?head_sha={d['headRefOid']}&per_page=100")
     waiting = sum(1 for r in runs.get("workflow_runs") or [] if r.get("conclusion") == "action_required")
     if d.get("mergedAt"):
@@ -102,6 +191,8 @@ def live(repo, number, owner):
         stage = "approved"
     elif d.get("reviewDecision") == "CHANGES_REQUESTED":
         stage = "rereview" if own and changes and own[-1] > changes[-1] else "changes"
+    elif "APPROVED" in verdict.values():
+        stage = "approved_pending"  # approved, but the repository requires more approving reviews
     elif waiting:
         stage = "ci_approval"
     else:
@@ -158,7 +249,7 @@ def main():
         head, items, tail = split
         for i, block in enumerate(items):
             e = parse(block)
-            status, date, _ = pr_state(e["repo"], e["pr"])
+            status, date, _ = gerrit_state(e) if e.get("gerrit") else pr_state(e["repo"], e["pr"])
             if status in ("merged", "approved") and (status != e.get("status") or date != str(e.get("decided"))):
                 items[i] = set_field(set_field(block, "status", status), "decided", date)
                 changed.append(f'{e["repo"]}#{e["pr"]}: {e.get("status")} {e.get("decided")} -> {status} {date}')
@@ -190,7 +281,10 @@ def main():
     links = {}
     for e in data.get("entries") or []:
         key = f"{e['repo']}#{e['pr']}"
-        links[key] = {**evidence(e["repo"], e["pr"]), "live": live(e["repo"], e["pr"], owner)}
+        if e.get("gerrit"):
+            links[key] = {**gerrit_evidence(e), "live": gerrit_live(e)}
+        else:
+            links[key] = {**evidence(e["repo"], e["pr"]), "live": live(e["repo"], e["pr"], owner)}
     old_links = json.load(open(EVIDENCE, encoding="utf-8")) if os.path.exists(EVIDENCE) else None
     if links != old_links:
         with open(EVIDENCE, "w", encoding="utf-8") as f:
