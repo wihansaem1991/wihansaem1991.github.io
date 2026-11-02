@@ -253,6 +253,85 @@ entries:
         `ecx_gen_set_params()`와 EC의 `COPY_OCTET_PARAM()` 매크로를 `OPENSSL_clear_free()`로 바꿨습니다.
         새 시험 `test_ikm_cleared_on_reset`은 IKM을 두 번 넣고, 두 수정 중 하나라도 되돌리면 실패합니다.
 
+  - project: OpenSSL
+    repo: openssl/openssl
+    pr: 33476
+    title:
+      en: Allocate the PBKDF1 derive_skey buffer without zeroing it
+      ko: PBKDF1 derive_skey 버퍼를 0으로 채우지 않고 할당
+    type: cleanup
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-02
+    decided: null
+    defect:
+      en: >-
+        `kdf_pbkdf1_derive_skey()` allocated the key buffer with `OPENSSL_zalloc()`, but nothing
+        reads it before the derivation writes every byte, and on failure it is cleared and freed
+        unread. The zero fill was wasted work.
+      ko: >-
+        `kdf_pbkdf1_derive_skey()`가 키 버퍼를 `OPENSSL_zalloc()`으로 할당했지만, 유도가 모든 바이트를 쓰기
+        전에 그 버퍼를 읽는 곳이 없고 실패하면 읽지 않은 채 지우고 해제합니다. 0으로 채우는 일이 쓸모없었습니다.
+    background:
+      en: >-
+        A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left
+        for a separate change to keep that PR to its scope.
+      ko: >-
+        #33444(PBKDF1 키를 실패 때 지우기) 리뷰에서 리뷰어가 짚었고, 그 PR 범위를 지키려고 따로 낸 변경입니다.
+    found_by:
+      en: Reviewer comment on #33444, checked against every write to the buffer in `kdf_pbkdf1_do_derive()`.
+      ko: "#33444 리뷰 지적을 `kdf_pbkdf1_do_derive()`의 버퍼 쓰기 전부와 대조해 확인했습니다."
+    fix:
+      en: >-
+        `OPENSSL_malloc()` instead of `OPENSSL_zalloc()`. Built with `--strict-warnings`;
+        `test_evp_kdf` passes, including `test_kdf_pbkdf1_skey`.
+      ko: >-
+        `OPENSSL_zalloc()` 대신 `OPENSSL_malloc()`을 씁니다. `--strict-warnings` 빌드에서 경고 0, `test_evp_kdf`
+        (`test_kdf_pbkdf1_skey` 포함) 통과.
+
+  - project: OpenSSL
+    repo: openssl/openssl
+    pr: 33477
+    title:
+      en: A test helper that looks for secrets left in freed memory
+      ko: 해제된 메모리에 남은 비밀값을 찾는 시험 도우미
+    type: test
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-02
+    decided: null
+    defect:
+      en: >-
+        Each test that checks a secret is cleared before its buffer is freed carried its own copy
+        of an allocator hook, and on openssl-4.0 and older the allocator cannot be replaced in the
+        middle of a test, so such checks could not run there.
+      ko: >-
+        비밀값을 지운 뒤 해제하는지 보는 시험마다 할당 함수 가로채기 코드를 따로 들고 있었고, openssl-4.0
+        이하에서는 시험 도중에 할당 함수를 바꿀 수 없어 그 검사가 돌지 못했습니다.
+    background:
+      en: >-
+        Zeroisation checks for critical security parameters (ISO/IEC 19790, FIPS 140-3, KCMVP),
+        turned into a reusable test. A reviewer of #33444 suggested generalising the hook and
+        pointed out the 4.0 limitation.
+      ko: >-
+        핵심 보안 매개변수 제로화 검사(ISO/IEC 19790, FIPS 140-3·KCMVP)를 다시 쓸 수 있는 시험으로 만들었습니다.
+        #33444 리뷰어가 가로채기 코드를 일반화하자고 했고 4.0 제약도 짚었습니다.
+    found_by:
+      en: Review of #33444; the rework followed the reviewer's note on 4.0.
+      ko: "#33444 리뷰에서 나왔고, 4.0에 대한 리뷰어 지적을 반영해 다시 만들었습니다."
+    fix:
+      en: >-
+        `test_watch_freed_start()`/`test_watch_freed_stop()` in libtestutil. With
+        `OPENSSL_TEST_WATCH_FREED` set, `test/testutil/main.c` installs the hooks at startup, so the
+        check runs with or without mfail. `test_kdf_pbkdf1_skey` uses it and fails if the PBKDF1 key
+        is freed without clearing.
+      ko: >-
+        libtestutil에 `test_watch_freed_start()`/`test_watch_freed_stop()`을 넣었습니다.
+        `OPENSSL_TEST_WATCH_FREED`를 켜면 `test/testutil/main.c`가 시작할 때 가로채기를 설치해, mfail이 있든
+        없든 검사가 돕니다. `test_kdf_pbkdf1_skey`가 이 도우미를 쓰고, PBKDF1 키를 지우지 않고 해제하면 실패합니다.
+
   - project: oqs-provider
     repo: open-quantum-safe/oqs-provider
     pr: 861
@@ -1097,10 +1176,10 @@ repos:
       ko: 가져온 설정 파일 해석
   - project: OpenVPN
     repo: OpenVPN/openvpn
-    link: https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077
+    link: https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078
     status:
-      en: 3 changes on Gerrit (2075, 2076, 2077)
-      ko: Gerrit 변경 3건(2075·2076·2077)
+      en: 4 changes on Gerrit (2075, 2076, 2077, 2078)
+      ko: Gerrit 변경 4건(2075·2076·2077·2078)
     about:
       en: OpenVPN itself, in C; patches go through Gerrit
       ko: OpenVPN 본체(C), 패치는 Gerrit으로 제출
@@ -1266,6 +1345,16 @@ vulnerabilities:
   - label: VR-6
     public: false
     submitted: 2026-11-01
+    channel:
+      en: GitHub private vulnerability report
+      ko: GitHub 비공개 취약점 보고
+    status: triage
+    cve: null
+    cvss: null
+
+  - label: VR-7
+    public: false
+    submitted: 2026-11-02
     channel:
       en: GitHub private vulnerability report
       ko: GitHub 비공개 취약점 보고
