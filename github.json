@@ -412,8 +412,8 @@
    "ci_waiting": 5,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-03",
+   "last_response": "2026-11-03",
    "opened": "2026-10-29",
    "stage": "ci_approval"
   },
