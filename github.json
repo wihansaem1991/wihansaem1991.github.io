@@ -190,8 +190,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
-    "pending": 11
+    "pass": 11,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
@@ -424,25 +424,28 @@
   "approvals": [
    {
     "by": "simo5",
-    "date": "2026-10-30",
-    "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741"
+    "date": "2026-11-03",
+    "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5747338642"
    }
   ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 50,
-    "pending": 0
+    "pass": 48,
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-03",
    "first_response": "2026-10-30",
-   "last_response": "2026-11-02",
+   "last_response": "2026-11-03",
    "opened": "2026-10-30",
-   "stage": "rereview"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "2ae3b1b660c86e4dcc0fb490ee60d2412a91da50",
+   "url": "https://github.com/openssl-projects/pkcs11-provider/commit/2ae3b1b660c86e4dcc0fb490ee60d2412a91da50"
+  },
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/813"
  },
  "openssl-projects/pkcs11-provider#814": {
@@ -484,19 +487,41 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 44,
-    "pending": 5
+    "pass": 50,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": "2026-11-03",
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-03",
+   "opened": "2026-10-31",
+   "stage": "merged"
+  },
+  "merge": {
+   "sha": "460b384ddf5ed471e2018ef1994b12a6aaca4df7",
+   "url": "https://github.com/openssl-projects/pkcs11-provider/commit/460b384ddf5ed471e2018ef1994b12a6aaca4df7"
+  },
+  "url": "https://github.com/openssl-projects/pkcs11-provider/pull/815"
+ },
+ "openssl-projects/pkcs11-provider#816": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 26,
+    "pending": 23
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": "2026-11-02",
-   "last_response": "2026-11-03",
-   "opened": "2026-10-31",
-   "stage": "approved_pending"
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-03",
+   "stage": "review"
   },
   "merge": null,
-  "url": "https://github.com/openssl-projects/pkcs11-provider/pull/815"
+  "url": "https://github.com/openssl-projects/pkcs11-provider/pull/816"
  },
  "openssl/openssl#33426": {
   "approvals": [],

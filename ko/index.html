@@ -92,14 +92,25 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 31건 · 취약점 보고 8건 · 메인테이너 응답 16건 · CVE 0건</div>
+  <div class="summary">제출 PR 32건 · 취약점 보고 8건 · 메인테이너 응답 16건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">39</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">11</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">40</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">13</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
 
+  <details class="entry" id="openssl-projects-pkcs11-provider-813" data-group="done">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge merged" data-pr="openssl-projects/pkcs11-provider#813">머지됨</span></span>
+      <span class="line2">큰 버퍼에도 ECDH 공유 비밀값만 돌려주기</span>
+      <span class="line3">제출 2026-10-30 · 4일째 · 첫 응답 2026-10-30 · CI <span class="ok">✓48</span> <span class="wait">…1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · 버그 수정 · 머지됨 2026-11-03 ↗</a></div>
+      <dl><dt>문제</dt><dd>PKCS#11 토큰을 쓰면 <code>EVP_PKEY_derive()</code>가 공유 비밀값 크기가 아니라 호출자 버퍼 크기만큼 토큰에 요청했습니다. NSS softokn은 P-256 비밀값 앞을 0으로 채워 돌려줘서, 64바이트 버퍼에는 0 32개 뒤에 비밀값이 들어갔고 ECDH 양쪽 값이 서로 달라졌습니다.</dd><dt>배경 지식</dt><dd>PKCS#11·HSM 연동 지식이 필요했습니다. ECDH 파생(<code>CKM_ECDH1_DERIVE</code>, <code>CKD_NULL</code>)은 출력 길이를 키 템플릿의 <code>CKA_VALUE_LEN</code>에서 가져오고, OpenSSL <code>EVP_PKEY_derive()</code>는 길이를 버퍼 크기로 받아 실제로 쓴 바이트 수를 돌려줍니다. 두 규약이 어긋나는 지점이었습니다.</dd><dt>찾은 방법</dt><dd>차등 시험으로 찾았습니다. 같은 ECDH 파생을 OpenSSL 기본 provider와 NSS softokn 토큰 위의 pkcs11-provider에 여러 크기의 출력 버퍼로 넣어 결과를 비교했습니다.</dd><dt>수정</dt><dd>요청 길이를 키 크기로 제한했습니다. 새 회귀 시험이 오래된 누수도 드러냈습니다. 한 문맥에서 두 번 파생하면 상대 공개점 사본을 덮어써 앞 사본이 새는 문제로, Address Sanitizer 시험이 잡았고 같은 PR에서 고쳤습니다.</dd><dt>리뷰</dt><dd>메인테이너가 승인한 뒤 회귀 시험 구조 정리와 Address Sanitizer 실패 해결을 요청했고, 두 가지 모두 새 커밋으로 반영했습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">PR 원문 #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5747338642" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/2ae3b1b660c86e4dcc0fb490ee60d2412a91da50" target="_blank" rel="noopener">머지 커밋 2ae3b1b660 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="RustCrypto-signatures-1493" data-group="done">
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/signatures#1493">머지됨</span></span>
@@ -142,6 +153,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #814 · 버그 수정 · 머지됨 2026-11-02 ↗</a></div>
       <dl><dt>문제</dt><dd>너무 작은 버퍼로 서명을 한 번 하면 풀에 있는 PKCS#11 세션에 서명 작업이 열린 채 남았습니다. 그 세션을 받은 다음 서명은 모두 <code>CKR_OPERATION_ACTIVE</code>로 실패했습니다. NSS softokn에서 2048비트 RSA 키로 255바이트 버퍼에 한 번 서명하자, 그 프로세스의 RSA·RSA-PSS·ECDSA·DigestSign 서명이 전부 멈췄습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 세션 규약 지식이 필요했습니다. <code>C_Sign()</code>이 <code>CKR_BUFFER_TOO_SMALL</code>을 돌려주면 더 큰 버퍼로 다시 부를 수 있게 작업을 열어 둡니다. 세션을 풀로 돌려쓰는 provider는 돌려주기 전에 그 작업을 끝내야 합니다.</dd><dt>찾은 방법</dt><dd>버퍼 크기 측정으로 찾았습니다. pkcs11-provider의 서명·파생·복호화 경로마다 필요한 것보다 작고 큰 버퍼를 넣은 뒤, 이어서 정상 호출을 해 세션이 아직 쓸 수 있는지 봤습니다.</dd><dt>수정</dt><dd>열린 작업을 정리하던 기존 코드를 함수로 빼서, <code>CKR_BUFFER_TOO_SMALL</code>이면 세션을 돌려주기 전에 부릅니다. 새 <code>sigbuf</code> 시험은 수정 전에 실패하고 수정 후에 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">PR 원문 #814 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814#pullrequestreview-5738072405" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/ed9cb506b2a1fae556ca9ac4fd2cf539743c726d" target="_blank" rel="noopener">머지 커밋 ed9cb506b2 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-815" data-group="done">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge merged" data-pr="openssl-projects/pkcs11-provider#815">머지됨</span></span>
+      <span class="line2">RSA 무패딩 서명 입력을 버퍼 크기가 아니라 모듈러스와 비교</span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓50</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #815 · 버그 수정 · 머지됨 2026-11-03 ↗</a></div>
+      <dl><dt>문제</dt><dd>토큰 키로 RSA 무패딩(<code>RSA_NO_PADDING</code>) 서명을 하면, 입력이 맞아도 출력 버퍼가 모듈러스보다 크기만 하면 실패했습니다. 기본 provider는 같은 입력·같은 버퍼로 서명하고 모듈러스 크기를 돌려줍니다.</dd><dt>배경 지식</dt><dd>RSA와 OpenSSL provider API 지식이 필요했습니다. <code>EVP_PKEY_sign()</code>은 <code>*siglen</code>으로 버퍼 크기를 받고, 무패딩 RSA(PKCS#11의 <code>CKM_RSA_X_509</code>)는 입력이 모듈러스와 정확히 같은 길이여야 합니다.</dd><dt>찾은 방법</dt><dd>같은 버퍼 크기 측정에서 pkcs11-provider와 OpenSSL 기본 provider를 비교해 찾았습니다. 257·512·8448바이트 버퍼가 토큰에서는 실패하고 기본 provider에서는 성공했습니다.</dd><dt>수정</dt><dd>입력 길이를 호출자 버퍼 크기가 아니라 키의 모듈러스 크기와 비교합니다. 새 <code>rsaraw</code> 시험은 두 provider를 모두 확인하고, 토큰 서명에서 원래 데이터를 되살려 보며, 모듈러스보다 짧은 입력은 여전히 거부하는지 봅니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">PR 원문 #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815#pullrequestreview-5747302850" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/460b384ddf5ed471e2018ef1994b12a6aaca4df7" target="_blank" rel="noopener">머지 커밋 460b384ddf ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="RustCrypto-formats-2501" data-group="done">
@@ -241,28 +263,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · 시험 보강 ↗</a></div>
       <dl><dt>문제</dt><dd>liboqs 시험 하네스가 길이가 틀린 ML-DSA 서명과 255바이트를 넘는 context를 라이브러리 호출 전에 걸렀고, 실행기는 이를 통과로 셌습니다. 그래서 Wycheproof <code>IncorrectSignatureLength</code>·<code>InvalidContext</code> 벡터가 liboqs에 닿지 않았고, liboqs ML-DSA 연결 코드의 서명 길이 검사를 꺼도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 매개변수 집합마다 서명 길이를 고정합니다. liboqs는 mldsa-native 구현을 자체 연결 코드로 감싸므로, 공개 API에서 이 길이를 지키는 책임이 그 연결 코드에 있습니다.</dd><dt>찾은 방법</dt><dd>암호 라이브러리 9곳의 Wycheproof 시험 하네스에서 건너뛰는 벡터를 훑은 뒤, liboqs에서 변이 시험으로 확인했습니다.</dd><dt>수정</dt><dd>ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결 코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">PR 원문 #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/open-quantum-safe/liboqs/pull/2665#pullrequestreview-5743916795" target="_blank" rel="noopener">owaldron ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-projects-pkcs11-provider-815" data-group="review">
-    <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge approved_pending" data-pr="openssl-projects/pkcs11-provider#815">승인, 추가 리뷰 대기</span></span>
-      <span class="line2">RSA 무패딩 서명 입력을 버퍼 크기가 아니라 모듈러스와 비교</span>
-      <span class="line3">제출 2026-11-01 · 3일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓44</span> <span class="wait">…5</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #815 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>토큰 키로 RSA 무패딩(<code>RSA_NO_PADDING</code>) 서명을 하면, 입력이 맞아도 출력 버퍼가 모듈러스보다 크기만 하면 실패했습니다. 기본 provider는 같은 입력·같은 버퍼로 서명하고 모듈러스 크기를 돌려줍니다.</dd><dt>배경 지식</dt><dd>RSA와 OpenSSL provider API 지식이 필요했습니다. <code>EVP_PKEY_sign()</code>은 <code>*siglen</code>으로 버퍼 크기를 받고, 무패딩 RSA(PKCS#11의 <code>CKM_RSA_X_509</code>)는 입력이 모듈러스와 정확히 같은 길이여야 합니다.</dd><dt>찾은 방법</dt><dd>같은 버퍼 크기 측정에서 pkcs11-provider와 OpenSSL 기본 provider를 비교해 찾았습니다. 257·512·8448바이트 버퍼가 토큰에서는 실패하고 기본 provider에서는 성공했습니다.</dd><dt>수정</dt><dd>입력 길이를 호출자 버퍼 크기가 아니라 키의 모듈러스 크기와 비교합니다. 새 <code>rsaraw</code> 시험은 두 provider를 모두 확인하고, 토큰 서명에서 원래 데이터를 되살려 보며, 모듈러스보다 짧은 입력은 여전히 거부하는지 봅니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">PR 원문 #815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815#pullrequestreview-5747302850" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="openssl-projects-pkcs11-provider-813" data-group="review">
-    <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">수정 반영, 재리뷰 대기</span></span>
-      <span class="line2">큰 버퍼에도 ECDH 공유 비밀값만 돌려주기</span>
-      <span class="line3">제출 2026-10-30 · 4일째 · 첫 응답 2026-10-30 · CI <span class="ok">✓50</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>PKCS#11 토큰을 쓰면 <code>EVP_PKEY_derive()</code>가 공유 비밀값 크기가 아니라 호출자 버퍼 크기만큼 토큰에 요청했습니다. NSS softokn은 P-256 비밀값 앞을 0으로 채워 돌려줘서, 64바이트 버퍼에는 0 32개 뒤에 비밀값이 들어갔고 ECDH 양쪽 값이 서로 달라졌습니다.</dd><dt>배경 지식</dt><dd>PKCS#11·HSM 연동 지식이 필요했습니다. ECDH 파생(<code>CKM_ECDH1_DERIVE</code>, <code>CKD_NULL</code>)은 출력 길이를 키 템플릿의 <code>CKA_VALUE_LEN</code>에서 가져오고, OpenSSL <code>EVP_PKEY_derive()</code>는 길이를 버퍼 크기로 받아 실제로 쓴 바이트 수를 돌려줍니다. 두 규약이 어긋나는 지점이었습니다.</dd><dt>찾은 방법</dt><dd>차등 시험으로 찾았습니다. 같은 ECDH 파생을 OpenSSL 기본 provider와 NSS softokn 토큰 위의 pkcs11-provider에 여러 크기의 출력 버퍼로 넣어 결과를 비교했습니다.</dd><dt>수정</dt><dd>요청 길이를 키 크기로 제한했습니다. 새 회귀 시험이 오래된 누수도 드러냈습니다. 한 문맥에서 두 번 파생하면 상대 공개점 사본을 덮어써 앞 사본이 새는 문제로, Address Sanitizer 시험이 잡았고 같은 PR에서 고쳤습니다.</dd><dt>리뷰</dt><dd>메인테이너가 승인한 뒤 회귀 시험 구조 정리와 Address Sanitizer 실패 해결을 요청했고, 두 가지 모두 새 커밋으로 반영했습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">PR 원문 #813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813#pullrequestreview-5719255741" target="_blank" rel="noopener">simo5 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33426" data-group="review">
@@ -401,11 +401,22 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/AEADs#895">리뷰 대기</span></span>
       <span class="line2">eax: 길이 제한 없는 nonce 지원</span>
-      <span class="line3">제출 2026-11-03 · 0일째 · 응답 아직 · CI <span class="wait">…11</span></span>
+      <span class="line3">제출 2026-11-03 · 0일째 · 응답 아직 · CI <span class="ok">✓11</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/AEADs/pull/895" target="_blank" rel="noopener">RustCrypto/AEADs #895 · 기능 추가 ↗</a></div>
       <dl><dt>문제</dt><dd>EAX는 길이에 제한이 없는 nonce를 받는데, <code>eax</code> 크레이트는 16바이트로 고정해 두었습니다. 4바이트·6바이트 nonce를 쓰는 프로토콜이 이 크레이트를 쓸 수 없었고(2020년부터 열린 이슈 #239), nonce 길이가 다른 Wycheproof 벡터 54개도 돌릴 수 없었습니다.</dd><dt>배경 지식</dt><dd>EAX 모드 정의(nonce가 OMAC을 거치므로 길이 제한이 없음)와, 암호모듈 검증(KCMVP)의 기지 답 시험과 같은 방식의 공개 시험 벡터(Wycheproof)를 썼습니다.</dd><dt>찾은 방법</dt><dd>#894 때 Wycheproof를 돌리고 남은 유효 EAX 벡터 54개를 크레이트 타입으로 표현할 수 없었고, 그 원인이 이슈 #239였습니다.</dd><dt>수정</dt><dd><code>AesGcm</code>처럼 <code>Eax</code>와 스트리밍용 <code>online::Eax</code>에 <code>NonceSize</code> 타입 인자를 더했습니다(기본 16바이트라 기존 코드는 그대로). 벡터 54개(nonce 0~257바이트)를 두 API로 돌리고, 암호 안에서 nonce를 16바이트로 자르면 새 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/895" target="_blank" rel="noopener">PR 원문 #895 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/895/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-816" data-group="review">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge review" data-pr="openssl-projects/pkcs11-provider#816">리뷰 대기</span></span>
+      <span class="line2">kdf: 추출 전용 HKDF 출력 길이가 다이제스트와 다르면 거부</span>
+      <span class="line3">제출 2026-11-03 · 0일째 · 응답 아직 · CI <span class="ok">✓26</span> <span class="wait">…23</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #816 · 버그 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd>추출 전용 모드의 HKDF·TLS13-KDF 출력은 다이제스트 하나 길이입니다. 기본 provider는 다른 길이를 처음부터 거부하는데, pkcs11-provider는 요청 길이를 토큰에 넘기고 토큰이 값을 돌려준 뒤에야 길이를 확인했습니다.</dd><dt>배경 지식</dt><dd>HKDF(RFC 5869) 추출 단계, PKCS#11 HKDF 메커니즘, OpenSSL KDF provider API 지식이 필요했습니다. provider는 토큰을 부르기 전에 기본 provider와 같은 길이 규칙을 지켜야 합니다.</dd><dt>찾은 방법</dt><dd>여러 출력 길이로 추출 전용 HKDF를 기본 provider와 pkcs11-provider에 각각 돌려 결과를 비교해 찾았습니다.</dd><dt>수정</dt><dd>파생 전에 길이를 확인하고 기본 provider와 같은 오류를 냅니다. 새 <code>hkdfextract</code> 시험은 SHA-256·SHA-512로 HKDF·TLS13-KDF를 확인하고, 검사를 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">PR 원문 #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
@@ -443,7 +454,7 @@
   </details>
   <details class="entry" id="VR-1" data-group="cve">
     <summary>
-      <span class="line1"><b>취약점 보고 VR-1</b> <span class="badge vuln">취약점</span> <span class="badge v-triage">분류 중</span></span>
+      <span class="line1"><b>취약점 보고 VR-1</b> <span class="badge vuln">취약점</span> <span class="badge v-public_pr">공개 PR로 전환</span></span>
       <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
       <span class="line3">제출 2026-10-31 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
     </summary>
@@ -521,7 +532,7 @@
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
       <div class="about">OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider</div>
       <div class="focus">보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조</div>
-      <div class="prs"><span>PR 3건</span> <span class="badge merged">머지됨 1</span> <span class="badge approved_pending">승인, 추가 리뷰 대기 1</span> <span class="badge rereview">수정 반영, 재리뷰 대기 1</span></div>
+      <div class="prs"><span>PR 4건</span> <span class="badge merged">머지됨 3</span> <span class="badge review">리뷰 대기 1</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
