@@ -1694,3 +1694,13 @@ vulnerabilities:
     status: triage
     cve: null
     cvss: null
+
+  - label: VR-9
+    public: false
+    submitted: 2026-11-03
+    channel:
+      en: Project security mailbox (PGP encrypted)
+      ko: 프로젝트 보안 메일(PGP 암호화)
+    status: triage
+    cve: null
+    cvss: null
