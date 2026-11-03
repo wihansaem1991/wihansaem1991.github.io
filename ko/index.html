@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 37건 · 취약점 보고 9건 · 메인테이너 응답 22건 · CVE 0건</div>
+  <div class="summary">제출 PR 38건 · 취약점 보고 9건 · 메인테이너 응답 22건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">46</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">2</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">18</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">47</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">3</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">18</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -452,6 +452,17 @@
       <dl><dt>문제</dt><dd>프로필을 가져올 때 앱이 무시하는 옵션(<code>script-security</code>·<code>up</code>·<code>plugin</code>)과 거부하는 옵션(<code>config</code>·<code>tls-server</code>)은 최상위에서만 걸러졌습니다. <code>&lt;connection&gt;</code> 블록 안에서는 두 목록을 모두 건너뛰어, 무시할 옵션이 연결의 사용자 옵션에 남고 거부할 옵션이 받아들여졌습니다.</dd><dt>배경 지식</dt><dd>OpenVPN 설정 형식(자기 옵션을 가진 <code>&lt;connection&gt;</code> 블록)과, 앱이 가져온 <code>.ovpn</code> 파일을 자기 프로필로 바꾸는 과정을 알아야 했습니다.</dd><dt>찾은 방법</dt><dd>같은 옵션을 최상위와 <code>&lt;connection&gt;</code> 블록 안에 두고 생성된 설정을 비교해 찾았습니다.</dd><dt>수정</dt><dd>연결 블록의 옵션에도 같은 두 검사를 돌립니다. 최상위 처리는 그대로입니다. 새 시험 2개는 수정 전 실패하고 수정 뒤 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1941" target="_blank" rel="noopener">PR 원문 #1941 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1941/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="latchset-kryoptic-573" data-group="ci">
+    <summary>
+      <span class="line1"><b>Kryoptic</b> <span class="badge ci_approval" data-pr="latchset/kryoptic#573">CI 실행 허가 대기</span></span>
+      <span class="line2">ChaCha20-Poly1305를 큰 조각으로 나눠 복호할 때 앞부분이 빠지는 문제 고치기</span>
+      <span class="line3">제출 2026-11-04 · 1일째 · 응답 아직 · CI <span class="wait">⏸8</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/latchset/kryoptic/pull/573" target="_blank" rel="noopener">latchset/kryoptic #573 · 버그 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>C_DecryptUpdate</code>를 16바이트 태그보다 긴 조각으로 두 번 이상 부르면, 두 번째 조각부터 앞부분이 복호되지 않고 빠졌습니다. 평문이 짧게 나왔고 <code>C_DecryptFinal</code>은 정상 암호문을 <code>CKR_ENCRYPTED_DATA_INVALID</code>로 거부했습니다.</dd><dt>배경 지식</dt><dd>AEAD를 나눠 복호하는 방식을 알아야 했습니다. 토큰은 <code>C_DecryptFinal</code> 전까지 어느 바이트가 Poly1305 태그인지 모르므로, 매번 마지막 16바이트만 남겨 두고 그 앞은 모두 복호해야 합니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ChaCha20-Poly1305 벡터를 여러 조각 크기로 <code>C_DecryptUpdate</code>에 넣어 찾았습니다. 한 번에, 1바이트, 5바이트 조각은 맞았지만 17바이트 조각에서 정상 벡터 190건이 실패했습니다.</dd><dt>수정</dt><dd>입력을 통째로 남겨 둔 경우에만 건너뛰게 고쳤습니다. 나눠 복호하는 시험에 20바이트 조각을 더했고, 수정을 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/573" target="_blank" rel="noopener">PR 원문 #573 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/573/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-openssl-33444" data-group="closed">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge closed" data-pr="openssl/openssl#33444">닫힘</span></span>
@@ -691,7 +702,7 @@
       <div class="name"><b>Kryoptic</b> <a href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener">latchset/kryoptic ↗</a></div>
       <div class="about">OpenSSL을 쓰는 Rust PKCS#11 소프트웨어 토큰</div>
       <div class="focus">보는 것: Wycheproof 벡터를 PKCS#11 API로 넣어 결과와 반환 코드를 함께 확인</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge changes">수정 요청 1</span></div>
+      <div class="prs"><span>PR 2건</span> <span class="badge changes">수정 요청 1</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
     </article></div>
   </section>
 
