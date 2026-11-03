@@ -262,9 +262,9 @@ entries:
     type: cleanup
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-02
-    decided: null
+    decided: 2026-11-03
     defect:
       en: >-
         `kdf_pbkdf1_derive_skey()` allocated the key buffer with `OPENSSL_zalloc()`, but nothing
@@ -567,6 +567,52 @@ entries:
       ko: >-
         AES-128·192·256 Wycheproof 186개(유효 105·무효 81)를 `aead` 시험 매크로로 넣었습니다. 태그 검사를 끄면
         새 실패 시험 3개가 실패합니다.
+
+  - project: RustCrypto
+    repo: RustCrypto/AEADs
+    pr: 895
+    title:
+      en: "eax: support nonces of any length"
+      ko: "eax: 길이 제한 없는 nonce 지원"
+    type: feature
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-03
+    decided: null
+    defect:
+      en: >-
+        EAX accepts a nonce of any length, but the `eax` crate fixed it to 16 bytes. Protocols
+        with 4-byte or 6-byte nonces could not use the crate (issue #239, open since 2020), and 54
+        Wycheproof vectors with other nonce lengths could not be run.
+      ko: >-
+        EAX는 길이에 제한이 없는 nonce를 받는데, `eax` 크레이트는 16바이트로 고정해 두었습니다. 4바이트·6바이트
+        nonce를 쓰는 프로토콜이 이 크레이트를 쓸 수 없었고(2020년부터 열린 이슈 #239), nonce 길이가 다른
+        Wycheproof 벡터 54개도 돌릴 수 없었습니다.
+    background:
+      en: >-
+        The EAX mode definition (the nonce goes through OMAC, so any length works) and validation
+        test vectors (Wycheproof), the same approach as known-answer testing in cryptographic
+        module validation (KCMVP).
+      ko: >-
+        EAX 모드 정의(nonce가 OMAC을 거치므로 길이 제한이 없음)와, 암호모듈 검증(KCMVP)의 기지 답 시험과 같은
+        방식의 공개 시험 벡터(Wycheproof)를 썼습니다.
+    found_by:
+      en: >-
+        The Wycheproof run for #894 left 54 valid EAX cases that the crate's types could not
+        express, which pointed to issue #239.
+      ko: >-
+        #894 때 Wycheproof를 돌리고 남은 유효 EAX 벡터 54개를 크레이트 타입으로 표현할 수 없었고, 그 원인이 이슈
+        #239였습니다.
+    fix:
+      en: >-
+        A `NonceSize` type parameter (default 16 bytes, so existing code is unchanged) on `Eax` and
+        the streaming `online::Eax`, as `AesGcm` does. The 54 vectors (nonces of 0 to 257 bytes)
+        run through both APIs; with nonces cut to 16 bytes inside the cipher, the new tests fail.
+      ko: >-
+        `AesGcm`처럼 `Eax`와 스트리밍용 `online::Eax`에 `NonceSize` 타입 인자를 더했습니다(기본 16바이트라 기존
+        코드는 그대로). 벡터 54개(nonce 0~257바이트)를 두 API로 돌리고, 암호 안에서 nonce를 16바이트로 자르면 새
+        시험이 실패합니다.
 
   - project: RustCrypto
     repo: RustCrypto/signatures
