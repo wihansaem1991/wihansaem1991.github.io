@@ -223,13 +223,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-03",
    "first_response": "2026-11-02",
    "last_response": "2026-11-02",
    "opened": "2026-11-01",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "00501d34f19c631e53c6e6278cb7f7e1e625b3c3",
+   "url": "https://github.com/RustCrypto/crypto-bigint/commit/00501d34f19c631e53c6e6278cb7f7e1e625b3c3"
+  },
   "url": "https://github.com/RustCrypto/crypto-bigint/pull/1382"
  },
  "RustCrypto/crypto-bigint#1383": {
@@ -409,8 +412,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 50,
-    "pending": 0
+    "pass": 48,
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
@@ -456,8 +459,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 50,
-    "pending": 0
+    "pass": 48,
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
@@ -465,7 +468,7 @@
    "first_response": "2026-11-02",
    "last_response": "2026-11-02",
    "opened": "2026-10-31",
-   "stage": "changes"
+   "stage": "rereview"
   },
   "merge": null,
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/815"

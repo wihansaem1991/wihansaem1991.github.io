@@ -95,7 +95,7 @@
   <div class="summary">30 pull requests and 8 vulnerability reports · 15 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">9</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">10</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -120,6 +120,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · Test coverage · Merged 2026-11-01 ↗</a></div>
       <dl><dt>Problem</dt><dd>The <code>rsa</code> crate&#x27;s Wycheproof tests covered only PKCS#1 v1.5 and PSS signatures. Removing any one of three OAEP padding checks (leading zero byte, non-zero bytes before the 0x01 separator, missing separator) left the whole test suite green.</dd><dt>Background</dt><dd>RSA-OAEP (RFC 8017) decryption must reject malformed padding without revealing which check failed; Wycheproof&#x27;s OAEP files contain exactly those malformed ciphertexts.</dd><dt>How it was found</dt><dd>Mutation testing: each padding check was removed in turn and the existing suite run, then the same change was run against the Wycheproof OAEP vectors.</dd><dt>Fix</dt><dd><code>test_rsa_oaep_decrypt</code> runs 1098 vectors from 22 files; each of the three mutations makes 21 of them fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">Pull request #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/RustCrypto/RSA/pull/740#pullrequestreview-5730252760" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/RSA/commit/8f823d4a479ab4f4905897196b180c9a3781f5f8" target="_blank" rel="noopener">Merge commit 8f823d4a47 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-crypto-bigint-1382" data-group="done">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/crypto-bigint#1382">Merged</span></span>
+      <span class="line2">BoxedUint: parse &quot;0&quot; as a one-limb zero</span>
+      <span class="line3">submitted 2026-11-01 · 2 days · first reply 2026-11-02 · CI <span class="ok">✓33</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1382 · Bug fix · Merged 2026-11-03 ↗</a></div>
+      <dl><dt>Problem</dt><dd>Parsing the string <code>&quot;0&quot;</code> produced a big integer with no limbs at all. It printed as an empty string and panicked in <code>bits_vartime()</code>.</dd><dt>Background</dt><dd>Arbitrary-precision integer representation in a constant-time cryptography library: every value, including zero, is expected to have at least one limb.</dd><dt>How it was found</dt><dd>Differential fuzzing of the big-integer API against <code>num-bigint</code>.</dd><dt>Fix</dt><dd>Return the canonical one-limb zero when no digits remain; a new test covers several spellings of zero in four radixes and panics without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">Pull request #1382 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1382/files" target="_blank" rel="noopener">Changed files ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/commit/00501d34f19c631e53c6e6278cb7f7e1e625b3c3" target="_blank" rel="noopener">Merge commit 00501d34f1 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="done">
@@ -225,7 +236,7 @@
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">Updated, awaiting re-review</span></span>
       <span class="line2">Return only the ECDH secret into larger buffers</span>
-      <span class="line3">submitted 2026-10-30 · 4 days · first reply 2026-10-30 · CI <span class="ok">✓50</span></span>
+      <span class="line3">submitted 2026-10-30 · 4 days · first reply 2026-10-30 · CI <span class="ok">✓48</span> <span class="wait">…1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · Bug fix ↗</a></div>
@@ -234,9 +245,9 @@
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-815" data-group="review">
     <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge changes" data-pr="openssl-projects/pkcs11-provider#815">Changes requested</span></span>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#815">Updated, awaiting re-review</span></span>
       <span class="line2">Check raw RSA sign data against the modulus, not the buffer size</span>
-      <span class="line3">submitted 2026-11-01 · 3 days · first reply 2026-11-02 · CI <span class="ok">✓50</span></span>
+      <span class="line3">submitted 2026-11-01 · 3 days · first reply 2026-11-02 · CI <span class="ok">✓48</span> <span class="wait">…1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #815 · Bug fix ↗</a></div>
@@ -296,17 +307,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · Hardening ↗</a></div>
       <dl><dt>Problem</dt><dd>The DHKEM IKM on an EC or X25519/X448 key generation context fixes the private key that will be generated (RFC 9180 DeriveKeyPair). Setting a new IKM freed the previous copy with <code>OPENSSL_free()</code>, so a value that recreates the private key stayed in freed memory.</dd><dt>Background</dt><dd>HPKE key derivation (RFC 9180) and the zeroisation of keying material that determines a key (ISO/IEC 19790, FIPS 140-3, KCMVP). The generation context&#x27;s cleanup already cleared the IKM; only the replace path did not.</dd><dt>How it was found</dt><dd>A static scan for secrets freed without clearing, confirmed with the freed-block measurement program: the old 32-byte IKM was left for X25519, X448 and P-256.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> in <code>ecx_gen_set_params()</code> and in the EC <code>COPY_OCTET_PARAM()</code> macro. <code>test_ikm_cleared_on_reset</code> sets the IKM twice and fails if either change is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">Pull request #33471 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33471/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="RustCrypto-crypto-bigint-1382" data-group="review">
-    <summary>
-      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1382">Awaiting review</span></span>
-      <span class="line2">BoxedUint: parse &quot;0&quot; as a one-limb zero</span>
-      <span class="line3">submitted 2026-11-01 · 2 days · first reply 2026-11-02 · CI <span class="ok">✓33</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1382 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>Parsing the string <code>&quot;0&quot;</code> produced a big integer with no limbs at all. It printed as an empty string and panicked in <code>bits_vartime()</code>.</dd><dt>Background</dt><dd>Arbitrary-precision integer representation in a constant-time cryptography library: every value, including zero, is expected to have at least one limb.</dd><dt>How it was found</dt><dd>Differential fuzzing of the big-integer API against <code>num-bigint</code>.</dd><dt>Fix</dt><dd>Return the canonical one-limb zero when no digits remain; a new test covers several spellings of zero in four radixes and panics without the fix.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">Pull request #1382 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1382/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-TF-PSA-Crypto-960" data-group="review">
@@ -510,7 +510,7 @@
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
       <div class="about">OpenSSL 3 provider for PKCS#11 tokens and HSMs</div>
       <div class="focus">Looking at: Output-buffer length rules of signing, key derivation and ECDH, compared with OpenSSL&#x27;s default provider</div>
-      <div class="prs"><span>3 pull requests</span> <span class="badge merged">Merged 1</span> <span class="badge rereview">Updated, awaiting re-review 1</span> <span class="badge changes">Changes requested 1</span></div>
+      <div class="prs"><span>3 pull requests</span> <span class="badge merged">Merged 1</span> <span class="badge rereview">Updated, awaiting re-review 2</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
@@ -528,7 +528,7 @@
       <div class="name"><b>crypto-bigint</b> <a href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener">RustCrypto/crypto-bigint ↗</a></div>
       <div class="about">Constant-time big-integer arithmetic for Rust</div>
       <div class="focus">Looking at: Edge cases of string and byte conversion</div>
-      <div class="prs"><span>2 pull requests</span> <span class="badge review">Awaiting review 2</span></div>
+      <div class="prs"><span>2 pull requests</span> <span class="badge merged">Merged 1</span> <span class="badge review">Awaiting review 1</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-RSA">
       <div class="name"><b>RustCrypto RSA</b> <a href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener">RustCrypto/RSA ↗</a></div>

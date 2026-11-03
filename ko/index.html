@@ -95,7 +95,7 @@
   <div class="summary">제출 PR 30건 · 취약점 보고 8건 · 메인테이너 응답 15건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">9</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">10</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -120,6 +120,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">RustCrypto/RSA #740 · 시험 보강 · 머지됨 2026-11-01 ↗</a></div>
       <dl><dt>문제</dt><dd><code>rsa</code> 크레이트의 Wycheproof 시험은 PKCS#1 v1.5·PSS 서명만 돌렸습니다. OAEP 패딩 검사 세 가지(첫 바이트 0, 구분자 0x01 앞의 0 아닌 바이트, 구분자 없음) 중 하나를 빼도 시험이 모두 통과했습니다.</dd><dt>배경 지식</dt><dd>RSA-OAEP(RFC 8017) 복호화는 잘못된 패딩을 어느 검사에서 걸렸는지 드러내지 않고 거부해야 합니다. Wycheproof OAEP 파일에 바로 그런 잘못된 암호문이 들어 있습니다.</dd><dt>찾은 방법</dt><dd>변이 시험으로 찾았습니다. 패딩 검사를 하나씩 빼고 기존 시험을 돌린 뒤, 같은 변경을 Wycheproof OAEP 벡터로 다시 돌렸습니다.</dd><dt>수정</dt><dd>새 시험 <code>test_rsa_oaep_decrypt</code>가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개 파일에서 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">PR 원문 #740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/RSA/pull/740#pullrequestreview-5730252760" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/RSA/commit/8f823d4a479ab4f4905897196b180c9a3781f5f8" target="_blank" rel="noopener">머지 커밋 8f823d4a47 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="RustCrypto-crypto-bigint-1382" data-group="done">
+    <summary>
+      <span class="line1"><b>RustCrypto</b> <span class="badge merged" data-pr="RustCrypto/crypto-bigint#1382">머지됨</span></span>
+      <span class="line2">BoxedUint: &quot;0&quot;을 limb 1개짜리 0으로 읽기</span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓33</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1382 · 버그 수정 · 머지됨 2026-11-03 ↗</a></div>
+      <dl><dt>문제</dt><dd>문자열 <code>&quot;0&quot;</code>을 읽으면 limb가 하나도 없는 큰 정수가 만들어졌습니다. 출력하면 빈 문자열이 나오고 <code>bits_vartime()</code>에서 패닉했습니다.</dd><dt>배경 지식</dt><dd>상수 시간 암호 라이브러리의 다정밀 정수 표현에서는 0을 포함한 모든 값이 limb를 최소 하나 가져야 합니다.</dd><dt>찾은 방법</dt><dd>큰 정수 API를 <code>num-bigint</code>와 비교하는 차등 퍼징으로 찾았습니다.</dd><dt>수정</dt><dd>숫자가 남지 않으면 limb 1개짜리 표준 0을 돌려주게 했습니다. 새 시험은 네 가지 진법에서 0의 여러 표기를 확인하고, 수정을 빼면 패닉합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">PR 원문 #1382 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1382/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/commit/00501d34f19c631e53c6e6278cb7f7e1e625b3c3" target="_blank" rel="noopener">머지 커밋 00501d34f1 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-814" data-group="done">
@@ -225,7 +236,7 @@
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">수정 반영, 재리뷰 대기</span></span>
       <span class="line2">큰 버퍼에도 ECDH 공유 비밀값만 돌려주기</span>
-      <span class="line3">제출 2026-10-30 · 4일째 · 첫 응답 2026-10-30 · CI <span class="ok">✓50</span></span>
+      <span class="line3">제출 2026-10-30 · 4일째 · 첫 응답 2026-10-30 · CI <span class="ok">✓48</span> <span class="wait">…1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · 버그 수정 ↗</a></div>
@@ -234,9 +245,9 @@
   </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-815" data-group="review">
     <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge changes" data-pr="openssl-projects/pkcs11-provider#815">수정 요청</span></span>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#815">수정 반영, 재리뷰 대기</span></span>
       <span class="line2">RSA 무패딩 서명 입력을 버퍼 크기가 아니라 모듈러스와 비교</span>
-      <span class="line3">제출 2026-11-01 · 3일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓50</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓48</span> <span class="wait">…1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #815 · 버그 수정 ↗</a></div>
@@ -296,17 +307,6 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · 보안 강화 ↗</a></div>
       <dl><dt>문제</dt><dd>EC·X25519/X448 키 생성 문맥에 넣는 DHKEM IKM은 만들어질 개인키를 정하는 씨앗입니다(RFC 9180 DeriveKeyPair). IKM을 새로 넣으면 이전 사본을 <code>OPENSSL_free()</code>로 해제해서, 개인키를 다시 만들 수 있는 값이 해제된 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>HPKE 키 유도(RFC 9180)와, 키를 정하는 재료의 제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 썼습니다. 생성 문맥의 정리 함수는 이미 IKM을 지웠고, 바꿔 넣는 경로만 빠져 있었습니다.</dd><dt>찾은 방법</dt><dd>지우지 않고 해제하는 비밀값 정적 스캔으로 짚고, 해제 블록 측정 프로그램으로 X25519·X448·P-256 모두에서 이전 32바이트 IKM이 남는 것을 확인했습니다.</dd><dt>수정</dt><dd><code>ecx_gen_set_params()</code>와 EC의 <code>COPY_OCTET_PARAM()</code> 매크로를 <code>OPENSSL_clear_free()</code>로 바꿨습니다. 새 시험 <code>test_ikm_cleared_on_reset</code>은 IKM을 두 번 넣고, 두 수정 중 하나라도 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">PR 원문 #33471 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33471/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
-  <details class="entry" id="RustCrypto-crypto-bigint-1382" data-group="review">
-    <summary>
-      <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1382">리뷰 대기</span></span>
-      <span class="line2">BoxedUint: &quot;0&quot;을 limb 1개짜리 0으로 읽기</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓33</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1382 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>문자열 <code>&quot;0&quot;</code>을 읽으면 limb가 하나도 없는 큰 정수가 만들어졌습니다. 출력하면 빈 문자열이 나오고 <code>bits_vartime()</code>에서 패닉했습니다.</dd><dt>배경 지식</dt><dd>상수 시간 암호 라이브러리의 다정밀 정수 표현에서는 0을 포함한 모든 값이 limb를 최소 하나 가져야 합니다.</dd><dt>찾은 방법</dt><dd>큰 정수 API를 <code>num-bigint</code>와 비교하는 차등 퍼징으로 찾았습니다.</dd><dt>수정</dt><dd>숫자가 남지 않으면 limb 1개짜리 표준 0을 돌려주게 했습니다. 새 시험은 네 가지 진법에서 0의 여러 표기를 확인하고, 수정을 빼면 패닉합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">PR 원문 #1382 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1382/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="Mbed-TLS-TF-PSA-Crypto-960" data-group="review">
@@ -510,7 +510,7 @@
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
       <div class="about">OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider</div>
       <div class="focus">보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조</div>
-      <div class="prs"><span>PR 3건</span> <span class="badge merged">머지됨 1</span> <span class="badge rereview">수정 반영, 재리뷰 대기 1</span> <span class="badge changes">수정 요청 1</span></div>
+      <div class="prs"><span>PR 3건</span> <span class="badge merged">머지됨 1</span> <span class="badge rereview">수정 반영, 재리뷰 대기 2</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
@@ -528,7 +528,7 @@
       <div class="name"><b>crypto-bigint</b> <a href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener">RustCrypto/crypto-bigint ↗</a></div>
       <div class="about">상수 시간 큰 정수 연산 Rust 라이브러리</div>
       <div class="focus">보는 것: 문자열·바이트 변환 경계값</div>
-      <div class="prs"><span>PR 2건</span> <span class="badge review">리뷰 대기 2</span></div>
+      <div class="prs"><span>PR 2건</span> <span class="badge merged">머지됨 1</span> <span class="badge review">리뷰 대기 1</span></div>
     </article>
     <article class="repo" id="repo-RustCrypto-RSA">
       <div class="name"><b>RustCrypto RSA</b> <a href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener">RustCrypto/RSA ↗</a></div>

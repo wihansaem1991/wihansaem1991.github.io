@@ -660,9 +660,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-03
     defect:
       en: >-
         Parsing the string `"0"` produced a big integer with no limbs at all. It printed as an empty
