@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 30건 · 취약점 보고 8건 · 메인테이너 응답 14건 · CVE 0건</div>
+  <div class="summary">제출 PR 30건 · 취약점 보고 8건 · 메인테이너 응답 15건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">9</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">2</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">38</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">9</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">18</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">8</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -210,6 +210,17 @@
       <dl><dt>문제</dt><dd>base64 문맥은 입력의 마지막 부분 줄을 들고 있는데, 지우지 않고 해제했습니다. <code>PEM_write_bio()</code>는 개인키 DER를 이 문맥으로 인코딩하므로 키의 마지막 (길이 mod 48)바이트가 해제된 메모리에 남았습니다. RSA라면 <code>iqmp</code> 끝부분, Ed448·ML-DSA·ML-KEM이라면 개인키 바이트입니다. PEM을 읽을 때도 base64 문자열이 같은 식으로 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 PEM·base64 계층까지 따라갔습니다. <code>EVP_ENCODE_CTX</code>는 OpenSSL 1.1.0부터 불투명 구조체라 항상 <code>EVP_ENCODE_CTX_new()</code>로 만들어지므로, 해제할 때 지우면 PEM 읽기·쓰기와 <code>BIO_f_base64</code>가 모두 해결됩니다.</dd><dt>찾은 방법</dt><dd>같은 해제 블록 측정 프로그램을 개인키 PEM 인코딩에 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>EVP_ENCODE_CTX_free()</code>에서 문맥을 지웁니다. 새 시험 <code>test_encode_ctx_free_clears_input</code>은 문맥에 부분 블록을 남긴 채 해제 함수를 바꿔 끼우고, 해제된 문맥에 입력이 남아 있으면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">PR 원문 #33430 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33430/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl/openssl/pull/33430#pullrequestreview-5731464751" target="_blank" rel="noopener">esyr ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="open-quantum-safe-liboqs-2665" data-group="review">
+    <summary>
+      <span class="line1"><b>liboqs</b> <span class="badge approved_pending" data-pr="open-quantum-safe/liboqs#2665">승인, 추가 리뷰 대기</span></span>
+      <span class="line2">잘못된 길이의 ML-DSA Wycheproof 검증 벡터가 라이브러리까지 가도록</span>
+      <span class="line3">제출 2026-10-31 · 3일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · 시험 보강 ↗</a></div>
+      <dl><dt>문제</dt><dd>liboqs 시험 하네스가 길이가 틀린 ML-DSA 서명과 255바이트를 넘는 context를 라이브러리 호출 전에 걸렀고, 실행기는 이를 통과로 셌습니다. 그래서 Wycheproof <code>IncorrectSignatureLength</code>·<code>InvalidContext</code> 벡터가 liboqs에 닿지 않았고, liboqs ML-DSA 연결 코드의 서명 길이 검사를 꺼도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 매개변수 집합마다 서명 길이를 고정합니다. liboqs는 mldsa-native 구현을 자체 연결 코드로 감싸므로, 공개 API에서 이 길이를 지키는 책임이 그 연결 코드에 있습니다.</dd><dt>찾은 방법</dt><dd>암호 라이브러리 9곳의 Wycheproof 시험 하네스에서 건너뛰는 벡터를 훑은 뒤, liboqs에서 변이 시험으로 확인했습니다.</dd><dt>수정</dt><dd>ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결 코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">PR 원문 #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/open-quantum-safe/liboqs/pull/2665#pullrequestreview-5743916795" target="_blank" rel="noopener">owaldron ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-projects-pkcs11-provider-813" data-group="review">
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge rereview" data-pr="openssl-projects/pkcs11-provider#813">수정 반영, 재리뷰 대기</span></span>
@@ -291,7 +302,7 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1382">리뷰 대기</span></span>
       <span class="line2">BoxedUint: &quot;0&quot;을 limb 1개짜리 0으로 읽기</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓33</span></span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓33</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1382 · 버그 수정 ↗</a></div>
@@ -397,17 +408,6 @@
       <dl><dt>문제</dt><dd>양자내성 개인키를 PKCS#8 DER로 인코딩·디코딩하거나 내보낼(export) 때, oqs-provider가 키의 임시 사본을 지우지 않고 해제했습니다. ML-KEM·ML-DSA를 비롯한 양자내성 개인키가 해제된 힙 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>OpenSSL 3 provider 안에서 키가 오가는 경로와 ISO/IEC 19790(FIPS 140-3·KCMVP)의 제로화 요건을 알아야 보이는 문제였습니다. <code>OSSL_PARAM_free()</code>는 보안 힙 블록만 지웁니다. 그래서 OpenSSL의 <code>ml_kem_export()</code>는 해제 전에 파라미터를 지우는데, oqs-provider에는 이 단계가 없었습니다.</dd><dt>찾은 방법</dt><dd>해제 블록 측정 프로그램을 알고리즘 111종에 돌렸습니다. 개인키가 든 해제 블록이 1,377개였고, 수정 뒤 oqs-provider 자체 경로(서명 55종 × 8개 경로)에서는 0개가 됐습니다. 남은 823개는 libcrypto 몫입니다. 키 교환 경로를 다시 재서 KEM 56종 전부에서 내보내기 사본을 찾았습니다.</dd><dt>수정</dt><dd>인코더·디코더는 <code>ASN1_STRING_clear_free()</code>·<code>OPENSSL_clear_free()</code>로 바꾸고, 내보낸 파라미터는 <code>OSSL_PARAM_free()</code> 전에 <code>OPENSSL_cleanse()</code>로 지웁니다. 새 시험 <code>oqs_privkey_cleanse</code>가 해제 블록을 감시하고, 수정을 하나라도 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">PR 원문 #861 ↗</a> · <a href="https://github.com/open-quantum-safe/oqs-provider/pull/861/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="open-quantum-safe-liboqs-2665" data-group="ci">
-    <summary>
-      <span class="line1"><b>liboqs</b> <span class="badge ci_approval" data-pr="open-quantum-safe/liboqs#2665">CI 실행 허가 대기</span></span>
-      <span class="line2">잘못된 길이의 ML-DSA Wycheproof 검증 벡터가 라이브러리까지 가도록</span>
-      <span class="line3">제출 2026-10-31 · 3일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · 시험 보강 ↗</a></div>
-      <dl><dt>문제</dt><dd>liboqs 시험 하네스가 길이가 틀린 ML-DSA 서명과 255바이트를 넘는 context를 라이브러리 호출 전에 걸렀고, 실행기는 이를 통과로 셌습니다. 그래서 Wycheproof <code>IncorrectSignatureLength</code>·<code>InvalidContext</code> 벡터가 liboqs에 닿지 않았고, liboqs ML-DSA 연결 코드의 서명 길이 검사를 꺼도 시험이 전부 통과했습니다.</dd><dt>배경 지식</dt><dd>FIPS 204는 ML-DSA 매개변수 집합마다 서명 길이를 고정합니다. liboqs는 mldsa-native 구현을 자체 연결 코드로 감싸므로, 공개 API에서 이 길이를 지키는 책임이 그 연결 코드에 있습니다.</dd><dt>찾은 방법</dt><dd>암호 라이브러리 9곳의 Wycheproof 시험 하네스에서 건너뛰는 벡터를 훑은 뒤, liboqs에서 변이 시험으로 확인했습니다.</dd><dt>수정</dt><dd>ML-DSA도 바로 옆 SLH-DSA 분기처럼 잘못된 hex 입력만 거르고 나머지는 라이브러리로 넘깁니다. 이제 연결 코드의 길이 검사를 끄면 세 매개변수 집합 모두 Wycheproof 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">PR 원문 #2665 ↗</a> · <a href="https://github.com/open-quantum-safe/liboqs/pull/2665/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="openssl-openssl-33444" data-group="closed">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge closed" data-pr="openssl/openssl#33444">닫힘</span></span>
@@ -480,7 +480,7 @@
   </details>
   <details class="entry" id="VR-7" data-group="cve">
     <summary>
-      <span class="line1"><b>취약점 보고 VR-7</b> <span class="badge vuln">취약점</span> <span class="badge v-triage">분류 중</span></span>
+      <span class="line1"><b>취약점 보고 VR-7</b> <span class="badge vuln">취약점</span> <span class="badge v-accepted">인정됨</span></span>
       <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
       <span class="line3">제출 2026-11-02 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
     </summary>
@@ -552,7 +552,7 @@
       <div class="name"><b>liboqs</b> <a href="https://github.com/open-quantum-safe/liboqs" target="_blank" rel="noopener">open-quantum-safe/liboqs ↗</a></div>
       <div class="about">양자내성 암호 C 라이브러리(ML-KEM·ML-DSA·SLH-DSA 등)</div>
       <div class="focus">보는 것: 서명 검증에 Wycheproof 벡터·잘못된 길이 넣기</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
+      <div class="prs"><span>PR 1건</span> <span class="badge approved_pending">승인, 추가 리뷰 대기 1</span></div>
     </article>
     <article class="repo" id="repo-open-quantum-safe-oqs-provider">
       <div class="name"><b>oqs-provider</b> <a href="https://github.com/open-quantum-safe/oqs-provider" target="_blank" rel="noopener">open-quantum-safe/oqs-provider ↗</a></div>

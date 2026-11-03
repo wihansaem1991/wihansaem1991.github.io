@@ -1593,7 +1593,7 @@ vulnerabilities:
     channel:
       en: GitHub private vulnerability report
       ko: GitHub 비공개 취약점 보고
-    status: triage
+    status: accepted
     cve: null
     cvss: null
 
