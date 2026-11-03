@@ -76,13 +76,7 @@
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2075"
  },
  "OpenVPN/openvpn#2076": {
-  "approvals": [
-   {
-    "by": "Steffan Karger",
-    "date": "2026-11-02",
-    "url": "https://gerrit.openvpn.net/c/openvpn/+/2076"
-   }
-  ],
+  "approvals": [],
   "live": {
    "checks": {
     "fail": 0,
@@ -91,11 +85,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-03",
    "first_response": "2026-11-01",
-   "last_response": "2026-11-02",
+   "last_response": "2026-11-03",
    "opened": "2026-11-01",
-   "stage": "approved"
+   "stage": "merged"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2076"
@@ -356,6 +350,25 @@
    "url": "https://github.com/RustCrypto/signatures/commit/ebee8f9a79e8c7cd22254059791acd5121596fa4"
   },
   "url": "https://github.com/RustCrypto/signatures/pull/1493"
+ },
+ "latchset/kryoptic#566": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 0,
+    "pending": 0
+   },
+   "ci_waiting": 8,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-03",
+   "stage": "ci_approval"
+  },
+  "merge": null,
+  "url": "https://github.com/latchset/kryoptic/pull/566"
  },
  "mitmproxy/mitmproxy#8548": {
   "approvals": [],
@@ -780,8 +793,8 @@
    "ci_waiting": 2,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-03",
+   "last_response": "2026-11-03",
    "opened": "2026-11-03",
    "stage": "ci_approval"
   },

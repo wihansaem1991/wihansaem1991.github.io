@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 36건 · 취약점 보고 9건 · 메인테이너 응답 19건 · CVE 0건</div>
+  <div class="summary">제출 PR 37건 · 취약점 보고 9건 · 메인테이너 응답 20건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">45</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">15</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">2</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">17</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">46</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">15</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">3</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">18</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -177,6 +177,17 @@
       <dl><dt>문제</dt><dd>#2483이 잘린 내용을 고친 뒤에도 <code>der</code> 크레이트의 ASN.1 REAL(<code>f64</code>) 해석기는 가수가 8옥텟을 넘으면 패닉했고, 가수가 0이거나 지수가 범위를 벗어나면 디버그 빌드에서 패닉했습니다. 릴리스 빌드에서는 뒤의 둘이 NaN과 엉뚱한 값(지수 0x7fff → 0.5)이 됐습니다.</dd><dt>배경 지식</dt><dd>X.690 이진 REAL 인코딩(부호·밑수·배율 F·지수 옥텟·가수 옥텟)을 썼습니다. 0은 내용 옥텟이 없어야 하고(8.5.2), 이 해석기가 IEEE-754 double로 옮기려면 지수가 -1023..=1023 안에 있어야 합니다.</dd><dt>찾은 방법</dt><dd>#2483 뒤의 해석기 코드에서 검사 없이 남은 산술을 찾고, 입력마다 master와 <code>der</code> 0.8.3에서 디버그·릴리스 빌드로 재현했습니다.</dd><dt>수정</dt><dd>세 경우 모두 값 오류를 돌려줍니다. 새 시험이 그 입력들을 다루고, 검사 셋 중 하나만 빼도 실패합니다. <code>der</code> 시험 120개가 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">PR 원문 #2501 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2501/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/formats/pull/2501#pullrequestreview-5730274250" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/ae28c9f4168b32f8096f70b2562ba7d2120a11d4" target="_blank" rel="noopener">머지 커밋 ae28c9f416 ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="OpenVPN-openvpn-2076" data-group="done">
+    <summary>
+      <span class="line1"><b>OpenVPN</b> <span class="badge merged" data-pr="OpenVPN/openvpn#2076">머지됨</span></span>
+      <span class="line2">auth_token: 서버 비밀키를 읽은 뒤 지우기</span>
+      <span class="line3">제출 2026-11-01 · 2일째 · 첫 응답 2026-11-01 · CI <span class="none">—</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2076 · 보안 강화 · 머지됨 2026-11-03 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>auth_token_init_secret()</code>은 auth-token 서버 키를 2048바이트 버퍼로 읽고, 스택의 <code>struct key</code>와 <code>struct key_parameters</code>로 옮긴 뒤 버퍼를 지우지 않고 해제했습니다. 서버 키 사본 세 개가 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 함수가 만드는 사본 하나하나에 대조했습니다. <code>tls_crypt_v2_init_server_key()</code>는 이미 사본을 지우는데 이 함수는 지우지 않았습니다.</dd><dt>찾은 방법</dt><dd><code>test_auth_token</code>이 쓰는 키를 해제된 힙 블록에서 찾았습니다.</dd><dt>수정</dt><dd><code>struct key</code>와 <code>struct key_parameters</code>를 <code>secure_memzero()</code>로 지우고, <code>free_buf()</code> 앞에 <code>buf_clear()</code>를 넣었습니다. 두 번째 패치에서 리뷰어가 짚은 <code>struct key_parameters</code> 사본을 더했고, 같은 질문에서 나머지 함수를 고치는 후속 변경(Gerrit 2078)이 나왔습니다.</dd><dt>리뷰</dt><dd>두 번째 패치에서 Steffan Karger가 승인했습니다(Code-Review +2).</dd><dt>증빙</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — 리뷰어<br><span class="tr">(번역) 더 이상 쓰지 않는 키 데이터를 지우는 것은 좋은 습관이고, 더 일관되게 해야 합니다.</span></blockquote>
+    </div>
+  </details>
   <details class="entry" id="OpenVPN-openvpn-2077" data-group="done">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge merged" data-pr="OpenVPN/openvpn#2077">머지됨</span></span>
@@ -221,17 +232,6 @@
       <dl><dt>문제</dt><dd>추출 전용 모드의 HKDF·TLS13-KDF 출력은 다이제스트 하나 길이입니다. 기본 provider는 다른 길이를 처음부터 거부하는데, pkcs11-provider는 요청 길이를 토큰에 넘기고 토큰이 값을 돌려준 뒤에야 길이를 확인했습니다.</dd><dt>배경 지식</dt><dd>HKDF(RFC 5869) 추출 단계, PKCS#11 HKDF 메커니즘, OpenSSL KDF provider API 지식이 필요했습니다. provider는 토큰을 부르기 전에 기본 provider와 같은 길이 규칙을 지켜야 합니다.</dd><dt>찾은 방법</dt><dd>여러 출력 길이로 추출 전용 HKDF를 기본 provider와 pkcs11-provider에 각각 돌려 결과를 비교해 찾았습니다.</dd><dt>수정</dt><dd>파생 전에 길이를 확인하고 기본 provider와 같은 오류를 냅니다. 새 <code>hkdfextract</code> 시험은 SHA-256·SHA-512로 HKDF·TLS13-KDF를 확인하고, 검사를 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">PR 원문 #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816#pullrequestreview-5748368367" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/20994e1d194a5d7cdbf84f388f90e6d267d218d8" target="_blank" rel="noopener">머지 커밋 20994e1d19 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="OpenVPN-openvpn-2076" data-group="done">
-    <summary>
-      <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2076">승인</span></span>
-      <span class="line2">auth_token: 서버 비밀키를 읽은 뒤 지우기</span>
-      <span class="line3">제출 2026-11-01 · 1일째 · 첫 응답 2026-11-01 · CI <span class="none">—</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2076 · 보안 강화 · 승인 2026-11-02 ↗</a></div>
-      <dl><dt>문제</dt><dd><code>auth_token_init_secret()</code>은 auth-token 서버 키를 2048바이트 버퍼로 읽고, 스택의 <code>struct key</code>와 <code>struct key_parameters</code>로 옮긴 뒤 버퍼를 지우지 않고 해제했습니다. 서버 키 사본 세 개가 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 함수가 만드는 사본 하나하나에 대조했습니다. <code>tls_crypt_v2_init_server_key()</code>는 이미 사본을 지우는데 이 함수는 지우지 않았습니다.</dd><dt>찾은 방법</dt><dd><code>test_auth_token</code>이 쓰는 키를 해제된 힙 블록에서 찾았습니다.</dd><dt>수정</dt><dd><code>struct key</code>와 <code>struct key_parameters</code>를 <code>secure_memzero()</code>로 지우고, <code>free_buf()</code> 앞에 <code>buf_clear()</code>를 넣었습니다. 두 번째 패치에서 리뷰어가 짚은 <code>struct key_parameters</code> 사본을 더했고, 같은 질문에서 나머지 함수를 고치는 후속 변경(Gerrit 2078)이 나왔습니다.</dd><dt>리뷰</dt><dd>두 번째 패치에서 Steffan Karger가 승인했습니다(Code-Review +2).</dd><dt>증빙</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a> · 승인한 리뷰어: <a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Steffan Karger ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — 리뷰어<br><span class="tr">(번역) 더 이상 쓰지 않는 키 데이터를 지우는 것은 좋은 습관이고, 더 일관되게 해야 합니다.</span></blockquote>
-    </div>
-  </details>
   <details class="entry" id="openssl-openssl-33476" data-group="done">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge approved" data-pr="openssl/openssl#33476">승인</span></span>
@@ -258,7 +258,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge approved_pending" data-pr="openssl/openssl#33430">승인, 추가 리뷰 대기</span></span>
       <span class="line2"><code>EVP_ENCODE_CTX</code>를 해제할 때 지우기</span>
-      <span class="line3">제출 2026-10-28 · 6일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓97</span></span>
+      <span class="line3">제출 2026-10-28 · 7일째 · 첫 응답 2026-11-02 · CI <span class="ok">✓97</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33430" target="_blank" rel="noopener">openssl/openssl #33430 · 보안 강화 ↗</a></div>
@@ -269,7 +269,7 @@
     <summary>
       <span class="line1"><b>liboqs</b> <span class="badge approved_pending" data-pr="open-quantum-safe/liboqs#2665">승인, 추가 리뷰 대기</span></span>
       <span class="line2">잘못된 길이의 ML-DSA Wycheproof 검증 벡터가 라이브러리까지 가도록</span>
-      <span class="line3">제출 2026-10-31 · 3일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
+      <span class="line3">제출 2026-10-31 · 4일째 · 첫 응답 2026-11-01 · CI <span class="ok">✓2</span> <span class="wait">⏸1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/liboqs/pull/2665" target="_blank" rel="noopener">open-quantum-safe/liboqs #2665 · 시험 보강 ↗</a></div>
@@ -280,7 +280,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33426">리뷰 대기</span></span>
       <span class="line2">키 형식별(type-specific) 개인키 DER를 지운 뒤 해제</span>
-      <span class="line3">제출 2026-10-28 · 6일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-10-28 · 7일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33426" target="_blank" rel="noopener">openssl/openssl #33426 · 보안 강화 ↗</a></div>
@@ -291,7 +291,7 @@
     <summary>
       <span class="line1"><b>Mbed TLS</b> <span class="badge review" data-pr="Mbed-TLS/mbedtls#11036">리뷰 대기</span></span>
       <span class="line2">파서가 없는 X.509 확장이 중복돼도 거부</span>
-      <span class="line3">제출 2026-10-30 · 4일째 · 응답 아직 · CI <span class="ok">✓2</span></span>
+      <span class="line3">제출 2026-10-30 · 5일째 · 응답 아직 · CI <span class="ok">✓2</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/Mbed-TLS/mbedtls/pull/11036" target="_blank" rel="noopener">Mbed-TLS/mbedtls #11036 · 버그 수정 ↗</a></div>
@@ -302,7 +302,7 @@
     <summary>
       <span class="line1"><b>mitmproxy</b> <span class="badge review" data-pr="mitmproxy/mitmproxy#8548">리뷰 대기</span></span>
       <span class="line2"><code>--set confdir</code>에서도 설정 파일 옵션을 먼저 적용</span>
-      <span class="line3">제출 2026-10-31 · 3일째 · 응답 아직 · CI <span class="ok">✓26</span></span>
+      <span class="line3">제출 2026-10-31 · 4일째 · 응답 아직 · CI <span class="ok">✓26</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/mitmproxy/mitmproxy/pull/8548" target="_blank" rel="noopener">mitmproxy/mitmproxy #8548 · 버그 수정 ↗</a></div>
@@ -313,7 +313,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33470">리뷰 대기</span></span>
       <span class="line2"><code>EVP_PKEY_derive_SKEY()</code>가 실패할 때 파생된 공유 비밀 지우기</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33470" target="_blank" rel="noopener">openssl/openssl #33470 · 보안 강화 ↗</a></div>
@@ -324,7 +324,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33471">리뷰 대기</span></span>
       <span class="line2">DHKEM IKM을 바꿀 때 이전 IKM 지우기</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33471" target="_blank" rel="noopener">openssl/openssl #33471 · 보안 강화 ↗</a></div>
@@ -335,7 +335,7 @@
     <summary>
       <span class="line1"><b>TF-PSA-Crypto</b> <span class="badge review" data-pr="Mbed-TLS/TF-PSA-Crypto#960">리뷰 대기</span></span>
       <span class="line2">mbedtls_mpi_gcd_modinv_odd() 임시 버퍼 소거</span>
-      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="ok">✓1</span></span>
+      <span class="line3">제출 2026-11-01 · 4일째 · 응답 아직 · CI <span class="ok">✓1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960" target="_blank" rel="noopener">Mbed-TLS/TF-PSA-Crypto #960 · 보안 강화 ↗</a></div>
@@ -346,7 +346,7 @@
     <summary>
       <span class="line1"><b>tpm2-tss</b> <span class="badge review" data-pr="tpm2-software/tpm2-tss#3198">리뷰 대기</span></span>
       <span class="line2">mu: TPMS_EMPTY 마샬링 함수가 NULL offset을 받게 고침</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓31</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="ok">✓31</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">tpm2-software/tpm2-tss #3198 · 버그 수정 ↗</a></div>
@@ -357,7 +357,7 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/crypto-bigint#1383">리뷰 대기</span></span>
       <span class="line2">BoxedUint: from_*e_slice가 정밀도 위 비트를 버린다고 문서 고침</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓33</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="ok">✓33</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">RustCrypto/crypto-bigint #1383 · 문서 수정 ↗</a></div>
@@ -368,7 +368,7 @@
     <summary>
       <span class="line1"><b>OpenSC</b> <span class="badge review" data-pr="OpenSC/OpenSC#3917">리뷰 대기</span></span>
       <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="ok">✓68</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="ok">✓68</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · 버그 수정 ↗</a></div>
@@ -379,7 +379,7 @@
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2075">리뷰 대기</span></span>
       <span class="line2">ssl: key_state_free()에서 키 원재료 지우기</span>
-      <span class="line3">제출 2026-11-01 · 2일째 · 응답 아직 · CI <span class="none">—</span></span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 응답 아직 · CI <span class="none">—</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2075" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2075 · 보안 강화 ↗</a></div>
@@ -390,7 +390,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33477">리뷰 대기</span></span>
       <span class="line2">해제된 메모리에 남은 비밀값을 찾는 시험 도우미</span>
-      <span class="line3">제출 2026-11-02 · 1일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
+      <span class="line3">제출 2026-11-02 · 2일째 · 응답 아직 · CI <span class="ok">✓95</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33477" target="_blank" rel="noopener">openssl/openssl #33477 · 시험 보강 ↗</a></div>
@@ -401,7 +401,7 @@
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2078">리뷰 대기</span></span>
       <span class="line2">crypto: struct key_parameters 사본을 쓴 뒤 지우기</span>
-      <span class="line3">제출 2026-11-02 · 1일째 · 응답 아직 · CI <span class="none">—</span></span>
+      <span class="line3">제출 2026-11-02 · 2일째 · 응답 아직 · CI <span class="none">—</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://gerrit.openvpn.net/c/openvpn/+/2078" target="_blank" rel="noopener">OpenVPN/openvpn Gerrit 2078 · 보안 강화 ↗</a></div>
@@ -412,7 +412,7 @@
     <summary>
       <span class="line1"><b>RustCrypto</b> <span class="badge review" data-pr="RustCrypto/AEADs#895">리뷰 대기</span></span>
       <span class="line2">eax: 길이 제한 없는 nonce 지원</span>
-      <span class="line3">제출 2026-11-03 · 0일째 · 응답 아직 · CI <span class="ok">✓11</span></span>
+      <span class="line3">제출 2026-11-03 · 1일째 · 응답 아직 · CI <span class="ok">✓11</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/AEADs/pull/895" target="_blank" rel="noopener">RustCrypto/AEADs #895 · 기능 추가 ↗</a></div>
@@ -423,7 +423,7 @@
     <summary>
       <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">CI 실행 허가 대기</span></span>
       <span class="line2">개인키 사본을 지운 뒤 해제</span>
-      <span class="line3">제출 2026-10-29 · 5일째 · 첫 응답 2026-11-03 · CI <span class="ok">✓2</span> <span class="wait">⏸5</span></span>
+      <span class="line3">제출 2026-10-29 · 6일째 · 첫 응답 2026-11-03 · CI <span class="ok">✓2</span> <span class="wait">⏸5</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">open-quantum-safe/oqs-provider #861 · 보안 강화 ↗</a></div>
@@ -434,11 +434,22 @@
     <summary>
       <span class="line1"><b>OpenVPN for Android</b> <span class="badge ci_approval" data-pr="schwabe/ics-openvpn#1941">CI 실행 허가 대기</span></span>
       <span class="line2">&lt;connection&gt; 블록 옵션도 최상위 옵션처럼 걸러내기</span>
-      <span class="line3">제출 2026-11-03 · 0일째 · 응답 아직 · CI <span class="wait">⏸2</span></span>
+      <span class="line3">제출 2026-11-03 · 1일째 · 첫 응답 2026-11-03 · CI <span class="wait">⏸2</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1941" target="_blank" rel="noopener">schwabe/ics-openvpn #1941 · 버그 수정 ↗</a></div>
       <dl><dt>문제</dt><dd>프로필을 가져올 때 앱이 무시하는 옵션(<code>script-security</code>·<code>up</code>·<code>plugin</code>)과 거부하는 옵션(<code>config</code>·<code>tls-server</code>)은 최상위에서만 걸러졌습니다. <code>&lt;connection&gt;</code> 블록 안에서는 두 목록을 모두 건너뛰어, 무시할 옵션이 연결의 사용자 옵션에 남고 거부할 옵션이 받아들여졌습니다.</dd><dt>배경 지식</dt><dd>OpenVPN 설정 형식(자기 옵션을 가진 <code>&lt;connection&gt;</code> 블록)과, 앱이 가져온 <code>.ovpn</code> 파일을 자기 프로필로 바꾸는 과정을 알아야 했습니다.</dd><dt>찾은 방법</dt><dd>같은 옵션을 최상위와 <code>&lt;connection&gt;</code> 블록 안에 두고 생성된 설정을 비교해 찾았습니다.</dd><dt>수정</dt><dd>연결 블록의 옵션에도 같은 두 검사를 돌립니다. 최상위 처리는 그대로입니다. 새 시험 2개는 수정 전 실패하고 수정 뒤 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1941" target="_blank" rel="noopener">PR 원문 #1941 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1941/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="latchset-kryoptic-566" data-group="ci">
+    <summary>
+      <span class="line1"><b>Kryoptic</b> <span class="badge ci_approval" data-pr="latchset/kryoptic#566">CI 실행 허가 대기</span></span>
+      <span class="line2">잘못된 ECDH 상대 공개점에 CKR_MECHANISM_PARAM_INVALID 돌려주기</span>
+      <span class="line3">제출 2026-11-04 · 1일째 · 응답 아직 · CI <span class="wait">⏸8</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">latchset/kryoptic #566 · 버그 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>CKM_ECDH1_DERIVE</code>가 곡선 위에 없거나 길이가 틀리거나 압축 형식이 잘못된 상대 공개점을 <code>CKR_DEVICE_ERROR</code>로 알렸습니다. 호출자는 상대가 보낸 키가 잘못됐는지 토큰이 고장 났는지 가릴 수 없었습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 반환 코드 규약을 알아야 했습니다. 메커니즘 입력이 잘못되면 <code>CKR_MECHANISM_PARAM_INVALID</code>이고, <code>CKR_DEVICE_ERROR</code>는 토큰 자체가 실패했다는 뜻입니다. ECDH 상대 공개키는 키 교환 상대가 보내므로 믿을 수 없는 입력입니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ECDH 벡터(P-256·P-384·P-521·X25519·X448, 2,834건)를 <code>C_DeriveKey</code>에 넣어 찾았습니다. 결과는 모두 맞았지만 잘못된 입력 82건 중 79건이 <code>CKR_DEVICE_ERROR</code>로 돌아왔습니다.</dd><dt>수정</dt><dd>상대 공개키를 읽지 못하면 <code>CKR_MECHANISM_PARAM_INVALID</code>를 돌려줍니다. 같은 함수가 DER 형식이 깨진 값에 이미 쓰는 오류입니다. 곡선 밖 P-256 점으로 파생하는 시험을 넣었고, 수정을 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">PR 원문 #566 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/566/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33444" data-group="closed">
@@ -590,7 +601,7 @@
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
       <div class="about">OpenVPN 본체(C), 패치는 Gerrit으로 제출</div>
       <div class="focus">보는 것: 지우지 않고 해제하는 키 재료</div>
-      <div class="prs"><span>PR 5건</span> <span class="badge merged">머지됨 1</span> <span class="badge approved">승인 2</span> <span class="badge review">리뷰 대기 2</span></div>
+      <div class="prs"><span>PR 5건</span> <span class="badge merged">머지됨 2</span> <span class="badge approved">승인 1</span> <span class="badge review">리뷰 대기 2</span></div>
     </article>
     <article class="repo" id="repo-randombit-botan">
       <div class="name"><b>Botan</b> <a href="https://github.com/randombit/botan" target="_blank" rel="noopener">randombit/botan ↗</a></div>
@@ -675,12 +686,18 @@
       <div class="about">안드로이드용 OpenVPN 앱</div>
       <div class="focus">보는 것: 가져온 설정 파일 해석</div>
       <div class="prs"><span>PR 4건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span> <span class="badge closed">닫힘 3</span></div>
+    </article>
+    <article class="repo" id="repo-latchset-kryoptic">
+      <div class="name"><b>Kryoptic</b> <a href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener">latchset/kryoptic ↗</a></div>
+      <div class="about">OpenSSL을 쓰는 Rust PKCS#11 소프트웨어 토큰</div>
+      <div class="focus">보는 것: Wycheproof 벡터를 PKCS#11 API로 넣어 결과와 반환 코드를 함께 확인</div>
+      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
     </article></div>
   </section>
 
-  <footer>2026-11-03 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
+  <footer>2026-11-04 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
-<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "approved_pending": "승인, 추가 리뷰 대기", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-11-03 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
+<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "approved_pending": "승인, 추가 리뷰 대기", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-11-04 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
 <script>
 (() => {
   const L = JSON.parse(document.getElementById("labels").textContent);
