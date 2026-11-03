@@ -1842,7 +1842,7 @@ vulnerabilities:
     channel:
       en: Project security mailbox (PGP encrypted)
       ko: 프로젝트 보안 메일(PGP 암호화)
-    status: triage
+    status: public_pr
     cve: null
     cvss: null
 
