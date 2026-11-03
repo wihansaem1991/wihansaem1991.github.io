@@ -265,6 +265,12 @@ def main():
                 a = private.get(v["label"])
                 if not a:
                     continue
+                if a.get("public_pr"):
+                    # the maintainer asked for a normal public pull request instead
+                    if v.get("status") != "public_pr":
+                        items[i] = set_field(block, "status", "public_pr")
+                        changed.append(f'{v["label"]}: {v.get("status")} -> public_pr')
+                    continue
                 adv = gh("api", f"repos/{a['repo']}/security-advisories/{a['ghsa']}")
                 stage = ADVISORY_STAGE.get(adv.get("state"), adv.get("state"))
                 if stage != v.get("status"):

@@ -390,9 +390,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-10-30
-    decided: null
+    decided: 2026-11-03
     defect:
       en: >-
         With a PKCS#11 token, `EVP_PKEY_derive()` asked the token for as many bytes as the caller's
@@ -879,9 +879,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-03
     defect:
       en: >-
         Raw RSA signing (`RSA_NO_PADDING`) on a token key failed whenever the output buffer was larger
@@ -912,6 +912,48 @@ entries:
       ko: >-
         입력 길이를 호출자 버퍼 크기가 아니라 키의 모듈러스 크기와 비교합니다. 새 `rsaraw` 시험은 두 provider를
         모두 확인하고, 토큰 서명에서 원래 데이터를 되살려 보며, 모듈러스보다 짧은 입력은 여전히 거부하는지 봅니다.
+
+  - project: pkcs11-provider
+    repo: openssl-projects/pkcs11-provider
+    pr: 816
+    title:
+      en: "kdf: Reject extract-only output lengths other than the digest size"
+      ko: "kdf: 추출 전용 HKDF 출력 길이가 다이제스트와 다르면 거부"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-03
+    decided: null
+    defect:
+      en: >-
+        In extract-only mode, HKDF and TLS13-KDF output exactly one digest. The default provider
+        refuses any other output length up front; pkcs11-provider passed the requested length to the
+        token and checked it only after the token had returned the derived value.
+      ko: >-
+        추출 전용 모드의 HKDF·TLS13-KDF 출력은 다이제스트 하나 길이입니다. 기본 provider는 다른 길이를 처음부터
+        거부하는데, pkcs11-provider는 요청 길이를 토큰에 넘기고 토큰이 값을 돌려준 뒤에야 길이를 확인했습니다.
+    background:
+      en: >-
+        HKDF (RFC 5869) extract step, the PKCS#11 HKDF mechanism and OpenSSL's KDF provider API:
+        the provider has to match the default provider's length rules before calling the token.
+      ko: >-
+        HKDF(RFC 5869) 추출 단계, PKCS#11 HKDF 메커니즘, OpenSSL KDF provider API 지식이 필요했습니다.
+        provider는 토큰을 부르기 전에 기본 provider와 같은 길이 규칙을 지켜야 합니다.
+    found_by:
+      en: >-
+        Running extract-only HKDF with several output lengths through both the default provider and
+        pkcs11-provider and comparing the results.
+      ko: >-
+        여러 출력 길이로 추출 전용 HKDF를 기본 provider와 pkcs11-provider에 각각 돌려 결과를 비교해 찾았습니다.
+    fix:
+      en: >-
+        Check the length before deriving and raise the default provider's error. The new
+        `hkdfextract` test covers HKDF and TLS13-KDF with SHA-256 and SHA-512, and fails with the
+        check reverted.
+      ko: >-
+        파생 전에 길이를 확인하고 기본 provider와 같은 오류를 냅니다. 새 `hkdfextract` 시험은 SHA-256·SHA-512로
+        HKDF·TLS13-KDF를 확인하고, 검사를 되돌리면 실패합니다.
 
   - project: TF-PSA-Crypto
     repo: Mbed-TLS/TF-PSA-Crypto
@@ -1579,7 +1621,7 @@ vulnerabilities:
     channel:
       en: GitHub private vulnerability report
       ko: GitHub 비공개 취약점 보고
-    status: triage
+    status: public_pr
     cve: null
     cvss: null
 
