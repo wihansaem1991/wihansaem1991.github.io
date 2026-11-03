@@ -48,8 +48,8 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-03",
+   "last_response": "2026-11-03",
    "opened": "2026-11-01",
    "stage": "review"
   },
@@ -356,16 +356,16 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 69,
     "pending": 0
    },
-   "ci_waiting": 8,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-03",
+   "last_response": "2026-11-03",
    "opened": "2026-11-03",
-   "stage": "ci_approval"
+   "stage": "changes"
   },
   "merge": null,
   "url": "https://github.com/latchset/kryoptic/pull/566"
