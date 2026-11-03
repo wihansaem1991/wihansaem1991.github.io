@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">37 pull requests and 9 vulnerability reports · 22 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">38 pull requests and 9 vulnerability reports · 22 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">46</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">2</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">18</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">47</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">3</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">18</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -452,6 +452,17 @@
       <dl><dt>Problem</dt><dd>When a profile is imported, options the app ignores (<code>script-security</code>, <code>up</code>, <code>plugin</code>) or rejects (<code>config</code>, <code>tls-server</code>) were filtered only at the top level. Inside a <code>&lt;connection&gt;</code> block they skipped both lists: ignored options stayed in the connection&#x27;s custom options and rejected ones were accepted.</dd><dt>Background</dt><dd>The OpenVPN configuration format (<code>&lt;connection&gt;</code> blocks with their own options) and how the app turns an imported <code>.ovpn</code> file into its own profile.</dd><dt>How it was found</dt><dd>Comparing the generated configuration for the same option at the top level and inside a <code>&lt;connection&gt;</code> block.</dd><dt>Fix</dt><dd>Run the same two checks on the connection block&#x27;s options; top-level handling is unchanged. Two new tests fail without the change and pass with it.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1941" target="_blank" rel="noopener">Pull request #1941 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1941/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="latchset-kryoptic-573" data-group="ci">
+    <summary>
+      <span class="line1"><b>Kryoptic</b> <span class="badge ci_approval" data-pr="latchset/kryoptic#573">Awaiting CI approval</span></span>
+      <span class="line2">Fix multi-part ChaCha20-Poly1305 decryption of large chunks</span>
+      <span class="line3">submitted 2026-11-04 · 1 days · no reply yet · CI <span class="wait">⏸8</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/latchset/kryoptic/pull/573" target="_blank" rel="noopener">latchset/kryoptic #573 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>When <code>C_DecryptUpdate</code> was called two or more times with chunks longer than the 16-byte tag, the front of each later chunk was never decrypted. The output came out short and <code>C_DecryptFinal</code> rejected valid ciphertext with <code>CKR_ENCRYPTED_DATA_INVALID</code>.</dd><dt>Background</dt><dd>AEAD streaming: in multi-part decryption the token cannot know which bytes are the Poly1305 tag until <code>C_DecryptFinal</code>, so it must hold back the last 16 bytes of every update and still decrypt everything in front of them.</dd><dt>How it was found</dt><dd>Wycheproof ChaCha20-Poly1305 vectors fed through <code>C_DecryptUpdate</code> in several chunk sizes: one-shot, 1-byte and 5-byte chunks matched, but with 17-byte chunks 190 valid vectors failed.</dd><dt>Fix</dt><dd>Skip the input only when it was appended to the held-back buffer as a whole. The multi-part test now also decrypts in 20-byte chunks and fails without the change.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/573" target="_blank" rel="noopener">Pull request #573 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/573/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="openssl-openssl-33444" data-group="closed">
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge closed" data-pr="openssl/openssl#33444">Closed</span></span>
@@ -691,7 +702,7 @@
       <div class="name"><b>Kryoptic</b> <a href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener">latchset/kryoptic ↗</a></div>
       <div class="about">PKCS#11 software token in Rust, backed by OpenSSL</div>
       <div class="focus">Looking at: Wycheproof vectors run through the PKCS#11 API, checking both results and return codes</div>
-      <div class="prs"><span>1 pull requests</span> <span class="badge changes">Changes requested 1</span></div>
+      <div class="prs"><span>2 pull requests</span> <span class="badge changes">Changes requested 1</span> <span class="badge ci_approval">Awaiting CI approval 1</span></div>
     </article></div>
   </section>
 
