@@ -955,6 +955,52 @@ entries:
         파생 전에 길이를 확인하고 기본 provider와 같은 오류를 냅니다. 새 `hkdfextract` 시험은 SHA-256·SHA-512로
         HKDF·TLS13-KDF를 확인하고, 검사를 되돌리면 실패합니다.
 
+  - project: Kryoptic
+    repo: latchset/kryoptic
+    pr: 566
+    title:
+      en: Return CKR_MECHANISM_PARAM_INVALID for an invalid ECDH peer point
+      ko: 잘못된 ECDH 상대 공개점에 CKR_MECHANISM_PARAM_INVALID 돌려주기
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-04
+    decided: null
+    defect:
+      en: >-
+        `CKM_ECDH1_DERIVE` reported a peer public point that is not on the curve, has the wrong
+        length or uses a bad compressed encoding as `CKR_DEVICE_ERROR`, so a caller could not tell a
+        corrupted or hostile peer key from a fault in the token.
+      ko: >-
+        `CKM_ECDH1_DERIVE`가 곡선 위에 없거나 길이가 틀리거나 압축 형식이 잘못된 상대 공개점을
+        `CKR_DEVICE_ERROR`로 알렸습니다. 호출자는 상대가 보낸 키가 잘못됐는지 토큰이 고장 났는지 가릴 수 없었습니다.
+    background:
+      en: >-
+        PKCS#11 return-code rules: bad mechanism input is `CKR_MECHANISM_PARAM_INVALID`, while
+        `CKR_DEVICE_ERROR` means the token itself failed. An ECDH peer key comes from the other side of
+        the key exchange, so it is untrusted input.
+      ko: >-
+        PKCS#11 반환 코드 규약을 알아야 했습니다. 메커니즘 입력이 잘못되면 `CKR_MECHANISM_PARAM_INVALID`이고,
+        `CKR_DEVICE_ERROR`는 토큰 자체가 실패했다는 뜻입니다. ECDH 상대 공개키는 키 교환 상대가 보내므로 믿을 수
+        없는 입력입니다.
+    found_by:
+      en: >-
+        Wycheproof ECDH vectors (P-256, P-384, P-521, X25519, X448; 2,834 cases) run through
+        `C_DeriveKey`: every result matched, but 79 of the 82 invalid cases came back as
+        `CKR_DEVICE_ERROR`.
+      ko: >-
+        Wycheproof ECDH 벡터(P-256·P-384·P-521·X25519·X448, 2,834건)를 `C_DeriveKey`에 넣어 찾았습니다.
+        결과는 모두 맞았지만 잘못된 입력 82건 중 79건이 `CKR_DEVICE_ERROR`로 돌아왔습니다.
+    fix:
+      en: >-
+        Map a failed peer-key import to `CKR_MECHANISM_PARAM_INVALID`, the error the same function
+        already gives for a malformed DER value. A new test case derives with an off-curve P-256
+        point and fails without the change.
+      ko: >-
+        상대 공개키를 읽지 못하면 `CKR_MECHANISM_PARAM_INVALID`를 돌려줍니다. 같은 함수가 DER 형식이 깨진 값에
+        이미 쓰는 오류입니다. 곡선 밖 P-256 점으로 파생하는 시험을 넣었고, 수정을 되돌리면 실패합니다.
+
   - project: OpenVPN for Android
     repo: schwabe/ics-openvpn
     pr: 1941
@@ -1423,9 +1469,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-01
-    decided: 2026-11-02
+    decided: 2026-11-03
     defect:
       en: >-
         `auth_token_init_secret()` reads the auth-token server key into a 2048-byte buffer, copies it
@@ -1764,6 +1810,14 @@ repos:
     focus:
       en: Parsing of imported configuration files
       ko: 가져온 설정 파일 해석
+  - project: Kryoptic
+    repo: latchset/kryoptic
+    about:
+      en: PKCS#11 software token in Rust, backed by OpenSSL
+      ko: OpenSSL을 쓰는 Rust PKCS#11 소프트웨어 토큰
+    focus:
+      en: Wycheproof vectors run through the PKCS#11 API, checking both results and return codes
+      ko: Wycheproof 벡터를 PKCS#11 API로 넣어 결과와 반환 코드를 함께 확인
 
 vulnerabilities:
   - label: VR-1
