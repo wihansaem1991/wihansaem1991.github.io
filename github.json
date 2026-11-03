@@ -224,8 +224,8 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-02",
    "opened": "2026-11-01",
    "stage": "review"
   },
@@ -355,7 +355,13 @@
   "url": "https://github.com/mitmproxy/mitmproxy/pull/8548"
  },
  "open-quantum-safe/liboqs#2665": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "owaldron",
+    "date": "2026-11-02",
+    "url": "https://github.com/open-quantum-safe/liboqs/pull/2665#pullrequestreview-5743916795"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -366,9 +372,9 @@
    "draft": false,
    "ended": null,
    "first_response": "2026-11-01",
-   "last_response": "2026-11-01",
+   "last_response": "2026-11-02",
    "opened": "2026-10-31",
-   "stage": "ci_approval"
+   "stage": "approved_pending"
   },
   "merge": null,
   "url": "https://github.com/open-quantum-safe/liboqs/pull/2665"
