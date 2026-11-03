@@ -922,9 +922,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-03
-    decided: null
+    decided: 2026-11-03
     defect:
       en: >-
         In extract-only mode, HKDF and TLS13-KDF output exactly one digest. The default provider

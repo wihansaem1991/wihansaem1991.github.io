@@ -431,8 +431,8 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 48,
-    "pending": 1
+    "pass": 50,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
@@ -505,22 +505,31 @@
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/815"
  },
  "openssl-projects/pkcs11-provider#816": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "simo5",
+    "date": "2026-11-03",
+    "url": "https://github.com/openssl-projects/pkcs11-provider/pull/816#pullrequestreview-5748368367"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 26,
-    "pending": 23
+    "pass": 50,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-03",
+   "first_response": "2026-11-03",
+   "last_response": "2026-11-03",
    "opened": "2026-11-03",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "20994e1d194a5d7cdbf84f388f90e6d267d218d8",
+   "url": "https://github.com/openssl-projects/pkcs11-provider/commit/20994e1d194a5d7cdbf84f388f90e6d267d218d8"
+  },
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/816"
  },
  "openssl/openssl#33426": {

@@ -92,10 +92,10 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
-  <div class="summary">제출 PR 32건 · 취약점 보고 9건 · 메인테이너 응답 16건 · CVE 0건</div>
+  <div class="summary">제출 PR 32건 · 취약점 보고 9건 · 메인테이너 응답 17건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">41</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">13</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">41</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">15</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -104,7 +104,7 @@
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge merged" data-pr="openssl-projects/pkcs11-provider#813">머지됨</span></span>
       <span class="line2">큰 버퍼에도 ECDH 공유 비밀값만 돌려주기</span>
-      <span class="line3">제출 2026-10-30 · 4일째 · 첫 응답 2026-10-30 · CI <span class="ok">✓48</span> <span class="wait">…1</span></span>
+      <span class="line3">제출 2026-10-30 · 4일째 · 첫 응답 2026-10-30 · CI <span class="ok">✓50</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · 버그 수정 · 머지됨 2026-11-03 ↗</a></div>
@@ -208,6 +208,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">RustCrypto/formats #2502 · 버그 수정 · 머지됨 2026-11-02 ↗</a></div>
       <dl><dt>문제</dt><dd><code>pkcs5::pbes2::Salt::new</code>는 32바이트보다 긴 솔트에 오류를 돌려준다고 문서에 적혀 있지만, #2295에서 길이 검사가 빠졌습니다. 33바이트 솔트를 <code>Salt::new</code>, <code>Pbkdf2Params::hmac_sha256</code>, <code>ScryptParams::from_params_and_salt</code>에 넘기면 오류 대신 범위 밖 인덱스로 패닉했습니다. 배포판 0.8.0과 0.8.1에 이 회귀가 들어 있습니다.</dd><dt>배경 지식</dt><dd>PKCS #5 PBES2(RFC 8018)를 썼습니다. PBKDF2와 scrypt 매개변수는 솔트를 OCTET STRING으로 담고, 이 크레이트는 할당자 없이도 돌도록 솔트를 고정 32바이트 버퍼에 담습니다.</dd><dt>찾은 방법</dt><dd><code>formats</code>의 해석기와 생성자를 libFuzzer로 퍼징해 찾았습니다. 해석기는 길이를 검사하지만 호출자가 솔트를 넘기는 생성자는 검사하지 않았고, <code>git log -p</code>로 검사가 빠진 커밋 #2295를 찾았습니다.</dd><dt>수정</dt><dd>길이 검사를 되살렸습니다. 새 시험은 33바이트 솔트(수정을 빼면 실패)와 32바이트 솔트를 다루고, <code>pkcs5</code> 시험·clippy·rustfmt가 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">PR 원문 #2502 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2502/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/RustCrypto/formats/pull/2502#pullrequestreview-5738605197" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/9960cb7b85862cc2a708ee97da9656afd863db23" target="_blank" rel="noopener">머지 커밋 9960cb7b85 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-816" data-group="done">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge merged" data-pr="openssl-projects/pkcs11-provider#816">머지됨</span></span>
+      <span class="line2">kdf: 추출 전용 HKDF 출력 길이가 다이제스트와 다르면 거부</span>
+      <span class="line3">제출 2026-11-03 · 0일째 · 첫 응답 2026-11-03 · CI <span class="ok">✓50</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #816 · 버그 수정 · 머지됨 2026-11-03 ↗</a></div>
+      <dl><dt>문제</dt><dd>추출 전용 모드의 HKDF·TLS13-KDF 출력은 다이제스트 하나 길이입니다. 기본 provider는 다른 길이를 처음부터 거부하는데, pkcs11-provider는 요청 길이를 토큰에 넘기고 토큰이 값을 돌려준 뒤에야 길이를 확인했습니다.</dd><dt>배경 지식</dt><dd>HKDF(RFC 5869) 추출 단계, PKCS#11 HKDF 메커니즘, OpenSSL KDF provider API 지식이 필요했습니다. provider는 토큰을 부르기 전에 기본 provider와 같은 길이 규칙을 지켜야 합니다.</dd><dt>찾은 방법</dt><dd>여러 출력 길이로 추출 전용 HKDF를 기본 provider와 pkcs11-provider에 각각 돌려 결과를 비교해 찾았습니다.</dd><dt>수정</dt><dd>파생 전에 길이를 확인하고 기본 provider와 같은 오류를 냅니다. 새 <code>hkdfextract</code> 시험은 SHA-256·SHA-512로 HKDF·TLS13-KDF를 확인하고, 검사를 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">PR 원문 #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816#pullrequestreview-5748368367" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/20994e1d194a5d7cdbf84f388f90e6d267d218d8" target="_blank" rel="noopener">머지 커밋 20994e1d19 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="OpenVPN-openvpn-2076" data-group="done">
@@ -408,17 +419,6 @@
       <dl><dt>문제</dt><dd>EAX는 길이에 제한이 없는 nonce를 받는데, <code>eax</code> 크레이트는 16바이트로 고정해 두었습니다. 4바이트·6바이트 nonce를 쓰는 프로토콜이 이 크레이트를 쓸 수 없었고(2020년부터 열린 이슈 #239), nonce 길이가 다른 Wycheproof 벡터 54개도 돌릴 수 없었습니다.</dd><dt>배경 지식</dt><dd>EAX 모드 정의(nonce가 OMAC을 거치므로 길이 제한이 없음)와, 암호모듈 검증(KCMVP)의 기지 답 시험과 같은 방식의 공개 시험 벡터(Wycheproof)를 썼습니다.</dd><dt>찾은 방법</dt><dd>#894 때 Wycheproof를 돌리고 남은 유효 EAX 벡터 54개를 크레이트 타입으로 표현할 수 없었고, 그 원인이 이슈 #239였습니다.</dd><dt>수정</dt><dd><code>AesGcm</code>처럼 <code>Eax</code>와 스트리밍용 <code>online::Eax</code>에 <code>NonceSize</code> 타입 인자를 더했습니다(기본 16바이트라 기존 코드는 그대로). 벡터 54개(nonce 0~257바이트)를 두 API로 돌리고, 암호 안에서 nonce를 16바이트로 자르면 새 시험이 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/895" target="_blank" rel="noopener">PR 원문 #895 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/895/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="openssl-projects-pkcs11-provider-816" data-group="review">
-    <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge review" data-pr="openssl-projects/pkcs11-provider#816">리뷰 대기</span></span>
-      <span class="line2">kdf: 추출 전용 HKDF 출력 길이가 다이제스트와 다르면 거부</span>
-      <span class="line3">제출 2026-11-03 · 0일째 · 응답 아직 · CI <span class="ok">✓26</span> <span class="wait">…23</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #816 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>추출 전용 모드의 HKDF·TLS13-KDF 출력은 다이제스트 하나 길이입니다. 기본 provider는 다른 길이를 처음부터 거부하는데, pkcs11-provider는 요청 길이를 토큰에 넘기고 토큰이 값을 돌려준 뒤에야 길이를 확인했습니다.</dd><dt>배경 지식</dt><dd>HKDF(RFC 5869) 추출 단계, PKCS#11 HKDF 메커니즘, OpenSSL KDF provider API 지식이 필요했습니다. provider는 토큰을 부르기 전에 기본 provider와 같은 길이 규칙을 지켜야 합니다.</dd><dt>찾은 방법</dt><dd>여러 출력 길이로 추출 전용 HKDF를 기본 provider와 pkcs11-provider에 각각 돌려 결과를 비교해 찾았습니다.</dd><dt>수정</dt><dd>파생 전에 길이를 확인하고 기본 provider와 같은 오류를 냅니다. 새 <code>hkdfextract</code> 시험은 SHA-256·SHA-512로 HKDF·TLS13-KDF를 확인하고, 검사를 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">PR 원문 #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
     <summary>
       <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">CI 실행 허가 대기</span></span>
@@ -540,7 +540,7 @@
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
       <div class="about">OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider</div>
       <div class="focus">보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조</div>
-      <div class="prs"><span>PR 4건</span> <span class="badge merged">머지됨 3</span> <span class="badge review">리뷰 대기 1</span></div>
+      <div class="prs"><span>PR 4건</span> <span class="badge merged">머지됨 4</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>

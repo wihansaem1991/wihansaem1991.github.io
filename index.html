@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">32 pull requests and 9 vulnerability reports · 16 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">32 pull requests and 9 vulnerability reports · 17 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">41</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">13</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">41</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">15</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">1</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">2</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">16</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -104,7 +104,7 @@
     <summary>
       <span class="line1"><b>pkcs11-provider</b> <span class="badge merged" data-pr="openssl-projects/pkcs11-provider#813">Merged</span></span>
       <span class="line2">Return only the ECDH secret into larger buffers</span>
-      <span class="line3">submitted 2026-10-30 · 4 days · first reply 2026-10-30 · CI <span class="ok">✓48</span> <span class="wait">…1</span></span>
+      <span class="line3">submitted 2026-10-30 · 4 days · first reply 2026-10-30 · CI <span class="ok">✓50</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #813 · Bug fix · Merged 2026-11-03 ↗</a></div>
@@ -208,6 +208,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">RustCrypto/formats #2502 · Bug fix · Merged 2026-11-02 ↗</a></div>
       <dl><dt>Problem</dt><dd><code>pkcs5::pbes2::Salt::new</code> is documented to return an error for a salt longer than 32 bytes, but the length check was dropped in #2295. A 33-byte salt passed to <code>Salt::new</code>, <code>Pbkdf2Params::hmac_sha256</code> or <code>ScryptParams::from_params_and_salt</code> panicked with an index out of bounds instead. Released versions 0.8.0 and 0.8.1 contain the regression.</dd><dt>Background</dt><dd>PKCS #5 PBES2 (RFC 8018): PBKDF2 and scrypt parameters carry the salt as an OCTET STRING. This crate stores it in a fixed 32-byte buffer so it works without an allocator.</dd><dt>How it was found</dt><dd>Fuzzing the <code>formats</code> decoders and constructors with libFuzzer. The decoder checks the length; the caller-supplied constructor did not. <code>git log -p</code> traced the missing check to #2295.</dd><dt>Fix</dt><dd>Restore the length check. New tests cover a 33-byte salt (fails without the fix) and a 32-byte salt; <code>pkcs5</code> tests, clippy and rustfmt pass.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">Pull request #2502 ↗</a> · <a href="https://github.com/RustCrypto/formats/pull/2502/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/RustCrypto/formats/pull/2502#pullrequestreview-5738605197" target="_blank" rel="noopener">tarcieri ↗</a> · <a href="https://github.com/RustCrypto/formats/commit/9960cb7b85862cc2a708ee97da9656afd863db23" target="_blank" rel="noopener">Merge commit 9960cb7b85 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-projects-pkcs11-provider-816" data-group="done">
+    <summary>
+      <span class="line1"><b>pkcs11-provider</b> <span class="badge merged" data-pr="openssl-projects/pkcs11-provider#816">Merged</span></span>
+      <span class="line2">kdf: Reject extract-only output lengths other than the digest size</span>
+      <span class="line3">submitted 2026-11-03 · 0 days · first reply 2026-11-03 · CI <span class="ok">✓50</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #816 · Bug fix · Merged 2026-11-03 ↗</a></div>
+      <dl><dt>Problem</dt><dd>In extract-only mode, HKDF and TLS13-KDF output exactly one digest. The default provider refuses any other output length up front; pkcs11-provider passed the requested length to the token and checked it only after the token had returned the derived value.</dd><dt>Background</dt><dd>HKDF (RFC 5869) extract step, the PKCS#11 HKDF mechanism and OpenSSL&#x27;s KDF provider API: the provider has to match the default provider&#x27;s length rules before calling the token.</dd><dt>How it was found</dt><dd>Running extract-only HKDF with several output lengths through both the default provider and pkcs11-provider and comparing the results.</dd><dt>Fix</dt><dd>Check the length before deriving and raise the default provider&#x27;s error. The new <code>hkdfextract</code> test covers HKDF and TLS13-KDF with SHA-256 and SHA-512, and fails with the check reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">Pull request #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816#pullrequestreview-5748368367" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/20994e1d194a5d7cdbf84f388f90e6d267d218d8" target="_blank" rel="noopener">Merge commit 20994e1d19 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="OpenVPN-openvpn-2076" data-group="done">
@@ -408,17 +419,6 @@
       <dl><dt>Problem</dt><dd>EAX accepts a nonce of any length, but the <code>eax</code> crate fixed it to 16 bytes. Protocols with 4-byte or 6-byte nonces could not use the crate (issue #239, open since 2020), and 54 Wycheproof vectors with other nonce lengths could not be run.</dd><dt>Background</dt><dd>The EAX mode definition (the nonce goes through OMAC, so any length works) and validation test vectors (Wycheproof), the same approach as known-answer testing in cryptographic module validation (KCMVP).</dd><dt>How it was found</dt><dd>The Wycheproof run for #894 left 54 valid EAX cases that the crate&#x27;s types could not express, which pointed to issue #239.</dd><dt>Fix</dt><dd>A <code>NonceSize</code> type parameter (default 16 bytes, so existing code is unchanged) on <code>Eax</code> and the streaming <code>online::Eax</code>, as <code>AesGcm</code> does. The 54 vectors (nonces of 0 to 257 bytes) run through both APIs; with nonces cut to 16 bytes inside the cipher, the new tests fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/895" target="_blank" rel="noopener">Pull request #895 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/895/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="openssl-projects-pkcs11-provider-816" data-group="review">
-    <summary>
-      <span class="line1"><b>pkcs11-provider</b> <span class="badge review" data-pr="openssl-projects/pkcs11-provider#816">Awaiting review</span></span>
-      <span class="line2">kdf: Reject extract-only output lengths other than the digest size</span>
-      <span class="line3">submitted 2026-11-03 · 0 days · no reply yet · CI <span class="ok">✓26</span> <span class="wait">…23</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">openssl-projects/pkcs11-provider #816 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>In extract-only mode, HKDF and TLS13-KDF output exactly one digest. The default provider refuses any other output length up front; pkcs11-provider passed the requested length to the token and checked it only after the token had returned the derived value.</dd><dt>Background</dt><dd>HKDF (RFC 5869) extract step, the PKCS#11 HKDF mechanism and OpenSSL&#x27;s KDF provider API: the provider has to match the default provider&#x27;s length rules before calling the token.</dd><dt>How it was found</dt><dd>Running extract-only HKDF with several output lengths through both the default provider and pkcs11-provider and comparing the results.</dd><dt>Fix</dt><dd>Check the length before deriving and raise the default provider&#x27;s error. The new <code>hkdfextract</code> test covers HKDF and TLS13-KDF with SHA-256 and SHA-512, and fails with the check reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">Pull request #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
     <summary>
       <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval</span></span>
@@ -540,7 +540,7 @@
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
       <div class="about">OpenSSL 3 provider for PKCS#11 tokens and HSMs</div>
       <div class="focus">Looking at: Output-buffer length rules of signing, key derivation and ECDH, compared with OpenSSL&#x27;s default provider</div>
-      <div class="prs"><span>4 pull requests</span> <span class="badge merged">Merged 3</span> <span class="badge review">Awaiting review 1</span></div>
+      <div class="prs"><span>4 pull requests</span> <span class="badge merged">Merged 4</span></div>
     </article>
     <article class="repo" id="repo-OpenVPN-openvpn">
       <div class="name"><b>OpenVPN</b> <a href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener">OpenVPN/openvpn ↗</a></div>
