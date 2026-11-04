@@ -1299,9 +1299,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-04
     defect:
       en: >-
         `Tss2_MU_TPMS_EMPTY_Marshal()` and `Tss2_MU_TPMS_EMPTY_Unmarshal()` read `*offset` for a
@@ -1477,9 +1477,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-04
     defect:
       en: >-
         OpenSC's PKCS#11 module could verify signatures with a public key but not encrypt with one:

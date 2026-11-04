@@ -38,20 +38,26 @@
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11036"
  },
  "OpenSC/OpenSC#3917": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "Jakuje",
+    "date": "2026-11-04",
+    "url": "https://github.com/OpenSC/OpenSC/pull/3917#pullrequestreview-5765802318"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 68,
     "pending": 0
    },
-   "ci_waiting": 12,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": "2026-11-03",
-   "last_response": "2026-11-03",
+   "last_response": "2026-11-04",
    "opened": "2026-11-01",
-   "stage": "ci_approval"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
@@ -639,7 +645,13 @@
   "url": "https://github.com/openssl/openssl/pull/33444"
  },
  "openssl/openssl#33470": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "beldmit",
+    "date": "2026-11-04",
+    "url": "https://github.com/openssl/openssl/pull/33470#pullrequestreview-5766329783"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -649,10 +661,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-04",
+   "last_response": "2026-11-04",
    "opened": "2026-11-01",
-   "stage": "review"
+   "stage": "approved_pending"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33470"
@@ -840,7 +852,13 @@
   "url": "https://github.com/schwabe/ics-openvpn/pull/1941"
  },
  "tpm2-software/tpm2-tss#3198": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "AndreasFuchsTPM",
+    "date": "2026-11-04",
+    "url": "https://github.com/tpm2-software/tpm2-tss/pull/3198#pullrequestreview-5765765098"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -850,10 +868,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-04",
+   "last_response": "2026-11-04",
    "opened": "2026-11-01",
-   "stage": "review"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/tpm2-software/tpm2-tss/pull/3198"

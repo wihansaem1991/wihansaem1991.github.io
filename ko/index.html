@@ -112,7 +112,7 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">15</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">4</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">17</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">6</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
     <h3 class="chart-h">프로젝트별 반영 기여</h3><div class="bars">
       <details class="bar">
         <summary>
@@ -250,8 +250,38 @@
           </summary>
           <div class="body"><dl><dt>문제</dt><dd>파생 키를 <code>EVP_SKEY</code>로 가져온 뒤 임시 버퍼를 <code>OPENSSL_free()</code>로 해제해서, 키 전체가 해제된 힙 메모리에 그대로 남았습니다.</dd><dt>배경 지식</dt><dd>FIPS 140-3와 KCMVP 검증의 바탕인 ISO/IEC 19790은 다 쓴 키를 지우도록(제로화) 요구합니다. 파생 키도 비밀값이라 메모리를 돌려주기 전에 지워야 하고, OpenSSL은 이를 위해 <code>OPENSSL_clear_free()</code>를 둡니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제되는 블록마다 키 바이트가 남았는지 재는 측정 프로그램으로 찾았습니다. <code>pbkdf1.c:318</code>에서 해제되는 20바이트 블록에 키 전체가 들어 있었습니다.</dd><dt>수정</dt><dd>두 경로 모두 <code>OPENSSL_clear_free()</code>로 바꿨습니다. 기존 시험 <code>test_kdf_pbkdf1_skey</code>가 이제 해제 블록을 감시하고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>리뷰어 두 명이 승인했고, FIPS와 관련된 버그로 분류됐습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">#33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — 리뷰어<br><span class="tr">(번역) 꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.</span></blockquote></div>
         </details></div>
+      </details>
+      <details class="bar">
+        <summary>
+          <span class="bar-name">OpenSC</span>
+          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-n">1</span>
+        </summary>
+        <div class="bar-body">
+        <details class="entry" id="OpenSC-OpenSC-3917">
+          <summary>
+            <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
+            <span class="line3">OpenSC/OpenSC #3917 · 버그 수정</span>
+          </summary>
+          <div class="body"><dl><dt>문제</dt><dd>OpenSC PKCS#11 모듈은 공개키로 서명 검증은 했지만 암호화는 못 했습니다. RSA 공개키로 <code>C_EncryptInit()</code>을 부르면 <code>CKR_KEY_TYPE_INCONSISTENT</code>로 실패했습니다(#3144). 시험 도구 p11test도 그 기능을 켜는 값을 시험 준비 단계에서 빠뜨려 <code>C_Encrypt()</code>를 한 번도 부르지 않았습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 객체 연산과 메커니즘 표시(<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5·패딩 없는 RSA 암호화, 그리고 OpenSC가 <code>C_Verify()</code>를 OpenSSL로 처리하는 기존 소프트웨어 경로를 썼습니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 입문 과제로 표시한 이슈입니다. 가상 SmartCard-HSM(pico-hsm 에뮬레이션 + vsmartcard + 사용자 모드 pcscd)으로 재현했고, pkcs11-spy로 p11test가 <code>C_Encrypt()</code>까지 가지 않는 것을 찾았습니다.</dd><dt>수정</dt><dd>공개키 객체가 OpenSSL로 <code>CKM_RSA_PKCS</code>·<code>CKM_RSA_X_509</code> 암호화를 하고, p11test가 그 값을 넘기게 고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이 같습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">#3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
+        </details></div>
+      </details>
+      <details class="bar">
+        <summary>
+          <span class="bar-name">tpm2-tss</span>
+          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-n">1</span>
+        </summary>
+        <div class="bar-body">
+        <details class="entry" id="tpm2-software-tpm2-tss-3198">
+          <summary>
+            <span class="line2">mu: TPMS_EMPTY 마샬링 함수가 NULL offset을 받게 고침</span>
+            <span class="line3">tpm2-software/tpm2-tss #3198 · 버그 수정</span>
+          </summary>
+          <div class="body"><dl><dt>문제</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code>·<code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code>가 디버그 로그를 찍으려고 <code>*offset</code>을 확인 없이 읽었습니다. 같은 파일의 다른 함수는 모두 NULL offset을 받는데, 이 둘은 널 포인터를 읽었습니다.</dd><dt>배경 지식</dt><dd>tpm2-tss는 마샬링(MU) 함수를 C 매크로로 찍어 내고, 매크로마다 로그에 <code>offset ? *offset : 0xffff</code>를 씁니다. 기본 로그 수준에서 <code>LOG_DEBUG()</code>는 그냥 함수 호출이라 디버그 로그가 꺼져 있어도 인자를 계산합니다.</dd><dt>찾은 방법</dt><dd>MU 함수에 NULL offset을 넘겨 UndefinedBehaviorSanitizer로 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>TPMS_MARSHAL_0</code>·<code>TPMS_UNMARSHAL_0</code>도 다른 매크로처럼 <code>offset ? *offset : 0xffff</code>를 씁니다. 수정을 되돌리면 새 단위 시험이 UBSan 보고로 멈추고, 고친 뒤 <code>TPMS-marshal</code> 시험 12개가 모두 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
+        </details></div>
       </details></div>
-    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:26.7%;background:var(--c-hardening,var(--accent))" title="보안 강화 4"></span><span class="seg" style="width:46.7%;background:var(--c-bugfix,var(--accent))" title="버그 수정 7"></span><span class="seg" style="width:20.0%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:6.7%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 4</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 7</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span></div>
+    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:23.5%;background:var(--c-hardening,var(--accent))" title="보안 강화 4"></span><span class="seg" style="width:52.9%;background:var(--c-bugfix,var(--accent))" title="버그 수정 9"></span><span class="seg" style="width:17.6%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:5.9%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 4</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 9</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span></div>
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
   </section>
 
