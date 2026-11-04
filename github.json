@@ -362,14 +362,14 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 69,
     "pending": 0
    },
-   "ci_waiting": 8,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": "2026-11-03",
-   "last_response": "2026-11-03",
+   "last_response": "2026-11-04",
    "opened": "2026-11-03",
    "stage": "rereview"
   },
