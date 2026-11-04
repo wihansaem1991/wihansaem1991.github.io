@@ -35,6 +35,9 @@ UI = {
         "repos_hint": "Repositories I am auditing now: what each project is and what I look at there. "
                       "Pull request counts by stage are refreshed every hour.",
         "focus": "Looking at", "prs": "{n} pull requests", "no_prs": "No pull request yet",
+        "wins_title": "Shipped to these projects",
+        "wins_intro": "{n} contributions are in {projects} open-source projects.",
+        "wins_count": "{n}",
         "summary": "{prs} pull requests and {vulns} vulnerability reports · {replied} with a maintainer reply · {cves} CVEs",
         "vuln": "Vulnerability report",
         "private_body": "Reported through the project's private channel. Details follow once the project publishes a fix.",
@@ -74,6 +77,9 @@ UI = {
         "repos_hint": "지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었고, "
                       "단계별 PR 수는 매시간 갱신합니다.",
         "focus": "보는 것", "prs": "PR {n}건", "no_prs": "아직 PR 없음",
+        "wins_title": "오픈소스에 반영된 기여",
+        "wins_intro": "오픈소스 프로젝트 {projects}곳에 기여 {n}건이 들어갔습니다.",
+        "wins_count": "{n}건",
         "summary": "제출 PR {prs}건 · 취약점 보고 {vulns}건 · 메인테이너 응답 {replied}건 · CVE {cves}건",
         "vuln": "취약점 보고",
         "private_body": "프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.",
@@ -139,6 +145,13 @@ def anchor(e):
 def stage_of(e, ev):
     live = (ev.get(key(e)) or {}).get("live") or {}
     return live.get("stage") or ("open" if e.get("status") not in DONE else e["status"])
+
+
+def landed(e, ev):
+    """A contribution that reached the project: merged, or applied/approved by a maintainer.
+    `approved` covers OpenSSL-style projects that commit a change to master by hand (the pull
+    request then shows as closed on GitHub, which is not a rejection)."""
+    return e.get("status") in ("merged", "approved", "accepted") or stage_of(e, ev) == "merged"
 
 
 def badge(e, ev, t):
@@ -294,6 +307,42 @@ def repo_card(r, lang, ev, entries):
     </article>"""
 
 
+def wins_section(data, lang, ev):
+    """A lead showcase of the contributions that reached their projects, grouped by project and
+    shown as what each change did — no review-stage labels."""
+    t = UI[lang]
+    won = [e for e in (data.get("entries") or []) if landed(e, ev)]
+    if not won:
+        return ""
+    groups = {}
+    for e in won:
+        groups.setdefault(e["project"], []).append(e)
+    cards = []
+    for proj, es in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0].lower())):
+        repos = sorted({e["repo"] for e in es})
+        owner = es[0]["repo"].split("/")[0]
+        url = f'https://github.com/{es[0]["repo"]}' if len(repos) == 1 else f'https://github.com/{owner}'
+        multi = len(repos) > 1
+        items = []
+        for e in sorted(es, key=lambda e: (e["repo"], -(int(str(e["pr"])) if str(e["pr"]).isdigit() else 0))):
+            crate = f'<code>{html.escape(e["repo"].split("/")[-1])}</code> ' if multi else ""
+            items.append(f'<li>{crate}<a href="{html.escape(pr_url(e))}" target="_blank" rel="noopener">'
+                         f'{text(pick(e["title"], lang))} ↗</a></li>')
+        cards.append(f"""
+      <article class="win">
+        <div class="win-head"><a href="{url}" target="_blank" rel="noopener"><b>{text(proj)}</b></a>
+          <span class="win-count">{t["wins_count"].format(n=len(es))}</span></div>
+        <ul>{''.join(items)}</ul>
+      </article>""")
+    intro = t["wins_intro"].format(n=len(won), projects=len(groups))
+    return f"""
+  <section class="wins" id="wins">
+    <h2>{t["wins_title"]}</h2>
+    <p class="wins-intro">{html.escape(intro)}</p>
+    <div class="win-grid">{''.join(cards)}</div>
+  </section>"""
+
+
 def render(data, lang, tmpl, ev, today):
     t, owner = UI[lang], data["owner"]
     entries = sorted(data.get("entries") or [],
@@ -313,11 +362,13 @@ def render(data, lang, tmpl, ev, today):
     replied = sum(1 for e in entries if ((ev.get(key(e)) or {}).get("live") or {}).get("first_response"))
     cves = sum(1 for e in entries if e.get("cve")) + sum(1 for v in vulns if v.get("cve"))
     labels = {"owner": owner["github"], "stages": t["stages"], "live": t["live"], "loading": t["loading"],
-              "snapshot": t["snapshot"].format(d=today.isoformat()), "groups": GROUP}
+              "snapshot": t["snapshot"].format(d=today.isoformat()), "groups": GROUP,
+              "landed": [key(e) for e in entries if landed(e, ev)]}
     subs = {
         "html_lang": t["html_lang"], "name": html.escape(owner["name"]),
         "title_suffix": t["title_suffix"], "tagline": html.escape(pick(owner["tagline"], lang)),
         "switch": t["switch"], "loading": t["loading"], "hint": t["hint"], "empty_tab": t["empty_tab"],
+        "wins": wins_section(data, lang, ev),
         "summary": html.escape(t["summary"].format(prs=len(entries), vulns=len(vulns), replied=replied, cves=cves)),
         "tags": "".join(f"<li>{html.escape(a)}</li>" for a in pick(owner["areas"], lang)),
         "tabs": tabs,
