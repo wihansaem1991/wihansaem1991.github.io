@@ -95,7 +95,7 @@
   <div class="summary">제출 PR 39건 · 취약점 보고 9건 · 메인테이너 응답 22건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">48</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">3</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">18</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">전체 <span class="count" id="c-all">48</span></button><button type="button" role="tab" class="tab" data-tab="done">승인·머지 <span class="count" id="c-done">13</span></button><button type="button" role="tab" class="tab" data-tab="review">리뷰 중 <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">CI 허가 대기 <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">닫힘 <span class="count" id="c-closed">6</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE 도전 <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">분석 중인 저장소 <span class="count" id="c-repos">18</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
@@ -232,17 +232,6 @@
       <dl><dt>문제</dt><dd>추출 전용 모드의 HKDF·TLS13-KDF 출력은 다이제스트 하나 길이입니다. 기본 provider는 다른 길이를 처음부터 거부하는데, pkcs11-provider는 요청 길이를 토큰에 넘기고 토큰이 값을 돌려준 뒤에야 길이를 확인했습니다.</dd><dt>배경 지식</dt><dd>HKDF(RFC 5869) 추출 단계, PKCS#11 HKDF 메커니즘, OpenSSL KDF provider API 지식이 필요했습니다. provider는 토큰을 부르기 전에 기본 provider와 같은 길이 규칙을 지켜야 합니다.</dd><dt>찾은 방법</dt><dd>여러 출력 길이로 추출 전용 HKDF를 기본 provider와 pkcs11-provider에 각각 돌려 결과를 비교해 찾았습니다.</dd><dt>수정</dt><dd>파생 전에 길이를 확인하고 기본 provider와 같은 오류를 냅니다. 새 <code>hkdfextract</code> 시험은 SHA-256·SHA-512로 HKDF·TLS13-KDF를 확인하고, 검사를 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">PR 원문 #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816#pullrequestreview-5748368367" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/20994e1d194a5d7cdbf84f388f90e6d267d218d8" target="_blank" rel="noopener">머지 커밋 20994e1d19 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="openssl-openssl-33476" data-group="done">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge approved" data-pr="openssl/openssl#33476">승인</span></span>
-      <span class="line2">PBKDF1 derive_skey 버퍼를 0으로 채우지 않고 할당</span>
-      <span class="line3">제출 2026-11-02 · 1일째 · 첫 응답 2026-11-03 · CI <span class="ok">✓105</span> <span class="bad">✗1</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · 코드 정리 · 승인 2026-11-03 ↗</a></div>
-      <dl><dt>문제</dt><dd><code>kdf_pbkdf1_derive_skey()</code>가 키 버퍼를 <code>OPENSSL_zalloc()</code>으로 할당했지만, 유도가 모든 바이트를 쓰기 전에 그 버퍼를 읽는 곳이 없고 실패하면 읽지 않은 채 지우고 해제합니다. 0으로 채우는 일이 쓸모없었습니다.</dd><dt>배경 지식</dt><dd>#33444(PBKDF1 키를 실패 때 지우기) 리뷰에서 리뷰어가 짚었고, 그 PR 범위를 지키려고 따로 낸 변경입니다.</dd><dt>찾은 방법</dt><dd>#33444 리뷰 지적을 <code>kdf_pbkdf1_do_derive()</code>의 버퍼 쓰기 전부와 대조해 확인했습니다.</dd><dt>수정</dt><dd><code>OPENSSL_zalloc()</code> 대신 <code>OPENSSL_malloc()</code>을 씁니다. <code>--strict-warnings</code> 빌드에서 경고 0, <code>test_evp_kdf</code> (<code>test_kdf_pbkdf1_skey</code> 포함) 통과.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">PR 원문 #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5746861003" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5747020711" target="_blank" rel="noopener">paulidale ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="OpenVPN-openvpn-2079" data-group="done">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2079">승인</span></span>
@@ -375,17 +364,6 @@
       <dl><dt>문제</dt><dd><code>BoxedUint::from_be_slice</code>·<code>from_le_slice</code> 문서는 값이 <code>bits_precision</code>보다 넓으면 <code>DecodeError::Precision</code>을 돌려준다고 적었습니다. #1266 뒤로 두 함수는 그 비트를 지우고 <code>Ok</code>를 돌려주고, 그 PR이 시험도 그렇게 바꿨습니다.</dd><dt>배경 지식</dt><dd>고정 정밀도 정수 타입은 정밀도보다 넓은 입력을 거부할지, RFC 6979 <code>bits2int</code>처럼 잘라 받을지 밝혀야 합니다. 비밀값을 읽는 호출자가 그 약속에 기댑니다.</dd><dt>찾은 방법</dt><dd>문서에 적힌 오류마다 실제 코드 경로와 맞춰 보고, <code>git log -S</code>로 어긋난 시점을 #1266까지 거슬러 찾았습니다.</dd><dt>수정</dt><dd>잘라 받는 동작을 적고 오류는 <code>DecodeError::InputSize</code>만 남겼습니다. 메인테이너가 옛 오류를 되살리기를 원하면 그쪽으로 바꾸겠다고 PR에 적었습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">PR 원문 #1383 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1383/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="OpenSC-OpenSC-3917" data-group="review">
-    <summary>
-      <span class="line1"><b>OpenSC</b> <span class="badge review" data-pr="OpenSC/OpenSC#3917">리뷰 대기</span></span>
-      <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
-      <span class="line3">제출 2026-11-01 · 3일째 · 첫 응답 2026-11-03 · CI <span class="ok">✓68</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd>OpenSC PKCS#11 모듈은 공개키로 서명 검증은 했지만 암호화는 못 했습니다. RSA 공개키로 <code>C_EncryptInit()</code>을 부르면 <code>CKR_KEY_TYPE_INCONSISTENT</code>로 실패했습니다(#3144). 시험 도구 p11test도 그 기능을 켜는 값을 시험 준비 단계에서 빠뜨려 <code>C_Encrypt()</code>를 한 번도 부르지 않았습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 객체 연산과 메커니즘 표시(<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5·패딩 없는 RSA 암호화, 그리고 OpenSC가 <code>C_Verify()</code>를 OpenSSL로 처리하는 기존 소프트웨어 경로를 썼습니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 입문 과제로 표시한 이슈입니다. 가상 SmartCard-HSM(pico-hsm 에뮬레이션 + vsmartcard + 사용자 모드 pcscd)으로 재현했고, pkcs11-spy로 p11test가 <code>C_Encrypt()</code>까지 가지 않는 것을 찾았습니다.</dd><dt>수정</dt><dd>공개키 객체가 OpenSSL로 <code>CKM_RSA_PKCS</code>·<code>CKM_RSA_X_509</code> 암호화를 하고, p11test가 그 값을 넘기게 고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이 같습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">PR 원문 #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="OpenVPN-openvpn-2075" data-group="review">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2075">리뷰 대기</span></span>
@@ -434,7 +412,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33524">리뷰 대기</span></span>
       <span class="line2">MSBLOB·PVK 개인키 블롭을 해제하기 전에 지우기</span>
-      <span class="line3">제출 2026-11-04 · 0일째 · 응답 아직 · CI <span class="ok">✓16</span> <span class="wait">…79</span></span>
+      <span class="line3">제출 2026-11-04 · 0일째 · 응답 아직 · CI <span class="ok">✓94</span> <span class="bad">✗1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33524" target="_blank" rel="noopener">openssl/openssl #33524 · 보안 강화 ↗</a></div>
@@ -450,6 +428,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">open-quantum-safe/oqs-provider #861 · 보안 강화 ↗</a></div>
       <dl><dt>문제</dt><dd>양자내성 개인키를 PKCS#8 DER로 인코딩·디코딩하거나 내보낼(export) 때, oqs-provider가 키의 임시 사본을 지우지 않고 해제했습니다. ML-KEM·ML-DSA를 비롯한 양자내성 개인키가 해제된 힙 메모리에 남았습니다.</dd><dt>배경 지식</dt><dd>OpenSSL 3 provider 안에서 키가 오가는 경로와 ISO/IEC 19790(FIPS 140-3·KCMVP)의 제로화 요건을 알아야 보이는 문제였습니다. <code>OSSL_PARAM_free()</code>는 보안 힙 블록만 지웁니다. 그래서 OpenSSL의 <code>ml_kem_export()</code>는 해제 전에 파라미터를 지우는데, oqs-provider에는 이 단계가 없었습니다.</dd><dt>찾은 방법</dt><dd>해제 블록 측정 프로그램을 알고리즘 111종에 돌렸습니다. 개인키가 든 해제 블록이 1,377개였고, 수정 뒤 oqs-provider 자체 경로(서명 55종 × 8개 경로)에서는 0개가 됐습니다. 남은 823개는 libcrypto 몫입니다. 키 교환 경로를 다시 재서 KEM 56종 전부에서 내보내기 사본을 찾았습니다.</dd><dt>수정</dt><dd>인코더·디코더는 <code>ASN1_STRING_clear_free()</code>·<code>OPENSSL_clear_free()</code>로 바꾸고, 내보낸 파라미터는 <code>OSSL_PARAM_free()</code> 전에 <code>OPENSSL_cleanse()</code>로 지웁니다. 새 시험 <code>oqs_privkey_cleanse</code>가 해제 블록을 감시하고, 수정을 하나라도 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">PR 원문 #861 ↗</a> · <a href="https://github.com/open-quantum-safe/oqs-provider/pull/861/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="OpenSC-OpenSC-3917" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenSC</b> <span class="badge ci_approval" data-pr="OpenSC/OpenSC#3917">CI 실행 허가 대기</span></span>
+      <span class="line2">pkcs11: RSA 공개키 암호화를 소프트웨어로 지원</span>
+      <span class="line3">제출 2026-11-01 · 3일째 · 첫 응답 2026-11-03 · CI <span class="wait">⏸12</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · 버그 수정 ↗</a></div>
+      <dl><dt>문제</dt><dd>OpenSC PKCS#11 모듈은 공개키로 서명 검증은 했지만 암호화는 못 했습니다. RSA 공개키로 <code>C_EncryptInit()</code>을 부르면 <code>CKR_KEY_TYPE_INCONSISTENT</code>로 실패했습니다(#3144). 시험 도구 p11test도 그 기능을 켜는 값을 시험 준비 단계에서 빠뜨려 <code>C_Encrypt()</code>를 한 번도 부르지 않았습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 객체 연산과 메커니즘 표시(<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5·패딩 없는 RSA 암호화, 그리고 OpenSC가 <code>C_Verify()</code>를 OpenSSL로 처리하는 기존 소프트웨어 경로를 썼습니다.</dd><dt>찾은 방법</dt><dd>메인테이너가 입문 과제로 표시한 이슈입니다. 가상 SmartCard-HSM(pico-hsm 에뮬레이션 + vsmartcard + 사용자 모드 pcscd)으로 재현했고, pkcs11-spy로 p11test가 <code>C_Encrypt()</code>까지 가지 않는 것을 찾았습니다.</dd><dt>수정</dt><dd>공개키 객체가 OpenSSL로 <code>CKM_RSA_PKCS</code>·<code>CKM_RSA_X_509</code> 암호화를 하고, p11test가 그 값을 넘기게 고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이 같습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">PR 원문 #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="schwabe-ics-openvpn-1941" data-group="ci">
@@ -527,6 +516,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">schwabe/ics-openvpn #1938 · 버그 수정 ↗</a></div>
       <dl><dt>문제</dt><dd>앞쪽 0 그룹이 있는 IPv6 주소가 그 그룹 없이 출력됐습니다(<code>::1</code>이 <code>1</code>, <code>::2:0</code>이 <code>2::</code>). 안드로이드 13 미만에서는 이 문자열로 VPN 경로를 설치합니다.</dd><dt>배경 지식</dt><dd>IPv6 문자 표기(RFC 4291/5952)와 안드로이드 <code>VpnService.Builder.addRoute()</code>의 경로 설치 방식을 썼습니다.</dd><dt>찾은 방법</dt><dd>무작위 주소로 앱의 주소 출력과 Python <code>ipaddress</code>를 비교해 찾았습니다.</dd><dt>수정</dt><dd>0에서 멈추지 않고 여덟 그룹을 모두 돌게 했습니다. 불일치가 1,524건에서 0건이 됐고 기존 시험의 문자열은 그대로입니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">PR 원문 #1938 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1938/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33476" data-group="closed">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge closed" data-pr="openssl/openssl#33476">닫힘</span></span>
+      <span class="line2">PBKDF1 derive_skey 버퍼를 0으로 채우지 않고 할당</span>
+      <span class="line3">제출 2026-11-02 · 2일째 · 첫 응답 2026-11-03 · CI <span class="ok">✓105</span> <span class="bad">✗1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · 코드 정리 · 승인 2026-11-03 ↗</a></div>
+      <dl><dt>문제</dt><dd><code>kdf_pbkdf1_derive_skey()</code>가 키 버퍼를 <code>OPENSSL_zalloc()</code>으로 할당했지만, 유도가 모든 바이트를 쓰기 전에 그 버퍼를 읽는 곳이 없고 실패하면 읽지 않은 채 지우고 해제합니다. 0으로 채우는 일이 쓸모없었습니다.</dd><dt>배경 지식</dt><dd>#33444(PBKDF1 키를 실패 때 지우기) 리뷰에서 리뷰어가 짚었고, 그 PR 범위를 지키려고 따로 낸 변경입니다.</dd><dt>찾은 방법</dt><dd>#33444 리뷰 지적을 <code>kdf_pbkdf1_do_derive()</code>의 버퍼 쓰기 전부와 대조해 확인했습니다.</dd><dt>수정</dt><dd><code>OPENSSL_zalloc()</code> 대신 <code>OPENSSL_malloc()</code>을 씁니다. <code>--strict-warnings</code> 빌드에서 경고 0, <code>test_evp_kdf</code> (<code>test_kdf_pbkdf1_skey</code> 포함) 통과.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">PR 원문 #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">바뀐 코드 ↗</a> · 승인한 리뷰어: <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5746861003" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5747020711" target="_blank" rel="noopener">paulidale ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="VR-1" data-group="cve">
@@ -611,7 +611,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">가장 널리 쓰이는 C TLS·암호 라이브러리</div>
       <div class="focus">보는 것: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)</div>
-      <div class="prs"><span>PR 8건</span> <span class="badge approved">승인 1</span> <span class="badge approved_pending">승인, 추가 리뷰 대기 1</span> <span class="badge review">리뷰 대기 5</span> <span class="badge closed">닫힘 1</span></div>
+      <div class="prs"><span>PR 8건</span> <span class="badge approved_pending">승인, 추가 리뷰 대기 1</span> <span class="badge review">리뷰 대기 5</span> <span class="badge closed">닫힘 2</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -701,7 +701,7 @@
       <div class="name"><b>OpenSC</b> <a href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener">OpenSC/OpenSC ↗</a></div>
       <div class="about">스마트카드 도구와 PKCS#11 모듈</div>
       <div class="focus">보는 것: PKCS#11 모듈의 빠진 기능(가상 카드로 시험)</div>
-      <div class="prs"><span>PR 1건</span> <span class="badge review">리뷰 대기 1</span></div>
+      <div class="prs"><span>PR 1건</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
     </article>
     <article class="repo" id="repo-schwabe-ics-openvpn">
       <div class="name"><b>OpenVPN for Android</b> <a href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener">schwabe/ics-openvpn ↗</a></div>

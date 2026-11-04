@@ -42,16 +42,16 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 68,
+    "pass": 0,
     "pending": 0
    },
-   "ci_waiting": 0,
+   "ci_waiting": 12,
    "draft": false,
    "ended": null,
    "first_response": "2026-11-03",
    "last_response": "2026-11-03",
    "opened": "2026-11-01",
-   "stage": "review"
+   "stage": "ci_approval"
   },
   "merge": null,
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
@@ -697,11 +697,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-04",
    "first_response": "2026-11-03",
-   "last_response": "2026-11-03",
+   "last_response": "2026-11-04",
    "opened": "2026-11-02",
-   "stage": "approved"
+   "stage": "closed"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33476"
@@ -729,9 +729,9 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 0,
-    "pass": 16,
-    "pending": 79
+    "fail": 1,
+    "pass": 94,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,

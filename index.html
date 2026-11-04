@@ -95,7 +95,7 @@
   <div class="summary">39 pull requests and 9 vulnerability reports · 22 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">48</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">3</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">18</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">48</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">13</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">4</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">6</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">18</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -232,17 +232,6 @@
       <dl><dt>Problem</dt><dd>In extract-only mode, HKDF and TLS13-KDF output exactly one digest. The default provider refuses any other output length up front; pkcs11-provider passed the requested length to the token and checked it only after the token had returned the derived value.</dd><dt>Background</dt><dd>HKDF (RFC 5869) extract step, the PKCS#11 HKDF mechanism and OpenSSL&#x27;s KDF provider API: the provider has to match the default provider&#x27;s length rules before calling the token.</dd><dt>How it was found</dt><dd>Running extract-only HKDF with several output lengths through both the default provider and pkcs11-provider and comparing the results.</dd><dt>Fix</dt><dd>Check the length before deriving and raise the default provider&#x27;s error. The new <code>hkdfextract</code> test covers HKDF and TLS13-KDF with SHA-256 and SHA-512, and fails with the check reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">Pull request #816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816#pullrequestreview-5748368367" target="_blank" rel="noopener">simo5 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/commit/20994e1d194a5d7cdbf84f388f90e6d267d218d8" target="_blank" rel="noopener">Merge commit 20994e1d19 ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="openssl-openssl-33476" data-group="done">
-    <summary>
-      <span class="line1"><b>OpenSSL</b> <span class="badge approved" data-pr="openssl/openssl#33476">Approved</span></span>
-      <span class="line2">Allocate the PBKDF1 derive_skey buffer without zeroing it</span>
-      <span class="line3">submitted 2026-11-02 · 1 days · first reply 2026-11-03 · CI <span class="ok">✓105</span> <span class="bad">✗1</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · Cleanup · Approved 2026-11-03 ↗</a></div>
-      <dl><dt>Problem</dt><dd><code>kdf_pbkdf1_derive_skey()</code> allocated the key buffer with <code>OPENSSL_zalloc()</code>, but nothing reads it before the derivation writes every byte, and on failure it is cleared and freed unread. The zero fill was wasted work.</dd><dt>Background</dt><dd>A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left for a separate change to keep that PR to its scope.</dd><dt>How it was found</dt><dd>Reviewer comment on</dd><dt>Fix</dt><dd><code>OPENSSL_malloc()</code> instead of <code>OPENSSL_zalloc()</code>. Built with <code>--strict-warnings</code>; <code>test_evp_kdf</code> passes, including <code>test_kdf_pbkdf1_skey</code>.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">Pull request #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5746861003" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5747020711" target="_blank" rel="noopener">paulidale ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="OpenVPN-openvpn-2079" data-group="done">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge approved" data-pr="OpenVPN/openvpn#2079">Approved</span></span>
@@ -375,17 +364,6 @@
       <dl><dt>Problem</dt><dd>The docs of <code>BoxedUint::from_be_slice</code> and <code>from_le_slice</code> promised <code>DecodeError::Precision</code> for a value wider than <code>bits_precision</code>. Since #1266 both functions mask those bits off and return <code>Ok</code>, and that PR changed the test to expect it.</dd><dt>Background</dt><dd>A fixed-precision integer type has to say what happens to input wider than its precision: reject it or truncate it, as RFC 6979 <code>bits2int</code> does. Callers decoding secret values rely on that answer.</dd><dt>How it was found</dt><dd>Comparing each documented error with the code path, then tracing the change back to #1266 with <code>git log -S</code>.</dd><dt>Fix</dt><dd>Describe the truncation and list only <code>DecodeError::InputSize</code>. The PR offers to restore the old error instead if the maintainers prefer it.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">Pull request #1383 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1383/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
-  <details class="entry" id="OpenSC-OpenSC-3917" data-group="review">
-    <summary>
-      <span class="line1"><b>OpenSC</b> <span class="badge review" data-pr="OpenSC/OpenSC#3917">Awaiting review</span></span>
-      <span class="line2">pkcs11: Encrypt with RSA public keys in software</span>
-      <span class="line3">submitted 2026-11-01 · 3 days · first reply 2026-11-03 · CI <span class="ok">✓68</span></span>
-    </summary>
-    <div class="body">
-      <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd>OpenSC&#x27;s PKCS#11 module could verify signatures with a public key but not encrypt with one: <code>C_EncryptInit()</code> on an RSA public key failed with <code>CKR_KEY_TYPE_INCONSISTENT</code> (#3144). The p11test suite also never called <code>C_Encrypt()</code>, because its group setup dropped the flag that enables it.</dd><dt>Background</dt><dd>PKCS#11 object operations and mechanism flags (<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5 and raw RSA encryption, and OpenSC&#x27;s existing software path for <code>C_Verify()</code> through OpenSSL.</dd><dt>How it was found</dt><dd>A maintainer-labelled good first issue. A virtual SmartCard-HSM (pico-hsm emulation behind vsmartcard and a user-mode pcscd) reproduced it, and pkcs11-spy showed p11test never reaching <code>C_Encrypt()</code>.</dd><dt>Fix</dt><dd>Public key objects encrypt with <code>CKM_RSA_PKCS</code> and <code>CKM_RSA_X_509</code> through OpenSSL, and p11test now keeps the flag. Card round trips work for both mechanisms; the CI p11test run matches the updated reference with no differences.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">Pull request #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
-    </div>
-  </details>
   <details class="entry" id="OpenVPN-openvpn-2075" data-group="review">
     <summary>
       <span class="line1"><b>OpenVPN</b> <span class="badge review" data-pr="OpenVPN/openvpn#2075">Awaiting review</span></span>
@@ -434,7 +412,7 @@
     <summary>
       <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33524">Awaiting review</span></span>
       <span class="line2">Clear the MSBLOB and PVK private key blobs before freeing them</span>
-      <span class="line3">submitted 2026-11-04 · 0 days · no reply yet · CI <span class="ok">✓16</span> <span class="wait">…79</span></span>
+      <span class="line3">submitted 2026-11-04 · 0 days · no reply yet · CI <span class="ok">✓94</span> <span class="bad">✗1</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/openssl/openssl/pull/33524" target="_blank" rel="noopener">openssl/openssl #33524 · Hardening ↗</a></div>
@@ -450,6 +428,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">open-quantum-safe/oqs-provider #861 · Hardening ↗</a></div>
       <dl><dt>Problem</dt><dd>When post-quantum private keys were encoded to or decoded from PKCS#8 DER, and when they were exported, oqs-provider freed temporary copies of the key without clearing them. ML-KEM, ML-DSA and the other post-quantum private keys stayed in released heap memory.</dd><dt>Background</dt><dd>How keys travel through an OpenSSL 3 provider, and the zeroisation rule of ISO/IEC 19790 (FIPS 140-3, KCMVP). <code>OSSL_PARAM_free()</code> clears only secure-heap blocks, which is why OpenSSL&#x27;s own <code>ml_kem_export()</code> cleanses its parameters before freeing them; oqs-provider had no such step.</dd><dt>How it was found</dt><dd>The freed-block measurement program run over 111 algorithms: 1,377 freed blocks held private keys. The fix removes every one on oqs-provider&#x27;s own paths (55 signature algorithms × 8 paths); the 823 left come from libcrypto. A second run over the key-exchange paths found the export copy for all 56 KEM algorithms.</dd><dt>Fix</dt><dd><code>ASN1_STRING_clear_free()</code> and <code>OPENSSL_clear_free()</code> in the encoder and decoder, and <code>OPENSSL_cleanse()</code> of the exported parameters before <code>OSSL_PARAM_free()</code>. A new test, <code>oqs_privkey_cleanse</code>, watches freed blocks and fails if any of the changes is reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/open-quantum-safe/oqs-provider/pull/861" target="_blank" rel="noopener">Pull request #861 ↗</a> · <a href="https://github.com/open-quantum-safe/oqs-provider/pull/861/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="OpenSC-OpenSC-3917" data-group="ci">
+    <summary>
+      <span class="line1"><b>OpenSC</b> <span class="badge ci_approval" data-pr="OpenSC/OpenSC#3917">Awaiting CI approval</span></span>
+      <span class="line2">pkcs11: Encrypt with RSA public keys in software</span>
+      <span class="line3">submitted 2026-11-01 · 3 days · first reply 2026-11-03 · CI <span class="wait">⏸12</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">OpenSC/OpenSC #3917 · Bug fix ↗</a></div>
+      <dl><dt>Problem</dt><dd>OpenSC&#x27;s PKCS#11 module could verify signatures with a public key but not encrypt with one: <code>C_EncryptInit()</code> on an RSA public key failed with <code>CKR_KEY_TYPE_INCONSISTENT</code> (#3144). The p11test suite also never called <code>C_Encrypt()</code>, because its group setup dropped the flag that enables it.</dd><dt>Background</dt><dd>PKCS#11 object operations and mechanism flags (<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5 and raw RSA encryption, and OpenSC&#x27;s existing software path for <code>C_Verify()</code> through OpenSSL.</dd><dt>How it was found</dt><dd>A maintainer-labelled good first issue. A virtual SmartCard-HSM (pico-hsm emulation behind vsmartcard and a user-mode pcscd) reproduced it, and pkcs11-spy showed p11test never reaching <code>C_Encrypt()</code>.</dd><dt>Fix</dt><dd>Public key objects encrypt with <code>CKM_RSA_PKCS</code> and <code>CKM_RSA_X_509</code> through OpenSSL, and p11test now keeps the flag. Card round trips work for both mechanisms; the CI p11test run matches the updated reference with no differences.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">Pull request #3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="schwabe-ics-openvpn-1941" data-group="ci">
@@ -527,6 +516,17 @@
     <div class="body">
       <div class="meta"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">schwabe/ics-openvpn #1938 · Bug fix ↗</a></div>
       <dl><dt>Problem</dt><dd>IPv6 addresses with leading zero groups were printed without them (<code>::1</code> as <code>1</code>, <code>::2:0</code> as <code>2::</code>). On Android below 13 that string is used to install VPN routes.</dd><dt>Background</dt><dd>IPv6 text representation (RFC 4291/5952) and Android&#x27;s <code>VpnService.Builder.addRoute()</code> route installation.</dd><dt>How it was found</dt><dd>Comparing the app&#x27;s address formatting with Python&#x27;s <code>ipaddress</code> on random addresses.</dd><dt>Fix</dt><dd>Walk all eight groups instead of stopping at zero; mismatches went from 1,524 to 0 and existing test strings are unchanged.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/schwabe/ics-openvpn/pull/1938" target="_blank" rel="noopener">Pull request #1938 ↗</a> · <a href="https://github.com/schwabe/ics-openvpn/pull/1938/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
+  <details class="entry" id="openssl-openssl-33476" data-group="closed">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge closed" data-pr="openssl/openssl#33476">Closed</span></span>
+      <span class="line2">Allocate the PBKDF1 derive_skey buffer without zeroing it</span>
+      <span class="line3">submitted 2026-11-02 · 2 days · first reply 2026-11-03 · CI <span class="ok">✓105</span> <span class="bad">✗1</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">openssl/openssl #33476 · Cleanup · Approved 2026-11-03 ↗</a></div>
+      <dl><dt>Problem</dt><dd><code>kdf_pbkdf1_derive_skey()</code> allocated the key buffer with <code>OPENSSL_zalloc()</code>, but nothing reads it before the derivation writes every byte, and on failure it is cleared and freed unread. The zero fill was wasted work.</dd><dt>Background</dt><dd>A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left for a separate change to keep that PR to its scope.</dd><dt>How it was found</dt><dd>Reviewer comment on</dd><dt>Fix</dt><dd><code>OPENSSL_malloc()</code> instead of <code>OPENSSL_zalloc()</code>. Built with <code>--strict-warnings</code>; <code>test_evp_kdf</code> passes, including <code>test_kdf_pbkdf1_skey</code>.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">Pull request #33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">Changed files ↗</a> · Approved by: <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5746861003" target="_blank" rel="noopener">esyr ↗</a>, <a href="https://github.com/openssl/openssl/pull/33476#pullrequestreview-5747020711" target="_blank" rel="noopener">paulidale ↗</a></dd></dl>
     </div>
   </details>
   <details class="entry" id="VR-1" data-group="cve">
@@ -611,7 +611,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">The most widely deployed TLS and cryptography library, in C</div>
       <div class="focus">Looking at: Secrets left in freed memory, measured by hooking the allocator</div>
-      <div class="prs"><span>8 pull requests</span> <span class="badge approved">Approved 1</span> <span class="badge approved_pending">Approved, awaiting another review 1</span> <span class="badge review">Awaiting review 5</span> <span class="badge closed">Closed 1</span></div>
+      <div class="prs"><span>8 pull requests</span> <span class="badge approved_pending">Approved, awaiting another review 1</span> <span class="badge review">Awaiting review 5</span> <span class="badge closed">Closed 2</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
@@ -701,7 +701,7 @@
       <div class="name"><b>OpenSC</b> <a href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener">OpenSC/OpenSC ↗</a></div>
       <div class="about">Smart card tools and PKCS#11 module</div>
       <div class="focus">Looking at: Gaps in the PKCS#11 module, tested on a virtual card</div>
-      <div class="prs"><span>1 pull requests</span> <span class="badge review">Awaiting review 1</span></div>
+      <div class="prs"><span>1 pull requests</span> <span class="badge ci_approval">Awaiting CI approval 1</span></div>
     </article>
     <article class="repo" id="repo-schwabe-ics-openvpn">
       <div class="name"><b>OpenVPN for Android</b> <a href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener">schwabe/ics-openvpn ↗</a></div>
