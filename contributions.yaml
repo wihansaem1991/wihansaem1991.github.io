@@ -117,6 +117,56 @@ entries:
 
   - project: OpenSSL
     repo: openssl/openssl
+    pr: 33524
+    title:
+      en: Clear the MSBLOB and PVK private key blobs before freeing them
+      ko: "MSBLOB·PVK 개인키 블롭을 해제하기 전에 지우기"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-04
+    decided: null
+    defect:
+      en: >-
+        The MSBLOB and PVK encoders and decoders free the buffer holding the private key blob with
+        `OPENSSL_free()`, leaving the RSA or DSA private key in freed memory: after writing an MSBLOB
+        or an unencrypted PVK, on the PVK encryption-failure path, after reading an MSBLOB, and after
+        decrypting a PVK. Six distinct free sites were still holding the key.
+      ko: >-
+        MSBLOB·PVK 인코더와 디코더가 개인키 블롭이 담긴 버퍼를 `OPENSSL_free()`로 풀면서 RSA·DSA 개인키를
+        해제된 메모리에 남겼습니다. MSBLOB이나 암호화 안 한 PVK를 쓴 뒤, PVK 암호화 실패 경로, MSBLOB을 읽은
+        뒤, PVK를 복호한 뒤입니다. 키를 그대로 들고 있던 해제 지점이 여섯 곳이었습니다.
+    background:
+      en: >-
+        Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) across the legacy MSBLOB/PVK paths and their
+        provider encoders/decoders. The same file already clears one copy in `do_PVK_key_bio()` with
+        `OPENSSL_clear_free()`, so the remaining sites follow the pattern reviewers accepted in
+        #33430 and #33444.
+      ko: >-
+        제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 레거시 MSBLOB·PVK 경로와 그 provider 인코더/디코더에
+        적용했습니다. 같은 파일 `do_PVK_key_bio()`는 이미 한 복사본을 `OPENSSL_clear_free()`로 지우므로, 나머지
+        지점도 #33430·#33444에서 리뷰어가 받아들인 방식을 따랐습니다.
+    found_by:
+      en: >-
+        A freed-block measurement program that searches freed heap for the RSA private exponent in
+        both byte orders, run over the legacy pvkfmt API and the provider encoders/decoders.
+      ko: >-
+        해제된 힙에서 RSA 개인 지수를 빅·리틀 엔디언 둘 다로 찾는 해제 블록 측정 프로그램을 레거시 pvkfmt API와
+        provider 인코더/디코더에 돌려 찾았습니다.
+    fix:
+      en: >-
+        Replace the seven `OPENSSL_free()` calls with `OPENSSL_clear_free(<buf>, <len>)` using the
+        lengths already tracked for each buffer, and initialise `length` in `msblob2key_decode()`.
+        After the fix all twelve measured calls are clean; the regression test waits on the shared
+        allocator-hook helper in #33477.
+      ko: >-
+        일곱 곳의 `OPENSSL_free()`를 각 버퍼가 이미 들고 있던 길이로 `OPENSSL_clear_free(<buf>, <len>)`로
+        바꾸고, `msblob2key_decode()`의 `length`를 초기화했습니다. 수정 뒤 측정한 열두 호출이 모두 깨끗합니다.
+        회귀 시험은 #33477의 공용 할당자 가로채기 도우미를 기다립니다.
+
+  - project: OpenSSL
+    repo: openssl/openssl
     pr: 33430
     title:
       en: Clear the `EVP_ENCODE_CTX` when freeing it
