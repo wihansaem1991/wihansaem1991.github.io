@@ -23,7 +23,21 @@
   header p { margin: 0; color: var(--muted); font-size: 15px; }
   .tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; padding:0; list-style:none; }
   .tags li { border:1px solid var(--line); border-radius:999px; padding:1px 10px; font-size:12px; color:var(--muted); }
-  .summary { margin-top:20px; font-size:15px; }
+  .wins { margin: 24px 0 8px; }
+  .wins h2 { font-size: 20px; margin: 0 0 4px; letter-spacing:-0.01em; }
+  .wins-intro { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  .win-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:10px; }
+  .win { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--ok);
+         border-radius:12px; padding:12px 16px; overflow-wrap:anywhere; }
+  .win-head { display:flex; align-items:baseline; gap:8px; margin-bottom:8px; }
+  .win-head a { text-decoration:none; }
+  .win-head b { font-size:15px; color:var(--fg); }
+  .win-count { margin-left:auto; color:var(--muted); font-size:12px; white-space:nowrap; }
+  .win ul { margin:0; padding:0; list-style:none; display:grid; gap:7px; }
+  .win li { font-size:14px; line-height:1.45; }
+  .win li a { color:var(--fg); }
+  .win li code { font-size:12px; margin-right:2px; }
+  .summary { margin-top:28px; font-size:15px; }
   .live { color:var(--muted); font-size:13px; }
   .tabbar { position: sticky; top: 0; z-index: 2; background: var(--bg); margin: 16px -20px 0; padding: 10px 20px;
             display:flex; gap:8px; overflow-x:auto; border-bottom:1px solid var(--line); scrollbar-width: none; }
@@ -92,6 +106,31 @@
     <ul class="tags"><li>양자내성암호(PQC)</li><li>KCMVP 암호모듈 검증</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI 시스템</li></ul>
   </header>
 
+  <section class="wins" id="wins">
+    <h2>오픈소스에 반영된 기여</h2>
+    <p class="wins-intro">오픈소스 프로젝트 4곳에 기여 15건이 들어갔습니다.</p>
+    <div class="win-grid">
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/RustCrypto" target="_blank" rel="noopener"><b>RustCrypto</b></a>
+          <span class="win-count">6건</span></div>
+        <ul><li><code>AEADs</code> <a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">eax: Wycheproof 시험 벡터 추가 ↗</a></li><li><code>RSA</code> <a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">wycheproof: OAEP 복호화 벡터 시험 추가 ↗</a></li><li><code>crypto-bigint</code> <a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">BoxedUint: &quot;0&quot;을 limb 1개짜리 0으로 읽기 ↗</a></li><li><code>formats</code> <a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">pkcs5: <code>MAX_LEN</code>보다 긴 솔트에 <code>Salt::new</code>가 패닉 대신 오류를 돌려줌 ↗</a></li><li><code>formats</code> <a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">der: 잘못된 이진 REAL 값을 패닉 대신 오류로 거부 ↗</a></li><li><code>signatures</code> <a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">ml-dsa: context가 있는 Wycheproof 검증 벡터도 시험 ↗</a></li></ul>
+      </article>
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener"><b>pkcs11-provider</b></a>
+          <span class="win-count">4건</span></div>
+        <ul><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">kdf: 추출 전용 HKDF 출력 길이가 다이제스트와 다르면 거부 ↗</a></li><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">RSA 무패딩 서명 입력을 버퍼 크기가 아니라 모듈러스와 비교 ↗</a></li><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">CKR_BUFFER_TOO_SMALL 뒤 서명 작업 취소 ↗</a></li><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">큰 버퍼에도 ECDH 공유 비밀값만 돌려주기 ↗</a></li></ul>
+      </article>
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/OpenVPN/openvpn" target="_blank" rel="noopener"><b>OpenVPN</b></a>
+          <span class="win-count">3건</span></div>
+        <ul><li><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">tls_crypt: tls-crypt-v2 클라이언트 키 사본 지우기 ↗</a></li><li><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">crypto_openssl: PEM에서 디코딩한 키 데이터를 해제 전에 지우기 ↗</a></li><li><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">auth_token: 서버 비밀키를 읽은 뒤 지우기 ↗</a></li></ul>
+      </article>
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/openssl/openssl" target="_blank" rel="noopener"><b>OpenSSL</b></a>
+          <span class="win-count">2건</span></div>
+        <ul><li><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">PBKDF1 derive_skey 버퍼를 0으로 채우지 않고 할당 ↗</a></li><li><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener"><code>kdf_pbkdf1_derive_skey()</code>에서 PBKDF1 파생 키를 지우고 해제 ↗</a></li></ul>
+      </article></div>
+  </section>
   <div class="summary">제출 PR 39건 · 취약점 보고 9건 · 메인테이너 응답 22건 · CVE 0건</div>
   <div class="live" id="live">GitHub에서 현재 단계를 읽는 중…</div>
 
@@ -719,7 +758,7 @@
 
   <footer>2026-11-04 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
-<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "approved_pending": "승인, 추가 리뷰 대기", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-11-04 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
+<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "머지됨", "approved": "승인", "approved_pending": "승인, 추가 리뷰 대기", "rereview": "수정 반영, 재리뷰 대기", "changes": "수정 요청", "review": "리뷰 대기", "ci_approval": "CI 실행 허가 대기", "closed": "닫힘", "open": "열림"}, "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).", "loading": "GitHub에서 현재 단계를 읽는 중…", "snapshot": "2026-11-04 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}, "landed": ["openssl-projects/pkcs11-provider#813", "RustCrypto/signatures#1493", "RustCrypto/RSA#740", "RustCrypto/crypto-bigint#1382", "openssl-projects/pkcs11-provider#814", "openssl-projects/pkcs11-provider#815", "RustCrypto/formats#2501", "OpenVPN/openvpn#2076", "OpenVPN/openvpn#2077", "RustCrypto/AEADs#894", "RustCrypto/formats#2502", "openssl-projects/pkcs11-provider#816", "openssl/openssl#33476", "OpenVPN/openvpn#2079", "openssl/openssl#33444"]}</script>
 <script>
 (() => {
   const L = JSON.parse(document.getElementById("labels").textContent);
@@ -781,10 +820,13 @@
       const id = (it) => it.repository_url.replace("https://api.github.com/repos/", "") + "#" + it.number;
       const ok = new Set(approved.items.map(id));
       const asked = new Set(changes.items.map(id));
+      const landed = new Set(L.landed || []);
       for (const it of all.items) {
         let stage = null;
         if (it.pull_request && it.pull_request.merged_at) stage = "merged";
-        else if (it.state === "closed") stage = "closed";
+        /* a maintainer who applies a change to master by hand leaves the pull request closed,
+           not merged; keep the stage we recorded for those instead of showing "closed" */
+        else if (it.state === "closed" && !landed.has(id(it))) stage = "closed";
         else if (ok.has(id(it)) && !asked.has(id(it))) stage = "approved";
         if (!stage) continue;
         for (const el of document.querySelectorAll('[data-pr="' + CSS.escape(id(it)) + '"]')) {

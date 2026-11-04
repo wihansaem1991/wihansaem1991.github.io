@@ -23,7 +23,21 @@
   header p { margin: 0; color: var(--muted); font-size: 15px; }
   .tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; padding:0; list-style:none; }
   .tags li { border:1px solid var(--line); border-radius:999px; padding:1px 10px; font-size:12px; color:var(--muted); }
-  .summary { margin-top:20px; font-size:15px; }
+  .wins { margin: 24px 0 8px; }
+  .wins h2 { font-size: 20px; margin: 0 0 4px; letter-spacing:-0.01em; }
+  .wins-intro { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  .win-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:10px; }
+  .win { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--ok);
+         border-radius:12px; padding:12px 16px; overflow-wrap:anywhere; }
+  .win-head { display:flex; align-items:baseline; gap:8px; margin-bottom:8px; }
+  .win-head a { text-decoration:none; }
+  .win-head b { font-size:15px; color:var(--fg); }
+  .win-count { margin-left:auto; color:var(--muted); font-size:12px; white-space:nowrap; }
+  .win ul { margin:0; padding:0; list-style:none; display:grid; gap:7px; }
+  .win li { font-size:14px; line-height:1.45; }
+  .win li a { color:var(--fg); }
+  .win li code { font-size:12px; margin-right:2px; }
+  .summary { margin-top:28px; font-size:15px; }
   .live { color:var(--muted); font-size:13px; }
   .tabbar { position: sticky; top: 0; z-index: 2; background: var(--bg); margin: 16px -20px 0; padding: 10px 20px;
             display:flex; gap:8px; overflow-x:auto; border-bottom:1px solid var(--line); scrollbar-width: none; }
@@ -91,7 +105,7 @@
     <p>{{tagline}}</p>
     <ul class="tags">{{tags}}</ul>
   </header>
-
+{{wins}}
   <div class="summary">{{summary}}</div>
   <div class="live" id="live">{{loading}}</div>
 
@@ -172,10 +186,13 @@
       const id = (it) => it.repository_url.replace("https://api.github.com/repos/", "") + "#" + it.number;
       const ok = new Set(approved.items.map(id));
       const asked = new Set(changes.items.map(id));
+      const landed = new Set(L.landed || []);
       for (const it of all.items) {
         let stage = null;
         if (it.pull_request && it.pull_request.merged_at) stage = "merged";
-        else if (it.state === "closed") stage = "closed";
+        /* a maintainer who applies a change to master by hand leaves the pull request closed,
+           not merged; keep the stage we recorded for those instead of showing "closed" */
+        else if (it.state === "closed" && !landed.has(id(it))) stage = "closed";
         else if (ok.has(id(it)) && !asked.has(id(it))) stage = "approved";
         if (!stage) continue;
         for (const el of document.querySelectorAll('[data-pr="' + CSS.escape(id(it)) + '"]')) {

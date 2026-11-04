@@ -23,7 +23,21 @@
   header p { margin: 0; color: var(--muted); font-size: 15px; }
   .tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; padding:0; list-style:none; }
   .tags li { border:1px solid var(--line); border-radius:999px; padding:1px 10px; font-size:12px; color:var(--muted); }
-  .summary { margin-top:20px; font-size:15px; }
+  .wins { margin: 24px 0 8px; }
+  .wins h2 { font-size: 20px; margin: 0 0 4px; letter-spacing:-0.01em; }
+  .wins-intro { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  .win-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:10px; }
+  .win { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--ok);
+         border-radius:12px; padding:12px 16px; overflow-wrap:anywhere; }
+  .win-head { display:flex; align-items:baseline; gap:8px; margin-bottom:8px; }
+  .win-head a { text-decoration:none; }
+  .win-head b { font-size:15px; color:var(--fg); }
+  .win-count { margin-left:auto; color:var(--muted); font-size:12px; white-space:nowrap; }
+  .win ul { margin:0; padding:0; list-style:none; display:grid; gap:7px; }
+  .win li { font-size:14px; line-height:1.45; }
+  .win li a { color:var(--fg); }
+  .win li code { font-size:12px; margin-right:2px; }
+  .summary { margin-top:28px; font-size:15px; }
   .live { color:var(--muted); font-size:13px; }
   .tabbar { position: sticky; top: 0; z-index: 2; background: var(--bg); margin: 16px -20px 0; padding: 10px 20px;
             display:flex; gap:8px; overflow-x:auto; border-bottom:1px solid var(--line); scrollbar-width: none; }
@@ -92,6 +106,31 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
+  <section class="wins" id="wins">
+    <h2>Shipped to these projects</h2>
+    <p class="wins-intro">15 contributions are in 4 open-source projects.</p>
+    <div class="win-grid">
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/RustCrypto" target="_blank" rel="noopener"><b>RustCrypto</b></a>
+          <span class="win-count">6</span></div>
+        <ul><li><code>AEADs</code> <a href="https://github.com/RustCrypto/AEADs/pull/894" target="_blank" rel="noopener">eax: add Wycheproof test vectors ↗</a></li><li><code>RSA</code> <a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">wycheproof: test OAEP decryption ↗</a></li><li><code>crypto-bigint</code> <a href="https://github.com/RustCrypto/crypto-bigint/pull/1382" target="_blank" rel="noopener">BoxedUint: parse &quot;0&quot; as a one-limb zero ↗</a></li><li><code>formats</code> <a href="https://github.com/RustCrypto/formats/pull/2502" target="_blank" rel="noopener">pkcs5: return an error from <code>Salt::new</code> for salts longer than <code>MAX_LEN</code> ↗</a></li><li><code>formats</code> <a href="https://github.com/RustCrypto/formats/pull/2501" target="_blank" rel="noopener">der: reject malformed binary REAL values instead of panicking ↗</a></li><li><code>signatures</code> <a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">ml-dsa: check Wycheproof verify vectors that have a context ↗</a></li></ul>
+      </article>
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener"><b>pkcs11-provider</b></a>
+          <span class="win-count">4</span></div>
+        <ul><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">kdf: Reject extract-only output lengths other than the digest size ↗</a></li><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">Check raw RSA sign data against the modulus, not the buffer size ↗</a></li><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">Cancel the signing operation after CKR_BUFFER_TOO_SMALL ↗</a></li><li><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">Return only the ECDH secret into larger buffers ↗</a></li></ul>
+      </article>
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/OpenVPN/openvpn" target="_blank" rel="noopener"><b>OpenVPN</b></a>
+          <span class="win-count">3</span></div>
+        <ul><li><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">tls_crypt: Wipe the tls-crypt-v2 client key copies ↗</a></li><li><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">crypto_openssl: Clear PEM decoded key data before freeing it ↗</a></li><li><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">auth_token: Wipe the server secret key after loading it ↗</a></li></ul>
+      </article>
+      <article class="win">
+        <div class="win-head"><a href="https://github.com/openssl/openssl" target="_blank" rel="noopener"><b>OpenSSL</b></a>
+          <span class="win-count">2</span></div>
+        <ul><li><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">Allocate the PBKDF1 derive_skey buffer without zeroing it ↗</a></li><li><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code> ↗</a></li></ul>
+      </article></div>
+  </section>
   <div class="summary">39 pull requests and 9 vulnerability reports · 22 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
@@ -719,7 +758,7 @@
 
   <footer>Updated 2026-11-04; refreshed from GitHub every hour, and merged, closed and approved stages are re-read on every page load. Private vulnerability reports show only their stage until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
 </main>
-<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "Merged", "approved": "Approved", "approved_pending": "Approved, awaiting another review", "rereview": "Updated, awaiting re-review", "changes": "Changes requested", "review": "Awaiting review", "ci_approval": "Awaiting CI approval", "closed": "Closed", "open": "Open"}, "live": "Stages read from GitHub just now ({t}).", "loading": "Reading current stages from GitHub…", "snapshot": "Showing the snapshot of 2026-11-04; GitHub could not be reached from this browser.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}}</script>
+<script id="labels" type="application/json">{"owner": "wihansaem1991", "stages": {"merged": "Merged", "approved": "Approved", "approved_pending": "Approved, awaiting another review", "rereview": "Updated, awaiting re-review", "changes": "Changes requested", "review": "Awaiting review", "ci_approval": "Awaiting CI approval", "closed": "Closed", "open": "Open"}, "live": "Stages read from GitHub just now ({t}).", "loading": "Reading current stages from GitHub…", "snapshot": "Showing the snapshot of 2026-11-04; GitHub could not be reached from this browser.", "groups": {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review", "open": "review", "ci_approval": "ci", "closed": "closed"}, "landed": ["openssl-projects/pkcs11-provider#813", "RustCrypto/signatures#1493", "RustCrypto/RSA#740", "RustCrypto/crypto-bigint#1382", "openssl-projects/pkcs11-provider#814", "openssl-projects/pkcs11-provider#815", "RustCrypto/formats#2501", "OpenVPN/openvpn#2076", "OpenVPN/openvpn#2077", "RustCrypto/AEADs#894", "RustCrypto/formats#2502", "openssl-projects/pkcs11-provider#816", "openssl/openssl#33476", "OpenVPN/openvpn#2079", "openssl/openssl#33444"]}</script>
 <script>
 (() => {
   const L = JSON.parse(document.getElementById("labels").textContent);
@@ -781,10 +820,13 @@
       const id = (it) => it.repository_url.replace("https://api.github.com/repos/", "") + "#" + it.number;
       const ok = new Set(approved.items.map(id));
       const asked = new Set(changes.items.map(id));
+      const landed = new Set(L.landed || []);
       for (const it of all.items) {
         let stage = null;
         if (it.pull_request && it.pull_request.merged_at) stage = "merged";
-        else if (it.state === "closed") stage = "closed";
+        /* a maintainer who applies a change to master by hand leaves the pull request closed,
+           not merged; keep the stage we recorded for those instead of showing "closed" */
+        else if (it.state === "closed" && !landed.has(id(it))) stage = "closed";
         else if (ok.has(id(it)) && !asked.has(id(it))) stage = "approved";
         if (!stage) continue;
         for (const el of document.querySelectorAll('[data-pr="' + CSS.escape(id(it)) + '"]')) {
