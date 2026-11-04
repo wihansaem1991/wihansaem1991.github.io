@@ -32,10 +32,9 @@ UI = {
         "switch": '<a href="ko/" hreflang="ko">한국어</a>',
         "tabs": {"all": "All", "done": "Approved / merged", "review": "In review", "ci": "Awaiting CI approval",
                  "closed": "Closed", "cve": "CVE challenge", "repos": "Repositories"},
-        "repos_hint": "Repositories I am auditing now: what each project is and what I look at there. "
-                      "Pull request counts by stage are refreshed every hour.",
+        "repos_hint": "Repositories I am auditing now: what each project is and what I look at there.",
         "focus": "Looking at", "prs": "{n} pull requests", "no_prs": "No pull request yet",
-        "wins_title": "Shipped to these projects",
+        "wins_title": "Contributions that landed",
         "wins_intro": "{n} contributions are in {projects} open-source projects.",
         "wins_count": "{n}",
         "repos_title": "Repositories I audit",
@@ -67,7 +66,7 @@ UI = {
         "live": "Stages read from GitHub just now ({t}).",
         "snapshot": "Showing the snapshot of {d}; GitHub could not be reached from this browser.",
         "loading": "Reading current stages from GitHub…",
-        "footer": ("Updated {d}; refreshed from GitHub every hour. Private vulnerability reports stay unnamed "
+        "footer": ("Updated {d}. Private vulnerability reports stay unnamed "
                    "until the project discloses them. Development was assisted by Claude Code; every change was "
                    "reproduced and tested, and AI assistance is disclosed in each commit."),
     },
@@ -76,8 +75,7 @@ UI = {
         "switch": '<a href="../" hreflang="en">English</a>',
         "tabs": {"all": "전체", "done": "승인·머지", "review": "리뷰 중", "ci": "CI 허가 대기", "closed": "닫힘",
                  "cve": "CVE 도전", "repos": "분석 중인 저장소"},
-        "repos_hint": "지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었고, "
-                      "단계별 PR 수는 매시간 갱신합니다.",
+        "repos_hint": "지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었습니다.",
         "focus": "보는 것", "prs": "PR {n}건", "no_prs": "아직 PR 없음",
         "wins_title": "오픈소스에 반영된 기여",
         "wins_intro": "오픈소스 프로젝트 {projects}곳에 기여 {n}건이 들어갔습니다.",
@@ -109,7 +107,7 @@ UI = {
         "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).",
         "snapshot": "{d} 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.",
         "loading": "GitHub에서 현재 단계를 읽는 중…",
-        "footer": ("{d} 갱신. 매시간 GitHub에서 자동으로 다시 읽습니다. 비공개 취약점 보고는 프로젝트가 공개하기 "
+        "footer": ("{d} 갱신. 비공개 취약점 보고는 프로젝트가 공개하기 "
                    "전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 "
                    "커밋에 AI 도움을 밝혔습니다."),
     },
@@ -334,35 +332,20 @@ def win_entry(e, lang):
 
 
 def wins_section(data, lang, ev):
-    """A lead showcase of the contributions that reached their projects, grouped by project. Each
-    item opens into its briefing. No review-stage labels, no dates presented as a status."""
+    """A simple list of the contributions that landed in their projects. One line each; open an
+    entry to read its briefing. No review-stage labels, no dates presented as a status."""
     t = UI[lang]
     won = [e for e in (data.get("entries") or []) if landed(e, ev)]
     if not won:
         return ""
-    groups = {}
-    for e in won:
-        groups.setdefault(e["project"], []).append(e)
-    cards = []
-    for proj, es in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0].lower())):
-        repos = sorted({e["repo"] for e in es})
-        owner = es[0]["repo"].split("/")[0]
-        url = f'https://github.com/{es[0]["repo"]}' if len(repos) == 1 else f'https://github.com/{owner}'
-        es = sorted(es, key=lambda e: (e["repo"], -(int(str(e["pr"])) if str(e["pr"]).isdigit() else 0)))
-        body = "".join(win_entry(e, lang) for e in es)
-        cards.append(f"""
-      <article class="win">
-        <div class="win-head"><a href="{url}" target="_blank" rel="noopener"><b>{text(proj)}</b></a>
-          <span class="win-count">{t["wins_count"].format(n=len(es))}</span></div>
-        {body}
-      </article>""")
-    intro = t["wins_intro"].format(n=len(won), projects=len(groups))
+    won = sorted(won, key=lambda e: (str(e["project"]).lower(), e["repo"],
+                                     -(int(str(e["pr"])) if str(e["pr"]).isdigit() else 0)))
+    body = "".join(win_entry(e, lang) for e in won)
     return f"""
-  <section class="wins" id="wins">
+  <section class="section" id="wins">
     <h2>{t["wins_title"]}</h2>
-    <p class="wins-intro">{html.escape(intro)}</p>
     <p class="hint">{t["hint"]}</p>
-    <div class="win-grid">{''.join(cards)}</div>
+    {body}
   </section>"""
 
 

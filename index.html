@@ -23,29 +23,16 @@
   .tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; padding:0; list-style:none; }
   .tags li { border:1px solid var(--line); border-radius:999px; padding:1px 10px; font-size:12px; color:var(--muted); }
 
-  .wins { margin: 28px 0 8px; }
-  .wins h2, .section h2 { font-size: 20px; margin: 0 0 4px; letter-spacing:-0.01em; }
-  .wins-intro { margin: 0 0 6px; color: var(--muted); font-size: 14px; }
+  .section { margin-top: 28px; }
+  .section h2 { font-size: 20px; margin: 0 0 4px; letter-spacing:-0.01em; }
   .hint { color:var(--muted); font-size:13px; margin:4px 0 12px; }
-  .win-grid { display:grid; gap:12px; }
-  .win { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--ok);
-         border-radius:12px; padding:4px 16px 8px; overflow-wrap:anywhere; }
-  .win-head { display:flex; align-items:baseline; gap:8px; padding:10px 0 2px; }
-  .win-head a { text-decoration:none; }
-  .win-head b { font-size:16px; color:var(--fg); }
-  .win-count { margin-left:auto; color:var(--muted); font-size:12px; white-space:nowrap; }
-
-  .section { margin-top: 32px; }
+  #wins .entry { border-left:3px solid var(--ok); }
 
   .entry { position:relative; overflow-wrap:anywhere; }
   .entry summary { list-style:none; cursor:pointer; display:grid; gap:2px; }
   .entry summary::-webkit-details-marker { display:none; }
   .entry summary::after { content:"▾"; position:absolute; color:var(--muted); }
   .entry[open] summary::after { content:"▴"; }
-  .win .entry { border-top:1px solid var(--line); }
-  .win .entry summary { padding:10px 20px 10px 0; }
-  .win .entry summary::after { right:0; top:10px; }
-  .win .entry .body { padding:2px 0 12px; }
   .section .entry { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; }
   .section .entry summary { padding:12px 34px 12px 16px; }
   .section .entry summary::after { right:16px; top:12px; }
@@ -90,15 +77,73 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <section class="wins" id="wins">
-    <h2>Shipped to these projects</h2>
-    <p class="wins-intro">15 contributions are in 4 open-source projects.</p>
+  <section class="section" id="wins">
+    <h2>Contributions that landed</h2>
     <p class="hint">Open an entry to read its briefing.</p>
-    <div class="win-grid">
-      <article class="win">
-        <div class="win-head"><a href="https://github.com/RustCrypto" target="_blank" rel="noopener"><b>RustCrypto</b></a>
-          <span class="win-count">6</span></div>
-        
+    
+        <details class="entry" id="openssl-openssl-33476">
+          <summary>
+            <span class="line2">Allocate the PBKDF1 derive_skey buffer without zeroing it</span>
+            <span class="line3">openssl/openssl #33476 · Cleanup</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>kdf_pbkdf1_derive_skey()</code> allocated the key buffer with <code>OPENSSL_zalloc()</code>, but nothing reads it before the derivation writes every byte, and on failure it is cleared and freed unread. The zero fill was wasted work.</dd><dt>Background</dt><dd>A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left for a separate change to keep that PR to its scope.</dd><dt>How it was found</dt><dd>Reviewer comment on</dd><dt>Fix</dt><dd><code>OPENSSL_malloc()</code> instead of <code>OPENSSL_zalloc()</code>. Built with <code>--strict-warnings</code>; <code>test_evp_kdf</code> passes, including <code>test_kdf_pbkdf1_skey</code>.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">#33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="openssl-openssl-33444">
+          <summary>
+            <span class="line2">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></span>
+            <span class="line3">openssl/openssl #33444 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">#33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote></div>
+        </details>
+        <details class="entry" id="OpenVPN-openvpn-2079">
+          <summary>
+            <span class="line2">tls_crypt: Wipe the tls-crypt-v2 client key copies</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2079 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>tls_crypt_v2_init_client_key()</code> left a stack copy of the client key at every client start, and <code>tls_crypt_v2_write_client_key_file()</code> freed the key data and the wrapped key buffer without clearing them.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), matched to the project&#x27;s own precedents: <code>crypto_read_openvpn_key()</code> already clears the same stack copy and <code>do_close_free_key_schedule()</code> the same kind of buffer.</dd><dt>How it was found</dt><dd>A stack residue measurement and a freed-block scan with a marked test client key.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the stack copies and <code>buf_clear()</code> before <code>free_buf()</code>. Together with Gerrit 2078 the stack copies go from 2 to 0, and the two freed blocks from key generation disappear.</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">Gerrit 2079 ↗</a></dd></dl><blockquote>"Welcome hardening." — reviewer</blockquote></div>
+        </details>
+        <details class="entry" id="OpenVPN-openvpn-2077">
+          <summary>
+            <span class="line2">crypto_openssl: Clear PEM decoded key data before freeing it</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2077 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>crypto_pem_decode()</code> decodes the tls-crypt-v2 client and server keys and the auth-token key, and freed the decoded key bytes with <code>OPENSSL_free()</code>, so they stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) in a project that builds with both OpenSSL and LibreSSL, so the clearing call has to exist in both.</dd><dt>How it was found</dt><dd>Scanning the blocks freed during the tls-crypt unit tests for the test key.</dd><dt>Fix</dt><dd><code>OPENSSL_cleanse()</code> and then <code>OPENSSL_free()</code>. The first patch set used <code>OPENSSL_clear_free()</code>, which LibreSSL does not have; the second builds with <code>--enable-werror</code> against LibreSSL 4.3.4 and OpenSSL 3.5.9, and the freed blocks holding key bytes go from 2 to 0.</dd><dt>Review</dt><dd>Approved by Steffan Karger, then Gert Doering found the LibreSSL build failure and suggested the two-line form; the second patch set does exactly that and waits for another look.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="OpenVPN-openvpn-2076">
+          <summary>
+            <span class="line2">auth_token: Wipe the server secret key after loading it</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2076 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>auth_token_init_secret()</code> reads the auth-token server key into a 2048-byte buffer, copies it into a <code>struct key</code> and then a <code>struct key_parameters</code> on the stack, and freed the buffer without clearing it, so three copies of the server key stayed in memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), checked against every copy a function makes: <code>tls_crypt_v2_init_server_key()</code> already clears its copy, this function did not.</dd><dt>How it was found</dt><dd>Scanning freed heap blocks for the key used by <code>test_auth_token</code>.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the <code>struct key</code> and the <code>struct key_parameters</code>, and <code>buf_clear()</code> before <code>free_buf()</code>. The second patch set added the <code>struct key_parameters</code> copy, which a reviewer pointed out; the same question led to a follow-up change for the other functions (Gerrit 2078).</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger on the second patch set.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — reviewer</blockquote></div>
+        </details>
+        <details class="entry" id="openssl-projects-pkcs11-provider-816">
+          <summary>
+            <span class="line2">kdf: Reject extract-only output lengths other than the digest size</span>
+            <span class="line3">openssl-projects/pkcs11-provider #816 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>In extract-only mode, HKDF and TLS13-KDF output exactly one digest. The default provider refuses any other output length up front; pkcs11-provider passed the requested length to the token and checked it only after the token had returned the derived value.</dd><dt>Background</dt><dd>HKDF (RFC 5869) extract step, the PKCS#11 HKDF mechanism and OpenSSL&#x27;s KDF provider API: the provider has to match the default provider&#x27;s length rules before calling the token.</dd><dt>How it was found</dt><dd>Running extract-only HKDF with several output lengths through both the default provider and pkcs11-provider and comparing the results.</dd><dt>Fix</dt><dd>Check the length before deriving and raise the default provider&#x27;s error. The new <code>hkdfextract</code> test covers HKDF and TLS13-KDF with SHA-256 and SHA-512, and fails with the check reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">#816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="openssl-projects-pkcs11-provider-815">
+          <summary>
+            <span class="line2">Check raw RSA sign data against the modulus, not the buffer size</span>
+            <span class="line3">openssl-projects/pkcs11-provider #815 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>Raw RSA signing (<code>RSA_NO_PADDING</code>) on a token key failed whenever the output buffer was larger than the modulus, although the input was correct; the default provider signs the same input into the same buffer and returns the modulus size.</dd><dt>Background</dt><dd>RSA and OpenSSL provider API: <code>EVP_PKEY_sign()</code> takes the buffer size in <code>*siglen</code>, and raw RSA requires the input to be exactly as long as the modulus (<code>CKM_RSA_X_509</code> in PKCS#11).</dd><dt>How it was found</dt><dd>The same buffer-size sweep, comparing pkcs11-provider with OpenSSL&#x27;s default provider: buffers of 257, 512 and 8448 bytes failed on the token and succeeded on the default provider.</dd><dt>Fix</dt><dd>Compare the input length with the key&#x27;s modulus size instead of the caller&#x27;s buffer size. The new <code>rsaraw</code> test checks both providers, recovers the data from the token signature, and still refuses input shorter than the modulus.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">#815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="openssl-projects-pkcs11-provider-814">
+          <summary>
+            <span class="line2">Cancel the signing operation after CKR_BUFFER_TOO_SMALL</span>
+            <span class="line3">openssl-projects/pkcs11-provider #814 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>One signature into a buffer that was too small left the signing operation active on a pooled PKCS#11 session. Every later signature that picked up that session failed with <code>CKR_OPERATION_ACTIVE</code>: with NSS softokn, one 255-byte buffer for a 2048-bit RSA key broke all RSA, RSA-PSS, ECDSA and DigestSign signatures for the rest of the process.</dd><dt>Background</dt><dd>PKCS#11 session semantics: <code>C_Sign()</code> returning <code>CKR_BUFFER_TOO_SMALL</code> keeps the operation active so the caller can retry with a larger buffer, so a provider that pools sessions has to end the operation before handing the session back.</dd><dt>How it was found</dt><dd>A buffer-size sweep: every signature, derivation and decryption path of pkcs11-provider was run with buffers smaller and larger than needed, then followed by a normal call to see whether the session was still usable.</dd><dt>Fix</dt><dd>Move the existing cleanup for a hanging operation into a helper and call it on <code>CKR_BUFFER_TOO_SMALL</code> before the session is returned. The new <code>sigbuf</code> test fails without the change and passes with it.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">#814 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="openssl-projects-pkcs11-provider-813">
+          <summary>
+            <span class="line2">Return only the ECDH secret into larger buffers</span>
+            <span class="line3">openssl-projects/pkcs11-provider #813 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">#813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details>
         <details class="entry" id="RustCrypto-AEADs-894">
           <summary>
             <span class="line2">eax: add Wycheproof test vectors</span>
@@ -141,89 +186,10 @@
           </summary>
           <div class="body"><dl><dt>Problem</dt><dd>The ML-DSA Wycheproof verification test skipped every case with a context string, so deleting the check that rejects contexts longer than 255 bytes left all tests passing.</dd><dt>Background</dt><dd>FIPS 204: ML-DSA signing and verification reject a context string longer than 255 bytes. The C2SP Wycheproof vectors test exactly that with 7-, 255- and 256-byte contexts.</dd><dt>How it was found</dt><dd>Running the Wycheproof ML-DSA vectors against the crate, then mutation testing: removing the length check went unnoticed by every existing test.</dd><dt>Fix</dt><dd>Run the context cases through <code>verify_with_context()</code>. With the length check removed, the ML-DSA-44, -65 and -87 tests now fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/signatures/pull/1493" target="_blank" rel="noopener">#1493 ↗</a> · <a href="https://github.com/RustCrypto/signatures/pull/1493/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
         </details>
-      </article>
-      <article class="win">
-        <div class="win-head"><a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener"><b>pkcs11-provider</b></a>
-          <span class="win-count">4</span></div>
-        
-        <details class="entry" id="openssl-projects-pkcs11-provider-816">
-          <summary>
-            <span class="line2">kdf: Reject extract-only output lengths other than the digest size</span>
-            <span class="line3">openssl-projects/pkcs11-provider #816 · Bug fix</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd>In extract-only mode, HKDF and TLS13-KDF output exactly one digest. The default provider refuses any other output length up front; pkcs11-provider passed the requested length to the token and checked it only after the token had returned the derived value.</dd><dt>Background</dt><dd>HKDF (RFC 5869) extract step, the PKCS#11 HKDF mechanism and OpenSSL&#x27;s KDF provider API: the provider has to match the default provider&#x27;s length rules before calling the token.</dd><dt>How it was found</dt><dd>Running extract-only HKDF with several output lengths through both the default provider and pkcs11-provider and comparing the results.</dd><dt>Fix</dt><dd>Check the length before deriving and raise the default provider&#x27;s error. The new <code>hkdfextract</code> test covers HKDF and TLS13-KDF with SHA-256 and SHA-512, and fails with the check reverted.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/816" target="_blank" rel="noopener">#816 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/816/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
-        </details>
-        <details class="entry" id="openssl-projects-pkcs11-provider-815">
-          <summary>
-            <span class="line2">Check raw RSA sign data against the modulus, not the buffer size</span>
-            <span class="line3">openssl-projects/pkcs11-provider #815 · Bug fix</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd>Raw RSA signing (<code>RSA_NO_PADDING</code>) on a token key failed whenever the output buffer was larger than the modulus, although the input was correct; the default provider signs the same input into the same buffer and returns the modulus size.</dd><dt>Background</dt><dd>RSA and OpenSSL provider API: <code>EVP_PKEY_sign()</code> takes the buffer size in <code>*siglen</code>, and raw RSA requires the input to be exactly as long as the modulus (<code>CKM_RSA_X_509</code> in PKCS#11).</dd><dt>How it was found</dt><dd>The same buffer-size sweep, comparing pkcs11-provider with OpenSSL&#x27;s default provider: buffers of 257, 512 and 8448 bytes failed on the token and succeeded on the default provider.</dd><dt>Fix</dt><dd>Compare the input length with the key&#x27;s modulus size instead of the caller&#x27;s buffer size. The new <code>rsaraw</code> test checks both providers, recovers the data from the token signature, and still refuses input shorter than the modulus.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/815" target="_blank" rel="noopener">#815 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/815/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
-        </details>
-        <details class="entry" id="openssl-projects-pkcs11-provider-814">
-          <summary>
-            <span class="line2">Cancel the signing operation after CKR_BUFFER_TOO_SMALL</span>
-            <span class="line3">openssl-projects/pkcs11-provider #814 · Bug fix</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd>One signature into a buffer that was too small left the signing operation active on a pooled PKCS#11 session. Every later signature that picked up that session failed with <code>CKR_OPERATION_ACTIVE</code>: with NSS softokn, one 255-byte buffer for a 2048-bit RSA key broke all RSA, RSA-PSS, ECDSA and DigestSign signatures for the rest of the process.</dd><dt>Background</dt><dd>PKCS#11 session semantics: <code>C_Sign()</code> returning <code>CKR_BUFFER_TOO_SMALL</code> keeps the operation active so the caller can retry with a larger buffer, so a provider that pools sessions has to end the operation before handing the session back.</dd><dt>How it was found</dt><dd>A buffer-size sweep: every signature, derivation and decryption path of pkcs11-provider was run with buffers smaller and larger than needed, then followed by a normal call to see whether the session was still usable.</dd><dt>Fix</dt><dd>Move the existing cleanup for a hanging operation into a helper and call it on <code>CKR_BUFFER_TOO_SMALL</code> before the session is returned. The new <code>sigbuf</code> test fails without the change and passes with it.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/814" target="_blank" rel="noopener">#814 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/814/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
-        </details>
-        <details class="entry" id="openssl-projects-pkcs11-provider-813">
-          <summary>
-            <span class="line2">Return only the ECDH secret into larger buffers</span>
-            <span class="line3">openssl-projects/pkcs11-provider #813 · Bug fix</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">#813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
-        </details>
-      </article>
-      <article class="win">
-        <div class="win-head"><a href="https://github.com/OpenVPN/openvpn" target="_blank" rel="noopener"><b>OpenVPN</b></a>
-          <span class="win-count">3</span></div>
-        
-        <details class="entry" id="OpenVPN-openvpn-2079">
-          <summary>
-            <span class="line2">tls_crypt: Wipe the tls-crypt-v2 client key copies</span>
-            <span class="line3">OpenVPN/openvpn Gerrit 2079 · Hardening</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd><code>tls_crypt_v2_init_client_key()</code> left a stack copy of the client key at every client start, and <code>tls_crypt_v2_write_client_key_file()</code> freed the key data and the wrapped key buffer without clearing them.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), matched to the project&#x27;s own precedents: <code>crypto_read_openvpn_key()</code> already clears the same stack copy and <code>do_close_free_key_schedule()</code> the same kind of buffer.</dd><dt>How it was found</dt><dd>A stack residue measurement and a freed-block scan with a marked test client key.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the stack copies and <code>buf_clear()</code> before <code>free_buf()</code>. Together with Gerrit 2078 the stack copies go from 2 to 0, and the two freed blocks from key generation disappear.</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">Gerrit 2079 ↗</a></dd></dl><blockquote>"Welcome hardening." — reviewer</blockquote></div>
-        </details>
-        <details class="entry" id="OpenVPN-openvpn-2077">
-          <summary>
-            <span class="line2">crypto_openssl: Clear PEM decoded key data before freeing it</span>
-            <span class="line3">OpenVPN/openvpn Gerrit 2077 · Hardening</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd><code>crypto_pem_decode()</code> decodes the tls-crypt-v2 client and server keys and the auth-token key, and freed the decoded key bytes with <code>OPENSSL_free()</code>, so they stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) in a project that builds with both OpenSSL and LibreSSL, so the clearing call has to exist in both.</dd><dt>How it was found</dt><dd>Scanning the blocks freed during the tls-crypt unit tests for the test key.</dd><dt>Fix</dt><dd><code>OPENSSL_cleanse()</code> and then <code>OPENSSL_free()</code>. The first patch set used <code>OPENSSL_clear_free()</code>, which LibreSSL does not have; the second builds with <code>--enable-werror</code> against LibreSSL 4.3.4 and OpenSSL 3.5.9, and the freed blocks holding key bytes go from 2 to 0.</dd><dt>Review</dt><dd>Approved by Steffan Karger, then Gert Doering found the LibreSSL build failure and suggested the two-line form; the second patch set does exactly that and waits for another look.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a></dd></dl></div>
-        </details>
-        <details class="entry" id="OpenVPN-openvpn-2076">
-          <summary>
-            <span class="line2">auth_token: Wipe the server secret key after loading it</span>
-            <span class="line3">OpenVPN/openvpn Gerrit 2076 · Hardening</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd><code>auth_token_init_secret()</code> reads the auth-token server key into a 2048-byte buffer, copies it into a <code>struct key</code> and then a <code>struct key_parameters</code> on the stack, and freed the buffer without clearing it, so three copies of the server key stayed in memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), checked against every copy a function makes: <code>tls_crypt_v2_init_server_key()</code> already clears its copy, this function did not.</dd><dt>How it was found</dt><dd>Scanning freed heap blocks for the key used by <code>test_auth_token</code>.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the <code>struct key</code> and the <code>struct key_parameters</code>, and <code>buf_clear()</code> before <code>free_buf()</code>. The second patch set added the <code>struct key_parameters</code> copy, which a reviewer pointed out; the same question led to a follow-up change for the other functions (Gerrit 2078).</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger on the second patch set.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — reviewer</blockquote></div>
-        </details>
-      </article>
-      <article class="win">
-        <div class="win-head"><a href="https://github.com/openssl/openssl" target="_blank" rel="noopener"><b>OpenSSL</b></a>
-          <span class="win-count">2</span></div>
-        
-        <details class="entry" id="openssl-openssl-33476">
-          <summary>
-            <span class="line2">Allocate the PBKDF1 derive_skey buffer without zeroing it</span>
-            <span class="line3">openssl/openssl #33476 · Cleanup</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd><code>kdf_pbkdf1_derive_skey()</code> allocated the key buffer with <code>OPENSSL_zalloc()</code>, but nothing reads it before the derivation writes every byte, and on failure it is cleared and freed unread. The zero fill was wasted work.</dd><dt>Background</dt><dd>A reviewer pointed this out in #33444 (clearing the PBKDF1 key on failure) and it was left for a separate change to keep that PR to its scope.</dd><dt>How it was found</dt><dd>Reviewer comment on</dd><dt>Fix</dt><dd><code>OPENSSL_malloc()</code> instead of <code>OPENSSL_zalloc()</code>. Built with <code>--strict-warnings</code>; <code>test_evp_kdf</code> passes, including <code>test_kdf_pbkdf1_skey</code>.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33476" target="_blank" rel="noopener">#33476 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33476/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
-        </details>
-        <details class="entry" id="openssl-openssl-33444">
-          <summary>
-            <span class="line2">Clear the PBKDF1 derived key in <code>kdf_pbkdf1_derive_skey()</code></span>
-            <span class="line3">openssl/openssl #33444 · Hardening</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">#33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote></div>
-        </details>
-      </article></div>
   </section>
   <section class="section" id="repos">
     <h2>Repositories I audit</h2>
-    <p class="hint">Repositories I am auditing now: what each project is and what I look at there. Pull request counts by stage are refreshed every hour.</p>
+    <p class="hint">Repositories I am auditing now: what each project is and what I look at there.</p>
     <div class="repos">
     <article class="repo" id="repo-openssl-openssl">
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
@@ -412,7 +378,7 @@
       <div class="body"><p class="none">Reported through the project's private channel. Details follow once the project publishes a fix.</p></div>
     </details>
   </section>
-  <footer>Updated 2026-11-04; refreshed from GitHub every hour. Private vulnerability reports stay unnamed until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
+  <footer>Updated 2026-11-04. Private vulnerability reports stay unnamed until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
 </main>
 <script>
 (() => {
