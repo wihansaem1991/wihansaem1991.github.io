@@ -38,6 +38,9 @@ UI = {
         "wins_title": "Shipped to these projects",
         "wins_intro": "{n} contributions are in {projects} open-source projects.",
         "wins_count": "{n}",
+        "repos_title": "Repositories I audit",
+        "vulns_title": "Vulnerability reports",
+        "vulns_hint": "Reported through each project's private channel; named once the project publishes a fix.",
         "summary": "{prs} pull requests and {vulns} vulnerability reports · {replied} with a maintainer reply · {cves} CVEs",
         "vuln": "Vulnerability report",
         "private_body": "Reported through the project's private channel. Details follow once the project publishes a fix.",
@@ -64,9 +67,8 @@ UI = {
         "live": "Stages read from GitHub just now ({t}).",
         "snapshot": "Showing the snapshot of {d}; GitHub could not be reached from this browser.",
         "loading": "Reading current stages from GitHub…",
-        "footer": ("Updated {d}; refreshed from GitHub every hour, and merged, closed and approved stages are "
-                   "re-read on every page load. Private vulnerability reports show only their stage until the "
-                   "project discloses them. Development was assisted by Claude Code; every change was "
+        "footer": ("Updated {d}; refreshed from GitHub every hour. Private vulnerability reports stay unnamed "
+                   "until the project discloses them. Development was assisted by Claude Code; every change was "
                    "reproduced and tested, and AI assistance is disclosed in each commit."),
     },
     "ko": {
@@ -80,6 +82,9 @@ UI = {
         "wins_title": "오픈소스에 반영된 기여",
         "wins_intro": "오픈소스 프로젝트 {projects}곳에 기여 {n}건이 들어갔습니다.",
         "wins_count": "{n}건",
+        "repos_title": "분석 중인 저장소",
+        "vulns_title": "취약점 보고",
+        "vulns_hint": "각 프로젝트의 비공개 경로로 보고했고, 프로젝트가 수정을 공개하면 이름을 채웁니다.",
         "summary": "제출 PR {prs}건 · 취약점 보고 {vulns}건 · 메인테이너 응답 {replied}건 · CVE {cves}건",
         "vuln": "취약점 보고",
         "private_body": "프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.",
@@ -104,9 +109,9 @@ UI = {
         "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).",
         "snapshot": "{d} 기준 자료입니다. 이 브라우저에서 GitHub에 연결하지 못했습니다.",
         "loading": "GitHub에서 현재 단계를 읽는 중…",
-        "footer": ("{d} 갱신. 매시간 GitHub에서 자동으로 다시 읽고, 머지·닫힘·승인 단계는 페이지를 열 때마다 "
-                   "다시 확인합니다. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 단계만 보입니다. "
-                   "Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다."),
+        "footer": ("{d} 갱신. 매시간 GitHub에서 자동으로 다시 읽습니다. 비공개 취약점 보고는 프로젝트가 공개하기 "
+                   "전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 "
+                   "커밋에 AI 도움을 밝혔습니다."),
     },
 }
 
@@ -255,8 +260,6 @@ def vuln_entry(v, lang):
     """A vulnerability report, in the same list as the pull requests. Until the project discloses
     it, only the label, date, channel and stage are shown."""
     t = UI[lang]
-    status = v.get("status", "")
-    stage = f'<span class="badge v-{html.escape(status)}">{t["vstages"].get(status, status)}</span>'
     facts = [f'{t["submitted"]} {v.get("submitted")}', text(pick(v.get("channel"), lang)),
              f'CVE {v["cve"]}' if v.get("cve") else f'CVE {t["none_yet"]}']
     if v.get("public"):
@@ -273,27 +276,23 @@ def vuln_entry(v, lang):
         title = t["private"]
         body = f'<p class="none">{t["private_body"]}</p>'
     return f"""
-  <details class="entry" id="{html.escape(v['label'])}" data-group="cve">
-    <summary>
-      <span class="line1"><b>{head}</b> <span class="badge vuln">{t["types"]["vulnerability"]}</span> {stage}</span>
-      <span class="line2">{title}</span>
-      <span class="line3">{' · '.join(facts)}</span>
-    </summary>
-    <div class="body">{body}</div>
-  </details>"""
+    <details class="entry" id="{html.escape(v['label'])}">
+      <summary>
+        <span class="line1"><b>{head}</b> <span class="badge vuln">{t["types"]["vulnerability"]}</span></span>
+        <span class="line2">{title}</span>
+        <span class="line3">{' · '.join(facts)}</span>
+      </summary>
+      <div class="body">{body}</div>
+    </details>"""
 
 
-def repo_card(r, lang, ev, entries):
+def repo_card(r, lang, entries):
     """One repository being audited: what it is, what I look at, and my pull requests by stage."""
     t = UI[lang]
     mine = [e for e in entries if e["repo"] == r["repo"]]
     url = r.get("link") or f'https://github.com/{r["repo"]}'
     if mine:
-        stages = [stage_of(e, ev) for e in mine]
-        order = sorted(set(stages), key=lambda s: STAGE_ORDER.index(s) if s in STAGE_ORDER else 99)
-        badges = " ".join(f'<span class="badge {s}">{html.escape(t["stages"].get(s, s))} {stages.count(s)}</span>'
-                          for s in order)
-        prs = f'<span>{t["prs"].format(n=len(mine))}</span> {badges}'
+        prs = f'<span>{t["prs"].format(n=len(mine))}</span>'
     elif r.get("status"):
         prs = f'<span>{text(pick(r["status"], lang))}</span>'
     else:
@@ -307,9 +306,36 @@ def repo_card(r, lang, ev, entries):
     </article>"""
 
 
+def win_entry(e, lang):
+    """One landed contribution, as what it fixed — no review stage, no open-for-N-days facts."""
+    t = UI[lang]
+    url = pr_url(e)
+    keys = (["cve"] if e.get("cve") else []) + ["defect", "background", "found_by", "fix", "review"]
+    dl = "".join(
+        f'<dt>{t["dt"][k]}</dt><dd>{cve_cell(e.get("cve"), e.get("cvss")) if k == "cve" else text(pick(e[k], lang))}</dd>'
+        for k in keys if k == "cve" or e.get(k))
+    files = "" if e.get("gerrit") else f' · {ext(url + "/files", t["ev"]["files"])}'
+    dl += f'<dt>{t["dt"]["evidence"]}</dt><dd class="evidence">{ext(url, pr_label(e))}{files}</dd>'
+    quote = ""
+    if e.get("quote"):
+        quote = f'<blockquote>"{text(e["quote"])}" — {t["reviewer"]}'
+        if lang == "ko" and e.get("quote_ko"):
+            quote += f'<br><span class="tr">(번역) {text(e["quote_ko"])}</span>'
+        quote += "</blockquote>"
+    typ = t["types"].get(e["type"], text(e["type"]))
+    return f"""
+        <details class="entry" id="{anchor(e)}">
+          <summary>
+            <span class="line2">{text(pick(e['title'], lang))}</span>
+            <span class="line3">{html.escape(e['repo'])} {pr_label(e)} · {typ}</span>
+          </summary>
+          <div class="body"><dl>{dl}</dl>{quote}</div>
+        </details>"""
+
+
 def wins_section(data, lang, ev):
-    """A lead showcase of the contributions that reached their projects, grouped by project and
-    shown as what each change did — no review-stage labels."""
+    """A lead showcase of the contributions that reached their projects, grouped by project. Each
+    item opens into its briefing. No review-stage labels, no dates presented as a status."""
     t = UI[lang]
     won = [e for e in (data.get("entries") or []) if landed(e, ev)]
     if not won:
@@ -322,65 +348,57 @@ def wins_section(data, lang, ev):
         repos = sorted({e["repo"] for e in es})
         owner = es[0]["repo"].split("/")[0]
         url = f'https://github.com/{es[0]["repo"]}' if len(repos) == 1 else f'https://github.com/{owner}'
-        multi = len(repos) > 1
-        items = []
-        for e in sorted(es, key=lambda e: (e["repo"], -(int(str(e["pr"])) if str(e["pr"]).isdigit() else 0))):
-            crate = f'<code>{html.escape(e["repo"].split("/")[-1])}</code> ' if multi else ""
-            items.append(f'<li>{crate}<a href="{html.escape(pr_url(e))}" target="_blank" rel="noopener">'
-                         f'{text(pick(e["title"], lang))} ↗</a></li>')
+        es = sorted(es, key=lambda e: (e["repo"], -(int(str(e["pr"])) if str(e["pr"]).isdigit() else 0)))
+        body = "".join(win_entry(e, lang) for e in es)
         cards.append(f"""
       <article class="win">
         <div class="win-head"><a href="{url}" target="_blank" rel="noopener"><b>{text(proj)}</b></a>
           <span class="win-count">{t["wins_count"].format(n=len(es))}</span></div>
-        <ul>{''.join(items)}</ul>
+        {body}
       </article>""")
     intro = t["wins_intro"].format(n=len(won), projects=len(groups))
     return f"""
   <section class="wins" id="wins">
     <h2>{t["wins_title"]}</h2>
     <p class="wins-intro">{html.escape(intro)}</p>
+    <p class="hint">{t["hint"]}</p>
     <div class="win-grid">{''.join(cards)}</div>
+  </section>"""
+
+
+def vulns_section(data, lang):
+    """Vulnerability reports, in their own section, without a stage label."""
+    t = UI[lang]
+    vulns = list(data.get("vulnerabilities") or [])
+    if not vulns:
+        return ""
+    body = "".join(vuln_entry(v, lang) for v in vulns)
+    return f"""
+  <section class="section" id="vulns">
+    <h2>{t["vulns_title"]}</h2>
+    <p class="hint">{t["vulns_hint"]}</p>
+    {body}
   </section>"""
 
 
 def render(data, lang, tmpl, ev, today):
     t, owner = UI[lang], data["owner"]
-    entries = sorted(data.get("entries") or [],
-                     key=lambda e: (STAGE_ORDER.index(stage_of(e, ev)) if stage_of(e, ev) in STAGE_ORDER else 99,
-                                    str(e.get("submitted"))))
-    vulns = list(data.get("vulnerabilities") or [])
-    groups = [GROUP.get(stage_of(e, ev), "review") for e in entries]
-    counts = {g: groups.count(g) for g in TABS}
-    counts["all"] = len(entries) + len(vulns)
-    counts["cve"] = len(vulns)
+    entries = data.get("entries") or []
     repos = list(data.get("repos") or [])
-    counts["repos"] = len(repos)
-    tabs = "".join(
-        f'<button type="button" role="tab" class="tab" data-tab="{g}"{" hidden" if g == "closed" and not counts[g] else ""}>'
-        f'{t["tabs"][g]} <span class="count" id="c-{g}">{counts[g]}</span></button>'
-        for g in TABS)
-    replied = sum(1 for e in entries if ((ev.get(key(e)) or {}).get("live") or {}).get("first_response"))
-    cves = sum(1 for e in entries if e.get("cve")) + sum(1 for v in vulns if v.get("cve"))
-    labels = {"owner": owner["github"], "stages": t["stages"], "live": t["live"], "loading": t["loading"],
-              "snapshot": t["snapshot"].format(d=today.isoformat()), "groups": GROUP,
-              "landed": [key(e) for e in entries if landed(e, ev)]}
     subs = {
         "html_lang": t["html_lang"], "name": html.escape(owner["name"]),
         "title_suffix": t["title_suffix"], "tagline": html.escape(pick(owner["tagline"], lang)),
-        "switch": t["switch"], "loading": t["loading"], "hint": t["hint"], "empty_tab": t["empty_tab"],
-        "wins": wins_section(data, lang, ev),
-        "summary": html.escape(t["summary"].format(prs=len(entries), vulns=len(vulns), replied=replied, cves=cves)),
+        "switch": t["switch"],
         "tags": "".join(f"<li>{html.escape(a)}</li>" for a in pick(owner["areas"], lang)),
-        "tabs": tabs,
-        "entries": "".join(entry(e, lang, ev, today) for e in entries)
-        + "".join(vuln_entry(v, lang) for v in vulns)
-        or f'<p class="none">{t["empty"]}</p>',
+        "wins": wins_section(data, lang, ev),
+        "repos_title": t["repos_title"],
         "repos_hint": t["repos_hint"],
-        "repos": "".join(repo_card(r, lang, ev, entries) for r in repos),
-        "labels": json.dumps(labels, ensure_ascii=False).replace("</", "<\\/"),
+        "repos": "".join(repo_card(r, lang, entries) for r in repos),
+        "vulns": vulns_section(data, lang),
         "footer": html.escape(t["footer"].format(d=today.isoformat())),
     }
-    return re.sub(r"\{\{(\w+)\}\}", lambda m: subs[m.group(1)], tmpl), len(entries)
+    n = sum(1 for e in entries if landed(e, ev))
+    return re.sub(r"\{\{(\w+)\}\}", lambda m: subs[m.group(1)], tmpl), n
 
 
 def main():
@@ -396,7 +414,7 @@ def main():
         out, n = render(data, lang, tmpl, ev, today)
         os.makedirs(os.path.dirname(os.path.join(HERE, path)) or HERE, exist_ok=True)
         open(os.path.join(HERE, path), "w", encoding="utf-8").write(out)
-        print(f"{path}: {n} entries")
+        print(f"{path}: {n} landed contributions")
 
 
 if __name__ == "__main__":
