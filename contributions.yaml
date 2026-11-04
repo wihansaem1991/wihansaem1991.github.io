@@ -166,6 +166,56 @@ entries:
 
   - project: OpenSSL
     repo: openssl/openssl
+    pr: 33545
+    title:
+      en: Clear the PKCS#12 PBE plaintext on the failure paths
+      ko: "PKCS#12 PBE 평문을 실패 경로에서 지우기"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-05
+    decided: null
+    defect:
+      en: >-
+        `PKCS12_pbe_crypt_ex()` frees its output buffer with `OPENSSL_free()` on both decryption
+        failure paths, where the buffer already holds the plaintext: with the right password and a
+        corrupted final block, that is the whole PKCS#8 private key. `PKCS12_item_i2d_encrypt_ex()`
+        clears its encoded input only on success, so an encryption failure frees the PKCS#8 DER
+        uncleared even with `zbuf` set.
+      ko: >-
+        `PKCS12_pbe_crypt_ex()`는 복호화 실패 경로 두 곳에서 출력 버퍼를 `OPENSSL_free()`로 풉니다. 그 버퍼엔
+        이미 평문이 들어 있어, 맞는 비밀번호에 마지막 블록만 변조되면 PKCS#8 개인키 전체가 그대로 남습니다.
+        `PKCS12_item_i2d_encrypt_ex()`는 성공 경로에서만 입력을 지우므로, 암호화가 실패하면 `zbuf`가 켜져 있어도
+        PKCS#8 DER을 지우지 않고 해제합니다.
+    background:
+      en: >-
+        Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) on the PKCS#12 PBE paths. The success path of
+        the same function already clears its copy, so the failure paths follow the pattern reviewers
+        accepted in #33430 and #33444.
+      ko: >-
+        제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 PKCS#12 PBE 경로에 적용했습니다. 같은 함수의 성공 경로는
+        이미 복사본을 지우므로, 실패 경로도 #33430·#33444에서 리뷰어가 받아들인 방식을 따랐습니다.
+    found_by:
+      en: >-
+        A freed-block measurement program that encrypts and decrypts a PKCS#8 key, forces the two
+        failure paths, and searches freed heap for the key bytes.
+      ko: >-
+        PKCS#8 키를 암·복호하면서 두 실패 경로를 일부러 내고, 해제된 힙에서 키 바이트를 찾는 해제 블록 측정
+        프로그램으로 찾았습니다.
+    fix:
+      en: >-
+        Use `OPENSSL_clear_free(out, max_out_len)` on the two decryption failure paths and
+        `OPENSSL_cleanse(in, inlen)` before freeing the input when `zbuf` is set, matching the
+        success path. After the fix all three measured cases are clean; the regression test waits on
+        the shared allocator-hook helper in #33477.
+      ko: >-
+        복호화 실패 경로 두 곳에 `OPENSSL_clear_free(out, max_out_len)`를, `zbuf`가 켜졌을 때 입력을 해제하기 전
+        `OPENSSL_cleanse(in, inlen)`를 넣어 성공 경로와 맞췄습니다. 수정 뒤 측정한 세 경우가 모두 깨끗합니다.
+        회귀 시험은 #33477의 공용 할당자 가로채기 도우미를 기다립니다.
+
+  - project: OpenSSL
+    repo: openssl/openssl
     pr: 33430
     title:
       en: Clear the `EVP_ENCODE_CTX` when freeing it
