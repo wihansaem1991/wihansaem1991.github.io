@@ -23,29 +23,16 @@
   .tags { margin: 12px 0 0; display:flex; flex-wrap:wrap; gap:6px; padding:0; list-style:none; }
   .tags li { border:1px solid var(--line); border-radius:999px; padding:1px 10px; font-size:12px; color:var(--muted); }
 
-  .wins { margin: 28px 0 8px; }
-  .wins h2, .section h2 { font-size: 20px; margin: 0 0 4px; letter-spacing:-0.01em; }
-  .wins-intro { margin: 0 0 6px; color: var(--muted); font-size: 14px; }
+  .section { margin-top: 28px; }
+  .section h2 { font-size: 20px; margin: 0 0 4px; letter-spacing:-0.01em; }
   .hint { color:var(--muted); font-size:13px; margin:4px 0 12px; }
-  .win-grid { display:grid; gap:12px; }
-  .win { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--ok);
-         border-radius:12px; padding:4px 16px 8px; overflow-wrap:anywhere; }
-  .win-head { display:flex; align-items:baseline; gap:8px; padding:10px 0 2px; }
-  .win-head a { text-decoration:none; }
-  .win-head b { font-size:16px; color:var(--fg); }
-  .win-count { margin-left:auto; color:var(--muted); font-size:12px; white-space:nowrap; }
-
-  .section { margin-top: 32px; }
+  #wins .entry { border-left:3px solid var(--ok); }
 
   .entry { position:relative; overflow-wrap:anywhere; }
   .entry summary { list-style:none; cursor:pointer; display:grid; gap:2px; }
   .entry summary::-webkit-details-marker { display:none; }
   .entry summary::after { content:"▾"; position:absolute; color:var(--muted); }
   .entry[open] summary::after { content:"▴"; }
-  .win .entry { border-top:1px solid var(--line); }
-  .win .entry summary { padding:10px 20px 10px 0; }
-  .win .entry summary::after { right:0; top:10px; }
-  .win .entry .body { padding:2px 0 12px; }
   .section .entry { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; }
   .section .entry summary { padding:12px 34px 12px 16px; }
   .section .entry summary::after { right:16px; top:12px; }
