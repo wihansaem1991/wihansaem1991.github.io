@@ -278,13 +278,13 @@
   </details>
   <details class="entry" id="latchset-kryoptic-566" data-group="review">
     <summary>
-      <span class="line1"><b>Kryoptic</b> <span class="badge changes" data-pr="latchset/kryoptic#566">Changes requested</span></span>
-      <span class="line2">Return CKR_MECHANISM_PARAM_INVALID for an invalid ECDH peer point</span>
-      <span class="line3">submitted 2026-11-04 · 1 days · first reply 2026-11-03 · CI <span class="ok">✓69</span></span>
+      <span class="line1"><b>Kryoptic</b> <span class="badge rereview" data-pr="latchset/kryoptic#566">Updated, awaiting re-review</span></span>
+      <span class="line2">Return CKR_PUBLIC_KEY_INVALID for an invalid ECDH peer point</span>
+      <span class="line3">submitted 2026-11-04 · 1 days · first reply 2026-11-03 · CI <span class="wait">⏸8</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">latchset/kryoptic #566 · Bug fix ↗</a></div>
-      <dl><dt>Problem</dt><dd><code>CKM_ECDH1_DERIVE</code> reported a peer public point that is not on the curve, has the wrong length or uses a bad compressed encoding as <code>CKR_DEVICE_ERROR</code>, so a caller could not tell a corrupted or hostile peer key from a fault in the token.</dd><dt>Background</dt><dd>PKCS#11 return-code rules: bad mechanism input is <code>CKR_MECHANISM_PARAM_INVALID</code>, while <code>CKR_DEVICE_ERROR</code> means the token itself failed. An ECDH peer key comes from the other side of the key exchange, so it is untrusted input.</dd><dt>How it was found</dt><dd>Wycheproof ECDH vectors (P-256, P-384, P-521, X25519, X448; 2,834 cases) run through <code>C_DeriveKey</code>: every result matched, but 79 of the 82 invalid cases came back as <code>CKR_DEVICE_ERROR</code>.</dd><dt>Fix</dt><dd>Map a failed peer-key import to <code>CKR_MECHANISM_PARAM_INVALID</code>, the error the same function already gives for a malformed DER value. A new test case derives with an off-curve P-256 point and fails without the change.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">Pull request #566 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/566/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+      <dl><dt>Problem</dt><dd><code>CKM_ECDH1_DERIVE</code> reported a peer public point that is not on the curve, has the wrong length or uses a bad compressed encoding as <code>CKR_DEVICE_ERROR</code>, so a caller could not tell a corrupted or hostile peer key from a fault in the token.</dd><dt>Background</dt><dd>PKCS#11 return-code rules: a public key that cannot be used is <code>CKR_PUBLIC_KEY_INVALID</code>, while <code>CKR_DEVICE_ERROR</code> means the token itself failed. An ECDH peer key comes from the other side of the key exchange, so it is untrusted input.</dd><dt>How it was found</dt><dd>Wycheproof ECDH vectors (P-256, P-384, P-521, X25519, X448; 2,834 cases) run through <code>C_DeriveKey</code>: every result matched, but 79 of the 82 invalid cases came back as <code>CKR_DEVICE_ERROR</code>.</dd><dt>Fix</dt><dd>Map a failed peer-key import to <code>CKR_PUBLIC_KEY_INVALID</code>. A new test case derives with an off-curve P-256 point and fails without the change.</dd><dt>Review</dt><dd>The maintainer asked for <code>CKR_PUBLIC_KEY_INVALID</code> instead of <code>CKR_MECHANISM_PARAM_INVALID</code>. Changed in a follow-up commit; the Wycheproof rerun gives <code>CKR_PUBLIC_KEY_INVALID</code> for all 79 invalid peer points.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">Pull request #566 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/566/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl><blockquote>"Good approach, wrong error choice, easy to fix" — reviewer</blockquote>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33426" data-group="review">
@@ -702,7 +702,7 @@
       <div class="name"><b>Kryoptic</b> <a href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener">latchset/kryoptic ↗</a></div>
       <div class="about">PKCS#11 software token in Rust, backed by OpenSSL</div>
       <div class="focus">Looking at: Wycheproof vectors run through the PKCS#11 API, checking both results and return codes</div>
-      <div class="prs"><span>2 pull requests</span> <span class="badge changes">Changes requested 1</span> <span class="badge ci_approval">Awaiting CI approval 1</span></div>
+      <div class="prs"><span>2 pull requests</span> <span class="badge rereview">Updated, awaiting re-review 1</span> <span class="badge ci_approval">Awaiting CI approval 1</span></div>
     </article></div>
   </section>
 
