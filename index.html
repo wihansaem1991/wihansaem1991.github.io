@@ -112,7 +112,7 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">15</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">4</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">17</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">6</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
     <h3 class="chart-h">Landed by project</h3><div class="bars">
       <details class="bar">
         <summary>
@@ -250,8 +250,38 @@
           </summary>
           <div class="body"><dl><dt>Problem</dt><dd>The derived key was imported as an <code>EVP_SKEY</code> and its temporary buffer freed with <code>OPENSSL_free()</code>, leaving the whole key in released heap memory.</dd><dt>Background</dt><dd>Key zeroisation as required by ISO/IEC 19790, the standard behind FIPS 140-3 and Korea&#x27;s KCMVP validation: a derived key is secret material and has to be cleared before its memory is released. OpenSSL provides <code>OPENSSL_clear_free()</code> for exactly this.</dd><dt>How it was found</dt><dd>A measurement program that replaces OpenSSL&#x27;s allocator and scans every freed block for key bytes: a 20-byte block holding the full key, freed at <code>pbkdf1.c:318</code>.</dd><dt>Fix</dt><dd><code>OPENSSL_clear_free()</code> on both paths; <code>test_kdf_pbkdf1_skey</code> now watches freed blocks and fails if the change is reverted.</dd><dt>Review</dt><dd>Approved by two reviewers; triaged as a bug with FIPS relevance.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">#33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — reviewer</blockquote></div>
         </details></div>
+      </details>
+      <details class="bar">
+        <summary>
+          <span class="bar-name">OpenSC</span>
+          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-n">1</span>
+        </summary>
+        <div class="bar-body">
+        <details class="entry" id="OpenSC-OpenSC-3917">
+          <summary>
+            <span class="line2">pkcs11: Encrypt with RSA public keys in software</span>
+            <span class="line3">OpenSC/OpenSC #3917 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>OpenSC&#x27;s PKCS#11 module could verify signatures with a public key but not encrypt with one: <code>C_EncryptInit()</code> on an RSA public key failed with <code>CKR_KEY_TYPE_INCONSISTENT</code> (#3144). The p11test suite also never called <code>C_Encrypt()</code>, because its group setup dropped the flag that enables it.</dd><dt>Background</dt><dd>PKCS#11 object operations and mechanism flags (<code>CKF_ENCRYPT</code>), RSA PKCS#1 v1.5 and raw RSA encryption, and OpenSC&#x27;s existing software path for <code>C_Verify()</code> through OpenSSL.</dd><dt>How it was found</dt><dd>A maintainer-labelled good first issue. A virtual SmartCard-HSM (pico-hsm emulation behind vsmartcard and a user-mode pcscd) reproduced it, and pkcs11-spy showed p11test never reaching <code>C_Encrypt()</code>.</dd><dt>Fix</dt><dd>Public key objects encrypt with <code>CKM_RSA_PKCS</code> and <code>CKM_RSA_X_509</code> through OpenSSL, and p11test now keeps the flag. Card round trips work for both mechanisms; the CI p11test run matches the updated reference with no differences.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/OpenSC/OpenSC/pull/3917" target="_blank" rel="noopener">#3917 ↗</a> · <a href="https://github.com/OpenSC/OpenSC/pull/3917/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details></div>
+      </details>
+      <details class="bar">
+        <summary>
+          <span class="bar-name">tpm2-tss</span>
+          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-n">1</span>
+        </summary>
+        <div class="bar-body">
+        <details class="entry" id="tpm2-software-tpm2-tss-3198">
+          <summary>
+            <span class="line2">mu: Accept a NULL offset in the TPMS_EMPTY marshalling functions</span>
+            <span class="line3">tpm2-software/tpm2-tss #3198 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details></div>
       </details></div>
-    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:26.7%;background:var(--c-hardening,var(--accent))" title="Hardening 4"></span><span class="seg" style="width:46.7%;background:var(--c-bugfix,var(--accent))" title="Bug fix 7"></span><span class="seg" style="width:20.0%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:6.7%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 4</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 7</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
+    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:23.5%;background:var(--c-hardening,var(--accent))" title="Hardening 4"></span><span class="seg" style="width:52.9%;background:var(--c-bugfix,var(--accent))" title="Bug fix 9"></span><span class="seg" style="width:17.6%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:5.9%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 4</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 9</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
     <p class="hint">Open an entry to read its briefing.</p>
   </section>
 
