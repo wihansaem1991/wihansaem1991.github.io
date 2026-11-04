@@ -25,6 +25,8 @@ STAGE_ORDER = ["merged", "approved", "approved_pending", "rereview", "changes", 
 GROUP = {"merged": "done", "approved": "done", "approved_pending": "review", "rereview": "review", "changes": "review", "review": "review",
          "open": "review", "ci_approval": "ci", "closed": "closed"}
 TABS = ["all", "done", "review", "ci", "closed", "cve", "repos"]
+# fixed colour order for the type-mix bar (CSS vars --c-<type> carry the hue, with a dark variant)
+TYPE_ORDER = ["hardening", "bugfix", "test", "cleanup", "docs", "feature"]
 
 UI = {
     "en": {
@@ -37,6 +39,8 @@ UI = {
         "wins_title": "Contributions that landed",
         "wins_intro": "{n} contributions are in {projects} open-source projects.",
         "wins_count": "{n}",
+        "kpi_landed": "Landed", "kpi_projects": "Projects",
+        "chart_by_project": "Landed by project", "chart_by_type": "By type",
         "repos_title": "Repositories I audit",
         "vulns_title": "Vulnerability reports",
         "vulns_hint": "Reported through each project's private channel; named once the project publishes a fix.",
@@ -80,6 +84,8 @@ UI = {
         "wins_title": "오픈소스에 반영된 기여",
         "wins_intro": "오픈소스 프로젝트 {projects}곳에 기여 {n}건이 들어갔습니다.",
         "wins_count": "{n}건",
+        "kpi_landed": "반영된 기여", "kpi_projects": "기여한 프로젝트",
+        "chart_by_project": "프로젝트별 반영 기여", "chart_by_type": "종류별 기여",
         "repos_title": "분석 중인 저장소",
         "vulns_title": "취약점 보고",
         "vulns_hint": "각 프로젝트의 비공개 경로로 보고했고, 프로젝트가 수정을 공개하면 이름을 채웁니다.",
@@ -284,24 +290,18 @@ def vuln_entry(v, lang):
     </details>"""
 
 
-def repo_card(r, lang, entries):
-    """One repository being audited: what it is, what I look at, and my pull requests by stage."""
+def repo_chip(r, lang, entries):
+    """One repository I audit, as a compact chip: project name, a link, and how many of my pull
+    requests it carries. The full what-it-is / what-I-look-at text is in its title tooltip."""
     t = UI[lang]
     mine = [e for e in entries if e["repo"] == r["repo"]]
     url = r.get("link") or f'https://github.com/{r["repo"]}'
-    if mine:
-        prs = f'<span>{t["prs"].format(n=len(mine))}</span>'
-    elif r.get("status"):
-        prs = f'<span>{text(pick(r["status"], lang))}</span>'
-    else:
-        prs = f'<span class="none">{t["no_prs"]}</span>'
-    return f"""
-    <article class="repo" id="repo-{html.escape(r['repo'].replace('/', '-'))}">
-      <div class="name"><b>{text(r['project'])}</b> {ext(url, html.escape(r['repo']))}</div>
-      <div class="about">{text(pick(r.get('about'), lang))}</div>
-      <div class="focus">{t["focus"]}: {text(pick(r.get('focus'), lang))}</div>
-      <div class="prs">{prs}</div>
-    </article>"""
+    n = f'<span class="chip-n">{len(mine)}</span>' if mine else ""
+    about = pick(r.get("about"), lang) or ""
+    focus = pick(r.get("focus"), lang) or ""
+    tip = f'{about} · {t["focus"]}: {focus}'.strip(" ·") if (about or focus) else html.escape(r["repo"])
+    return (f'<a class="chip" href="{html.escape(url)}" target="_blank" rel="noopener" '
+            f'title="{html.escape(tip)}">{text(r["project"])}{n}</a>')
 
 
 def win_entry(e, lang):
@@ -331,53 +331,127 @@ def win_entry(e, lang):
         </details>"""
 
 
-def wins_section(data, lang, ev):
-    """A simple list of the contributions that landed in their projects. One line each; open an
-    entry to read its briefing. No review-stage labels, no dates presented as a status."""
+def kpi_tile(n, label):
+    return f'<div class="kpi"><div class="kpi-n">{n}</div><div class="kpi-l">{html.escape(label)}</div></div>'
+
+
+def _pr_key(e):
+    return int(str(e["pr"])) if str(e["pr"]).isdigit() else 0
+
+
+def proj_bars(data, lang, ev):
+    """Landed contributions as one horizontal bar per project, longest first. A bar opens into that
+    project's contributions — this is the drill-down from the overview to the detail."""
     t = UI[lang]
     won = [e for e in (data.get("entries") or []) if landed(e, ev)]
     if not won:
         return ""
-    won = sorted(won, key=lambda e: (str(e["project"]).lower(), e["repo"],
-                                     -(int(str(e["pr"])) if str(e["pr"]).isdigit() else 0)))
-    body = "".join(win_entry(e, lang) for e in won)
+    groups = {}
+    for e in won:
+        groups.setdefault(str(e["project"]), []).append(e)
+    order = sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0].lower()))
+    mx = max(len(es) for _, es in order)
+    rows = []
+    for proj, es in order:
+        es = sorted(es, key=lambda e: (e["repo"], -_pr_key(e)))
+        pct = round(len(es) / mx * 100)
+        body = "".join(win_entry(e, lang) for e in es)
+        rows.append(f"""
+      <details class="bar">
+        <summary>
+          <span class="bar-name">{text(proj)}</span>
+          <span class="bar-track"><span class="bar-fill" style="width:{pct}%"></span></span>
+          <span class="bar-n">{len(es)}</span>
+        </summary>
+        <div class="bar-body">{body}</div>
+      </details>""")
+    return (f'<h3 class="chart-h">{html.escape(t["chart_by_project"])}</h3>'
+            f'<div class="bars">{"".join(rows)}</div>')
+
+
+def type_mix(data, lang, ev):
+    """The mix of what landed, as a single 100%-stacked bar with a labelled legend. Colour follows
+    the contribution type in a fixed order (CSS vars --c-<type>), not its rank."""
+    t = UI[lang]
+    won = [e for e in (data.get("entries") or []) if landed(e, ev)]
+    if not won:
+        return ""
+    counts = {}
+    for e in won:
+        counts[e["type"]] = counts.get(e["type"], 0) + 1
+    present = [ty for ty in TYPE_ORDER if counts.get(ty)] + [ty for ty in counts if ty not in TYPE_ORDER]
+    total = sum(counts.values()) or 1
+    segs, legend = [], []
+    for ty in present:
+        c = counts[ty]
+        name = t["types"].get(ty, text(ty))
+        segs.append(f'<span class="seg" style="width:{c / total * 100:.1f}%;background:var(--c-{ty},var(--accent))" '
+                    f'title="{html.escape(name)} {c}"></span>')
+        legend.append(f'<span class="lg"><span class="sw" style="background:var(--c-{ty},var(--accent))"></span>'
+                      f'{html.escape(name)} {c}</span>')
+    return (f'<h3 class="chart-h">{html.escape(t["chart_by_type"])}</h3>'
+            f'<div class="stack">{"".join(segs)}</div><div class="legend">{"".join(legend)}</div>')
+
+
+def stats_section(data, lang, ev):
+    """The at-a-glance overview: a row of headline numbers, then the two bar charts."""
+    t = UI[lang]
+    entries = data.get("entries") or []
+    won = [e for e in entries if landed(e, ev)]
+    tiles = (kpi_tile(len(won), t["kpi_landed"])
+             + kpi_tile(len({str(e["project"]) for e in won}), t["kpi_projects"])
+             + kpi_tile(len(data.get("vulnerabilities") or []), t["vulns_title"])
+             + kpi_tile(len(data.get("repos") or []), t["repos_title"]))
     return f"""
-  <section class="section" id="wins">
-    <h2>{t["wins_title"]}</h2>
+  <section class="stats" id="stats">
+    <div class="kpis">{tiles}</div>
+    {proj_bars(data, lang, ev)}
+    {type_mix(data, lang, ev)}
     <p class="hint">{t["hint"]}</p>
-    {body}
   </section>"""
 
 
-def vulns_section(data, lang):
-    """Vulnerability reports, in their own section, without a stage label."""
+def vulns_block(data, lang):
+    """Vulnerability reports, folded away by default so the page stays short; the headline count is
+    in the overview. Open to read each report (named only once a project discloses it)."""
     t = UI[lang]
     vulns = list(data.get("vulnerabilities") or [])
     if not vulns:
         return ""
     body = "".join(vuln_entry(v, lang) for v in vulns)
     return f"""
-  <section class="section" id="vulns">
-    <h2>{t["vulns_title"]}</h2>
-    <p class="hint">{t["vulns_hint"]}</p>
-    {body}
-  </section>"""
+  <details class="fold" id="vulns">
+    <summary><b>{t["vulns_title"]}</b> <span class="fold-n">{len(vulns)}</span></summary>
+    <div class="fold-body"><p class="hint">{t["vulns_hint"]}</p>{body}</div>
+  </details>"""
+
+
+def repos_block(data, lang, entries):
+    """Repositories I audit, folded away by default as a strip of chips; the headline count is in
+    the overview. Each chip links to the repository and carries my open pull-request count."""
+    t = UI[lang]
+    repos = list(data.get("repos") or [])
+    if not repos:
+        return ""
+    chips = "".join(repo_chip(r, lang, entries) for r in repos)
+    return f"""
+  <details class="fold" id="repos">
+    <summary><b>{t["repos_title"]}</b> <span class="fold-n">{len(repos)}</span></summary>
+    <div class="fold-body"><p class="hint">{t["repos_hint"]}</p><div class="chips">{chips}</div></div>
+  </details>"""
 
 
 def render(data, lang, tmpl, ev, today):
     t, owner = UI[lang], data["owner"]
     entries = data.get("entries") or []
-    repos = list(data.get("repos") or [])
     subs = {
         "html_lang": t["html_lang"], "name": html.escape(owner["name"]),
         "title_suffix": t["title_suffix"], "tagline": html.escape(pick(owner["tagline"], lang)),
         "switch": t["switch"],
         "tags": "".join(f"<li>{html.escape(a)}</li>" for a in pick(owner["areas"], lang)),
-        "wins": wins_section(data, lang, ev),
-        "repos_title": t["repos_title"],
-        "repos_hint": t["repos_hint"],
-        "repos": "".join(repo_card(r, lang, entries) for r in repos),
-        "vulns": vulns_section(data, lang),
+        "stats": stats_section(data, lang, ev),
+        "vulns": vulns_block(data, lang),
+        "repos": repos_block(data, lang, entries),
         "footer": html.escape(t["footer"].format(d=today.isoformat())),
     }
     n = sum(1 for e in entries if landed(e, ev))
