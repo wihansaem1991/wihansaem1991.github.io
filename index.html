@@ -92,10 +92,10 @@
     <ul class="tags"><li>Post-quantum cryptography</li><li>KCMVP module validation</li><li>VPN</li><li>HSM / PKCS#11</li><li>AI systems</li></ul>
   </header>
 
-  <div class="summary">38 pull requests and 9 vulnerability reports · 22 with a maintainer reply · 0 CVEs</div>
+  <div class="summary">39 pull requests and 9 vulnerability reports · 22 with a maintainer reply · 0 CVEs</div>
   <div class="live" id="live">Reading current stages from GitHub…</div>
 
-  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">47</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">16</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">3</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">18</span></button></nav>
+  <nav class="tabbar" role="tablist"><button type="button" role="tab" class="tab" data-tab="all">All <span class="count" id="c-all">48</span></button><button type="button" role="tab" class="tab" data-tab="done">Approved / merged <span class="count" id="c-done">14</span></button><button type="button" role="tab" class="tab" data-tab="review">In review <span class="count" id="c-review">17</span></button><button type="button" role="tab" class="tab" data-tab="ci">Awaiting CI approval <span class="count" id="c-ci">3</span></button><button type="button" role="tab" class="tab" data-tab="closed">Closed <span class="count" id="c-closed">5</span></button><button type="button" role="tab" class="tab" data-tab="cve">CVE challenge <span class="count" id="c-cve">9</span></button><button type="button" role="tab" class="tab" data-tab="repos">Repositories <span class="count" id="c-repos">18</span></button></nav>
 
   <section class="panel" id="panel-prs">
     <p class="hint">Open an entry to read its briefing.</p>
@@ -430,6 +430,17 @@
       <dl><dt>Problem</dt><dd>EAX accepts a nonce of any length, but the <code>eax</code> crate fixed it to 16 bytes. Protocols with 4-byte or 6-byte nonces could not use the crate (issue #239, open since 2020), and 54 Wycheproof vectors with other nonce lengths could not be run.</dd><dt>Background</dt><dd>The EAX mode definition (the nonce goes through OMAC, so any length works) and validation test vectors (Wycheproof), the same approach as known-answer testing in cryptographic module validation (KCMVP).</dd><dt>How it was found</dt><dd>The Wycheproof run for #894 left 54 valid EAX cases that the crate&#x27;s types could not express, which pointed to issue #239.</dd><dt>Fix</dt><dd>A <code>NonceSize</code> type parameter (default 16 bytes, so existing code is unchanged) on <code>Eax</code> and the streaming <code>online::Eax</code>, as <code>AesGcm</code> does. The 54 vectors (nonces of 0 to 257 bytes) run through both APIs; with nonces cut to 16 bytes inside the cipher, the new tests fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/AEADs/pull/895" target="_blank" rel="noopener">Pull request #895 ↗</a> · <a href="https://github.com/RustCrypto/AEADs/pull/895/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
     </div>
   </details>
+  <details class="entry" id="openssl-openssl-33524" data-group="review">
+    <summary>
+      <span class="line1"><b>OpenSSL</b> <span class="badge review" data-pr="openssl/openssl#33524">Awaiting review</span></span>
+      <span class="line2">Clear the MSBLOB and PVK private key blobs before freeing them</span>
+      <span class="line3">submitted 2026-11-04 · 0 days · no reply yet · CI <span class="ok">✓16</span> <span class="wait">…79</span></span>
+    </summary>
+    <div class="body">
+      <div class="meta"><a href="https://github.com/openssl/openssl/pull/33524" target="_blank" rel="noopener">openssl/openssl #33524 · Hardening ↗</a></div>
+      <dl><dt>Problem</dt><dd>The MSBLOB and PVK encoders and decoders free the buffer holding the private key blob with <code>OPENSSL_free()</code>, leaving the RSA or DSA private key in freed memory: after writing an MSBLOB or an unencrypted PVK, on the PVK encryption-failure path, after reading an MSBLOB, and after decrypting a PVK. Six distinct free sites were still holding the key.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) across the legacy MSBLOB/PVK paths and their provider encoders/decoders. The same file already clears one copy in <code>do_PVK_key_bio()</code> with <code>OPENSSL_clear_free()</code>, so the remaining sites follow the pattern reviewers accepted in #33430 and #33444.</dd><dt>How it was found</dt><dd>A freed-block measurement program that searches freed heap for the RSA private exponent in both byte orders, run over the legacy pvkfmt API and the provider encoders/decoders.</dd><dt>Fix</dt><dd>Replace the seven <code>OPENSSL_free()</code> calls with <code>OPENSSL_clear_free(&lt;buf&gt;, &lt;len&gt;)</code> using the lengths already tracked for each buffer, and initialise <code>length</code> in <code>msblob2key_decode()</code>. After the fix all twelve measured calls are clean; the regression test waits on the shared allocator-hook helper in #33477.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33524" target="_blank" rel="noopener">Pull request #33524 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33524/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl>
+    </div>
+  </details>
   <details class="entry" id="open-quantum-safe-oqs-provider-861" data-group="ci">
     <summary>
       <span class="line1"><b>oqs-provider</b> <span class="badge ci_approval" data-pr="open-quantum-safe/oqs-provider#861">Awaiting CI approval</span></span>
@@ -600,7 +611,7 @@
       <div class="name"><b>OpenSSL</b> <a href="https://github.com/openssl/openssl" target="_blank" rel="noopener">openssl/openssl ↗</a></div>
       <div class="about">The most widely deployed TLS and cryptography library, in C</div>
       <div class="focus">Looking at: Secrets left in freed memory, measured by hooking the allocator</div>
-      <div class="prs"><span>7 pull requests</span> <span class="badge approved">Approved 1</span> <span class="badge approved_pending">Approved, awaiting another review 1</span> <span class="badge review">Awaiting review 4</span> <span class="badge closed">Closed 1</span></div>
+      <div class="prs"><span>8 pull requests</span> <span class="badge approved">Approved 1</span> <span class="badge approved_pending">Approved, awaiting another review 1</span> <span class="badge review">Awaiting review 5</span> <span class="badge closed">Closed 1</span></div>
     </article>
     <article class="repo" id="repo-openssl-projects-pkcs11-provider">
       <div class="name"><b>pkcs11-provider</b> <a href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener">openssl-projects/pkcs11-provider ↗</a></div>
