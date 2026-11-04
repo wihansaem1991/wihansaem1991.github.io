@@ -278,13 +278,13 @@
   </details>
   <details class="entry" id="latchset-kryoptic-566" data-group="review">
     <summary>
-      <span class="line1"><b>Kryoptic</b> <span class="badge changes" data-pr="latchset/kryoptic#566">수정 요청</span></span>
-      <span class="line2">잘못된 ECDH 상대 공개점에 CKR_MECHANISM_PARAM_INVALID 돌려주기</span>
-      <span class="line3">제출 2026-11-04 · 1일째 · 첫 응답 2026-11-03 · CI <span class="ok">✓69</span></span>
+      <span class="line1"><b>Kryoptic</b> <span class="badge rereview" data-pr="latchset/kryoptic#566">수정 반영, 재리뷰 대기</span></span>
+      <span class="line2">잘못된 ECDH 상대 공개점에 CKR_PUBLIC_KEY_INVALID 돌려주기</span>
+      <span class="line3">제출 2026-11-04 · 1일째 · 첫 응답 2026-11-03 · CI <span class="wait">⏸8</span></span>
     </summary>
     <div class="body">
       <div class="meta"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">latchset/kryoptic #566 · 버그 수정 ↗</a></div>
-      <dl><dt>문제</dt><dd><code>CKM_ECDH1_DERIVE</code>가 곡선 위에 없거나 길이가 틀리거나 압축 형식이 잘못된 상대 공개점을 <code>CKR_DEVICE_ERROR</code>로 알렸습니다. 호출자는 상대가 보낸 키가 잘못됐는지 토큰이 고장 났는지 가릴 수 없었습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 반환 코드 규약을 알아야 했습니다. 메커니즘 입력이 잘못되면 <code>CKR_MECHANISM_PARAM_INVALID</code>이고, <code>CKR_DEVICE_ERROR</code>는 토큰 자체가 실패했다는 뜻입니다. ECDH 상대 공개키는 키 교환 상대가 보내므로 믿을 수 없는 입력입니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ECDH 벡터(P-256·P-384·P-521·X25519·X448, 2,834건)를 <code>C_DeriveKey</code>에 넣어 찾았습니다. 결과는 모두 맞았지만 잘못된 입력 82건 중 79건이 <code>CKR_DEVICE_ERROR</code>로 돌아왔습니다.</dd><dt>수정</dt><dd>상대 공개키를 읽지 못하면 <code>CKR_MECHANISM_PARAM_INVALID</code>를 돌려줍니다. 같은 함수가 DER 형식이 깨진 값에 이미 쓰는 오류입니다. 곡선 밖 P-256 점으로 파생하는 시험을 넣었고, 수정을 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">PR 원문 #566 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/566/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl>
+      <dl><dt>문제</dt><dd><code>CKM_ECDH1_DERIVE</code>가 곡선 위에 없거나 길이가 틀리거나 압축 형식이 잘못된 상대 공개점을 <code>CKR_DEVICE_ERROR</code>로 알렸습니다. 호출자는 상대가 보낸 키가 잘못됐는지 토큰이 고장 났는지 가릴 수 없었습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 반환 코드 규약을 알아야 했습니다. 쓸 수 없는 공개키는 <code>CKR_PUBLIC_KEY_INVALID</code>이고, <code>CKR_DEVICE_ERROR</code>는 토큰 자체가 실패했다는 뜻입니다. ECDH 상대 공개키는 키 교환 상대가 보내므로 믿을 수 없는 입력입니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ECDH 벡터(P-256·P-384·P-521·X25519·X448, 2,834건)를 <code>C_DeriveKey</code>에 넣어 찾았습니다. 결과는 모두 맞았지만 잘못된 입력 82건 중 79건이 <code>CKR_DEVICE_ERROR</code>로 돌아왔습니다.</dd><dt>수정</dt><dd>상대 공개키를 읽지 못하면 <code>CKR_PUBLIC_KEY_INVALID</code>를 돌려줍니다. 곡선 밖 P-256 점으로 파생하는 시험을 넣었고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>메인테이너가 <code>CKR_MECHANISM_PARAM_INVALID</code> 대신 <code>CKR_PUBLIC_KEY_INVALID</code>를 요청해 추가 커밋으로 바꿨습니다. Wycheproof를 다시 돌려 잘못된 상대 점 79건이 모두 <code>CKR_PUBLIC_KEY_INVALID</code>인 것을 확인했습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">PR 원문 #566 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/566/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl><blockquote>"Good approach, wrong error choice, easy to fix" — 리뷰어<br><span class="tr">(번역) 접근은 좋은데 오류 코드를 잘못 골랐다. 쉽게 고칠 수 있다.</span></blockquote>
     </div>
   </details>
   <details class="entry" id="openssl-openssl-33426" data-group="review">
@@ -702,7 +702,7 @@
       <div class="name"><b>Kryoptic</b> <a href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener">latchset/kryoptic ↗</a></div>
       <div class="about">OpenSSL을 쓰는 Rust PKCS#11 소프트웨어 토큰</div>
       <div class="focus">보는 것: Wycheproof 벡터를 PKCS#11 API로 넣어 결과와 반환 코드를 함께 확인</div>
-      <div class="prs"><span>PR 2건</span> <span class="badge changes">수정 요청 1</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
+      <div class="prs"><span>PR 2건</span> <span class="badge rereview">수정 반영, 재리뷰 대기 1</span> <span class="badge ci_approval">CI 실행 허가 대기 1</span></div>
     </article></div>
   </section>
 

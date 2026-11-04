@@ -959,8 +959,8 @@ entries:
     repo: latchset/kryoptic
     pr: 566
     title:
-      en: Return CKR_MECHANISM_PARAM_INVALID for an invalid ECDH peer point
-      ko: 잘못된 ECDH 상대 공개점에 CKR_MECHANISM_PARAM_INVALID 돌려주기
+      en: Return CKR_PUBLIC_KEY_INVALID for an invalid ECDH peer point
+      ko: 잘못된 ECDH 상대 공개점에 CKR_PUBLIC_KEY_INVALID 돌려주기
     type: bugfix
     cve: null
     cvss: null
@@ -977,11 +977,11 @@ entries:
         `CKR_DEVICE_ERROR`로 알렸습니다. 호출자는 상대가 보낸 키가 잘못됐는지 토큰이 고장 났는지 가릴 수 없었습니다.
     background:
       en: >-
-        PKCS#11 return-code rules: bad mechanism input is `CKR_MECHANISM_PARAM_INVALID`, while
+        PKCS#11 return-code rules: a public key that cannot be used is `CKR_PUBLIC_KEY_INVALID`, while
         `CKR_DEVICE_ERROR` means the token itself failed. An ECDH peer key comes from the other side of
         the key exchange, so it is untrusted input.
       ko: >-
-        PKCS#11 반환 코드 규약을 알아야 했습니다. 메커니즘 입력이 잘못되면 `CKR_MECHANISM_PARAM_INVALID`이고,
+        PKCS#11 반환 코드 규약을 알아야 했습니다. 쓸 수 없는 공개키는 `CKR_PUBLIC_KEY_INVALID`이고,
         `CKR_DEVICE_ERROR`는 토큰 자체가 실패했다는 뜻입니다. ECDH 상대 공개키는 키 교환 상대가 보내므로 믿을 수
         없는 입력입니다.
     found_by:
@@ -994,12 +994,23 @@ entries:
         결과는 모두 맞았지만 잘못된 입력 82건 중 79건이 `CKR_DEVICE_ERROR`로 돌아왔습니다.
     fix:
       en: >-
-        Map a failed peer-key import to `CKR_MECHANISM_PARAM_INVALID`, the error the same function
-        already gives for a malformed DER value. A new test case derives with an off-curve P-256
-        point and fails without the change.
+        Map a failed peer-key import to `CKR_PUBLIC_KEY_INVALID`. A new test case derives with an
+        off-curve P-256 point and fails without the change.
       ko: >-
-        상대 공개키를 읽지 못하면 `CKR_MECHANISM_PARAM_INVALID`를 돌려줍니다. 같은 함수가 DER 형식이 깨진 값에
-        이미 쓰는 오류입니다. 곡선 밖 P-256 점으로 파생하는 시험을 넣었고, 수정을 되돌리면 실패합니다.
+        상대 공개키를 읽지 못하면 `CKR_PUBLIC_KEY_INVALID`를 돌려줍니다. 곡선 밖 P-256 점으로 파생하는 시험을
+        넣었고, 수정을 되돌리면 실패합니다.
+    review:
+      en: >-
+        The maintainer asked for `CKR_PUBLIC_KEY_INVALID` instead of `CKR_MECHANISM_PARAM_INVALID`.
+        Changed in a follow-up commit; the Wycheproof rerun gives `CKR_PUBLIC_KEY_INVALID` for all 79
+        invalid peer points.
+      ko: >-
+        메인테이너가 `CKR_MECHANISM_PARAM_INVALID` 대신 `CKR_PUBLIC_KEY_INVALID`를 요청해 추가 커밋으로
+        바꿨습니다. Wycheproof를 다시 돌려 잘못된 상대 점 79건이 모두 `CKR_PUBLIC_KEY_INVALID`인 것을 확인했습니다.
+    quote: >-
+      Good approach, wrong error choice, easy to fix
+    quote_ko: >-
+      접근은 좋은데 오류 코드를 잘못 골랐다. 쉽게 고칠 수 있다.
 
   - project: Kryoptic
     repo: latchset/kryoptic
