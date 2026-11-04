@@ -11,10 +11,9 @@ owner:
   tagline:
     en: >-
       Security fixes and vulnerability reports for open-source cryptography, found by measurement
-      and verified by tests, tracked here from submission to merge or CVE.
+      and verified by tests.
     ko: >-
-      오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고 시험으로 검증해 고칩니다. 제출부터 머지·CVE까지
-      진행 상황을 여기서 공개합니다.
+      오픈소스 암호 라이브러리의 보안 결함을 측정으로 찾고 시험으로 검증해 고칩니다.
   areas:
     en: [Post-quantum cryptography, KCMVP module validation, VPN, HSM / PKCS#11, AI systems]
     ko: [양자내성암호(PQC), KCMVP 암호모듈 검증, VPN, HSM / PKCS#11, AI 시스템]
