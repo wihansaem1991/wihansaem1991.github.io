@@ -1063,9 +1063,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-04
-    decided: null
+    decided: 2026-11-05
     defect:
       en: >-
         `CKM_ECDH1_DERIVE` reported a peer public point that is not on the curve, has the wrong
@@ -1575,7 +1575,7 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-01
     decided: 2026-11-05
     defect:
@@ -1725,7 +1725,7 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-02
     decided: 2026-11-05
     defect:

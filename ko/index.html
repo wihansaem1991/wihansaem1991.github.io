@@ -112,7 +112,7 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">20</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">21</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
     <h3 class="chart-h">프로젝트별 반영 기여</h3><div class="bars">
       <details class="bar">
         <summary>
@@ -245,6 +245,28 @@
       </details>
       <details class="bar">
         <summary>
+          <span class="bar-name">Kryoptic</span>
+          <span class="bar-track"><span class="bar-fill" style="width:33%"></span></span>
+          <span class="bar-n">2</span>
+        </summary>
+        <div class="bar-body">
+        <details class="entry" id="latchset-kryoptic-573">
+          <summary>
+            <span class="line2">ChaCha20-Poly1305를 큰 조각으로 나눠 복호할 때 앞부분이 빠지는 문제 고치기</span>
+            <span class="line3">latchset/kryoptic #573 · 버그 수정</span>
+          </summary>
+          <div class="body"><dl><dt>문제</dt><dd><code>C_DecryptUpdate</code>를 16바이트 태그보다 긴 조각으로 두 번 이상 부르면, 두 번째 조각부터 앞부분이 복호되지 않고 빠졌습니다. 평문이 짧게 나왔고 <code>C_DecryptFinal</code>은 정상 암호문을 <code>CKR_ENCRYPTED_DATA_INVALID</code>로 거부했습니다.</dd><dt>배경 지식</dt><dd>AEAD를 나눠 복호하는 방식을 알아야 했습니다. 토큰은 <code>C_DecryptFinal</code> 전까지 어느 바이트가 Poly1305 태그인지 모르므로, 매번 마지막 16바이트만 남겨 두고 그 앞은 모두 복호해야 합니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ChaCha20-Poly1305 벡터를 여러 조각 크기로 <code>C_DecryptUpdate</code>에 넣어 찾았습니다. 한 번에, 1바이트, 5바이트 조각은 맞았지만 17바이트 조각에서 정상 벡터 190건이 실패했습니다.</dd><dt>수정</dt><dd>입력을 통째로 남겨 둔 경우에만 건너뛰게 고쳤습니다. 나눠 복호하는 시험에 20바이트 조각을 더했고, 수정을 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/573" target="_blank" rel="noopener">#573 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/573/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="latchset-kryoptic-566">
+          <summary>
+            <span class="line2">잘못된 ECDH 상대 공개점에 CKR_PUBLIC_KEY_INVALID 돌려주기</span>
+            <span class="line3">latchset/kryoptic #566 · 버그 수정</span>
+          </summary>
+          <div class="body"><dl><dt>문제</dt><dd><code>CKM_ECDH1_DERIVE</code>가 곡선 위에 없거나 길이가 틀리거나 압축 형식이 잘못된 상대 공개점을 <code>CKR_DEVICE_ERROR</code>로 알렸습니다. 호출자는 상대가 보낸 키가 잘못됐는지 토큰이 고장 났는지 가릴 수 없었습니다.</dd><dt>배경 지식</dt><dd>PKCS#11 반환 코드 규약을 알아야 했습니다. 쓸 수 없는 공개키는 <code>CKR_PUBLIC_KEY_INVALID</code>이고, <code>CKR_DEVICE_ERROR</code>는 토큰 자체가 실패했다는 뜻입니다. ECDH 상대 공개키는 키 교환 상대가 보내므로 믿을 수 없는 입력입니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ECDH 벡터(P-256·P-384·P-521·X25519·X448, 2,834건)를 <code>C_DeriveKey</code>에 넣어 찾았습니다. 결과는 모두 맞았지만 잘못된 입력 82건 중 79건이 <code>CKR_DEVICE_ERROR</code>로 돌아왔습니다.</dd><dt>수정</dt><dd>상대 공개키를 읽지 못하면 <code>CKR_PUBLIC_KEY_INVALID</code>를 돌려줍니다. 곡선 밖 P-256 점으로 파생하는 시험을 넣었고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>메인테이너가 <code>CKR_MECHANISM_PARAM_INVALID</code> 대신 <code>CKR_PUBLIC_KEY_INVALID</code>를 요청해 추가 커밋으로 바꿨습니다. Wycheproof를 다시 돌려 잘못된 상대 점 79건이 모두 <code>CKR_PUBLIC_KEY_INVALID</code>인 것을 확인했습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/566" target="_blank" rel="noopener">#566 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/566/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl><blockquote>"Good approach, wrong error choice, easy to fix" — 리뷰어<br><span class="tr">(번역) 접근은 좋은데 오류 코드를 잘못 골랐다. 쉽게 고칠 수 있다.</span></blockquote></div>
+        </details></div>
+      </details>
+      <details class="bar">
+        <summary>
           <span class="bar-name">OpenSSL</span>
           <span class="bar-track"><span class="bar-fill" style="width:33%"></span></span>
           <span class="bar-n">2</span>
@@ -263,21 +285,6 @@
             <span class="line3">openssl/openssl #33444 · 보안 강화</span>
           </summary>
           <div class="body"><dl><dt>문제</dt><dd>파생 키를 <code>EVP_SKEY</code>로 가져온 뒤 임시 버퍼를 <code>OPENSSL_free()</code>로 해제해서, 키 전체가 해제된 힙 메모리에 그대로 남았습니다.</dd><dt>배경 지식</dt><dd>FIPS 140-3와 KCMVP 검증의 바탕인 ISO/IEC 19790은 다 쓴 키를 지우도록(제로화) 요구합니다. 파생 키도 비밀값이라 메모리를 돌려주기 전에 지워야 하고, OpenSSL은 이를 위해 <code>OPENSSL_clear_free()</code>를 둡니다.</dd><dt>찾은 방법</dt><dd>OpenSSL 할당자를 바꿔 해제되는 블록마다 키 바이트가 남았는지 재는 측정 프로그램으로 찾았습니다. <code>pbkdf1.c:318</code>에서 해제되는 20바이트 블록에 키 전체가 들어 있었습니다.</dd><dt>수정</dt><dd>두 경로 모두 <code>OPENSSL_clear_free()</code>로 바꿨습니다. 기존 시험 <code>test_kdf_pbkdf1_skey</code>가 이제 해제 블록을 감시하고, 수정을 되돌리면 실패합니다.</dd><dt>리뷰</dt><dd>리뷰어 두 명이 승인했고, FIPS와 관련된 버그로 분류됐습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/openssl/openssl/pull/33444" target="_blank" rel="noopener">#33444 ↗</a> · <a href="https://github.com/openssl/openssl/pull/33444/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl><blockquote>"this is quite neat technique, I wonder if it should be generalised and used with other part of the code [that] pass around key material." — 리뷰어<br><span class="tr">(번역) 꽤 깔끔한 기법이다. 키를 주고받는 다른 코드에도 일반화해서 쓰면 좋겠다.</span></blockquote></div>
-        </details></div>
-      </details>
-      <details class="bar">
-        <summary>
-          <span class="bar-name">Kryoptic</span>
-          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
-          <span class="bar-n">1</span>
-        </summary>
-        <div class="bar-body">
-        <details class="entry" id="latchset-kryoptic-573">
-          <summary>
-            <span class="line2">ChaCha20-Poly1305를 큰 조각으로 나눠 복호할 때 앞부분이 빠지는 문제 고치기</span>
-            <span class="line3">latchset/kryoptic #573 · 버그 수정</span>
-          </summary>
-          <div class="body"><dl><dt>문제</dt><dd><code>C_DecryptUpdate</code>를 16바이트 태그보다 긴 조각으로 두 번 이상 부르면, 두 번째 조각부터 앞부분이 복호되지 않고 빠졌습니다. 평문이 짧게 나왔고 <code>C_DecryptFinal</code>은 정상 암호문을 <code>CKR_ENCRYPTED_DATA_INVALID</code>로 거부했습니다.</dd><dt>배경 지식</dt><dd>AEAD를 나눠 복호하는 방식을 알아야 했습니다. 토큰은 <code>C_DecryptFinal</code> 전까지 어느 바이트가 Poly1305 태그인지 모르므로, 매번 마지막 16바이트만 남겨 두고 그 앞은 모두 복호해야 합니다.</dd><dt>찾은 방법</dt><dd>Wycheproof ChaCha20-Poly1305 벡터를 여러 조각 크기로 <code>C_DecryptUpdate</code>에 넣어 찾았습니다. 한 번에, 1바이트, 5바이트 조각은 맞았지만 17바이트 조각에서 정상 벡터 190건이 실패했습니다.</dd><dt>수정</dt><dd>입력을 통째로 남겨 둔 경우에만 건너뛰게 고쳤습니다. 나눠 복호하는 시험에 20바이트 조각을 더했고, 수정을 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/573" target="_blank" rel="noopener">#573 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/573/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
         </details></div>
       </details>
       <details class="bar">
@@ -310,7 +317,7 @@
           <div class="body"><dl><dt>문제</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code>·<code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code>가 디버그 로그를 찍으려고 <code>*offset</code>을 확인 없이 읽었습니다. 같은 파일의 다른 함수는 모두 NULL offset을 받는데, 이 둘은 널 포인터를 읽었습니다.</dd><dt>배경 지식</dt><dd>tpm2-tss는 마샬링(MU) 함수를 C 매크로로 찍어 내고, 매크로마다 로그에 <code>offset ? *offset : 0xffff</code>를 씁니다. 기본 로그 수준에서 <code>LOG_DEBUG()</code>는 그냥 함수 호출이라 디버그 로그가 꺼져 있어도 인자를 계산합니다.</dd><dt>찾은 방법</dt><dd>MU 함수에 NULL offset을 넘겨 UndefinedBehaviorSanitizer로 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>TPMS_MARSHAL_0</code>·<code>TPMS_UNMARSHAL_0</code>도 다른 매크로처럼 <code>offset ? *offset : 0xffff</code>를 씁니다. 수정을 되돌리면 새 단위 시험이 UBSan 보고로 멈추고, 고친 뒤 <code>TPMS-marshal</code> 시험 12개가 모두 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
         </details></div>
       </details></div>
-    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:30.0%;background:var(--c-hardening,var(--accent))" title="보안 강화 6"></span><span class="seg" style="width:50.0%;background:var(--c-bugfix,var(--accent))" title="버그 수정 10"></span><span class="seg" style="width:15.0%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:5.0%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 10</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span></div>
+    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:28.6%;background:var(--c-hardening,var(--accent))" title="보안 강화 6"></span><span class="seg" style="width:52.4%;background:var(--c-bugfix,var(--accent))" title="버그 수정 11"></span><span class="seg" style="width:14.3%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:4.8%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 11</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span></div>
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
   </section>
 
@@ -395,7 +402,7 @@
     <summary><b>분석 중인 저장소</b> <span class="fold-n">18</span></summary>
     <div class="fold-body"><p class="hint">지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었습니다.</p><div class="chips"><a class="chip" href="https://github.com/openssl/openssl" target="_blank" rel="noopener" title="가장 널리 쓰이는 C TLS·암호 라이브러리 · 보는 것: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)">OpenSSL<span class="chip-n">9</span></a><a class="chip" href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener" title="OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider · 보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조">pkcs11-provider<span class="chip-n">4</span></a><a class="chip" href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener" title="OpenVPN 본체(C), 패치는 Gerrit으로 제출 · 보는 것: 지우지 않고 해제하는 키 재료">OpenVPN<span class="chip-n">5</span></a><a class="chip" href="https://github.com/randombit/botan" target="_blank" rel="noopener" title="양자내성 알고리즘이 많은 C++ 암호 라이브러리 · 보는 것: 양자내성 키·서명 길이 입력 검증">Botan<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener" title="상수 시간 큰 정수 연산 Rust 라이브러리 · 보는 것: 문자열·바이트 변환 경계값">crypto-bigint<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener" title="순수 Rust RSA 구현 · 보는 것: 시험이 돌리지 않는 Wycheproof 벡터">RustCrypto RSA<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/AEADs" target="_blank" rel="noopener" title="Rust 인증 암호 모음(AES-GCM·ChaCha20-Poly1305·CCM·EAX 등) · 보는 것: 시험이 돌리지 않는 Wycheproof 벡터, 위조 태그 거부">RustCrypto AEADs<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener" title="Rust 서명 알고리즘 모음(ML-DSA 포함) · 보는 것: 시험이 건너뛰는 Wycheproof 벡터">RustCrypto signatures<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/liboqs" target="_blank" rel="noopener" title="양자내성 암호 C 라이브러리(ML-KEM·ML-DSA·SLH-DSA 등) · 보는 것: 서명 검증에 Wycheproof 벡터·잘못된 길이 넣기">liboqs<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/oqs-provider" target="_blank" rel="noopener" title="OpenSSL 3에 양자내성 알고리즘을 붙이는 provider · 보는 것: 지우지 않고 해제하는 개인키 사본">oqs-provider<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/TF-PSA-Crypto" target="_blank" rel="noopener" title="Mbed TLS에서 떼어 낸 PSA 암호 API 구현 · 보는 것: 지우지 않고 해제하는 큰 수 임시 버퍼">TF-PSA-Crypto<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/mbedtls" target="_blank" rel="noopener" title="임베디드용 TLS·X.509 라이브러리 · 보는 것: X.509 확장 해석">Mbed TLS<span class="chip-n">1</span></a><a class="chip" href="https://github.com/mitmproxy/mitmproxy" target="_blank" rel="noopener" title="HTTPS 통신을 풀어 보는 프록시(Python) · 보는 것: 인증서·설정 처리">mitmproxy<span class="chip-n">1</span></a><a class="chip" href="https://github.com/tpm2-software/tpm2-tss" target="_blank" rel="noopener" title="TPM 2.0 소프트웨어 스택(TCG TSS 2.0, C) · 보는 것: 마샬링(MU) 함수의 인자 처리">tpm2-tss<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener" title="Rust용 DER·PEM·X.509 등 형식 크레이트 모음 · 보는 것: 잘못된 DER 값 해석">RustCrypto formats<span class="chip-n">2</span></a><a class="chip" href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener" title="스마트카드 도구와 PKCS#11 모듈 · 보는 것: PKCS#11 모듈의 빠진 기능(가상 카드로 시험)">OpenSC<span class="chip-n">1</span></a><a class="chip" href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener" title="안드로이드용 OpenVPN 앱 · 보는 것: 가져온 설정 파일 해석">OpenVPN for Android<span class="chip-n">4</span></a><a class="chip" href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener" title="OpenSSL을 쓰는 Rust PKCS#11 소프트웨어 토큰 · 보는 것: Wycheproof 벡터를 PKCS#11 API로 넣어 결과와 반환 코드를 함께 확인">Kryoptic<span class="chip-n">2</span></a></div></div>
   </details>
-  <footer>2026-11-05 갱신. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
+  <footer>2026-11-06 갱신. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
 <script>
 (() => {
