@@ -63,13 +63,7 @@
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
  },
  "OpenVPN/openvpn#2075": {
-  "approvals": [
-   {
-    "by": "Steffan Karger",
-    "date": "2026-11-05",
-    "url": "https://gerrit.openvpn.net/c/openvpn/+/2075"
-   }
-  ],
+  "approvals": [],
   "live": {
    "checks": {
     "fail": 0,
@@ -78,11 +72,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-05",
    "first_response": "2026-11-05",
    "last_response": "2026-11-05",
    "opened": "2026-11-01",
-   "stage": "approved"
+   "stage": "merged"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2075"
@@ -126,13 +120,7 @@
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2077"
  },
  "OpenVPN/openvpn#2078": {
-  "approvals": [
-   {
-    "by": "Steffan Karger",
-    "date": "2026-11-05",
-    "url": "https://gerrit.openvpn.net/c/openvpn/+/2078"
-   }
-  ],
+  "approvals": [],
   "live": {
    "checks": {
     "fail": 0,
@@ -141,11 +129,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-05",
    "first_response": "2026-11-05",
    "last_response": "2026-11-05",
    "opened": "2026-11-02",
-   "stage": "approved"
+   "stage": "merged"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2078"
@@ -374,18 +362,21 @@
   "live": {
    "checks": {
     "fail": 1,
-    "pass": 21,
-    "pending": 47
+    "pass": 68,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-05",
    "first_response": "2026-11-03",
    "last_response": "2026-11-04",
    "opened": "2026-11-03",
-   "stage": "rereview"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "a485dd3fed9ca8c9dedfaa408b12978e13ddeed7",
+   "url": "https://github.com/latchset/kryoptic/commit/a485dd3fed9ca8c9dedfaa408b12978e13ddeed7"
+  },
   "url": "https://github.com/latchset/kryoptic/pull/566"
  },
  "latchset/kryoptic#573": {
