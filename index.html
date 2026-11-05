@@ -112,7 +112,7 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">17</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">6</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
     <h3 class="chart-h">Landed by project</h3><div class="bars">
       <details class="bar">
         <summary>
@@ -253,6 +253,21 @@
       </details>
       <details class="bar">
         <summary>
+          <span class="bar-name">Kryoptic</span>
+          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-n">1</span>
+        </summary>
+        <div class="bar-body">
+        <details class="entry" id="latchset-kryoptic-573">
+          <summary>
+            <span class="line2">Fix multi-part ChaCha20-Poly1305 decryption of large chunks</span>
+            <span class="line3">latchset/kryoptic #573 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>When <code>C_DecryptUpdate</code> was called two or more times with chunks longer than the 16-byte tag, the front of each later chunk was never decrypted. The output came out short and <code>C_DecryptFinal</code> rejected valid ciphertext with <code>CKR_ENCRYPTED_DATA_INVALID</code>.</dd><dt>Background</dt><dd>AEAD streaming: in multi-part decryption the token cannot know which bytes are the Poly1305 tag until <code>C_DecryptFinal</code>, so it must hold back the last 16 bytes of every update and still decrypt everything in front of them.</dd><dt>How it was found</dt><dd>Wycheproof ChaCha20-Poly1305 vectors fed through <code>C_DecryptUpdate</code> in several chunk sizes: one-shot, 1-byte and 5-byte chunks matched, but with 17-byte chunks 190 valid vectors failed.</dd><dt>Fix</dt><dd>Skip the input only when it was appended to the held-back buffer as a whole. The multi-part test now also decrypts in 20-byte chunks and fails without the change.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/573" target="_blank" rel="noopener">#573 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/573/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details></div>
+      </details>
+      <details class="bar">
+        <summary>
           <span class="bar-name">OpenSC</span>
           <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
           <span class="bar-n">1</span>
@@ -281,7 +296,7 @@
           <div class="body"><dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
         </details></div>
       </details></div>
-    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:23.5%;background:var(--c-hardening,var(--accent))" title="Hardening 4"></span><span class="seg" style="width:52.9%;background:var(--c-bugfix,var(--accent))" title="Bug fix 9"></span><span class="seg" style="width:17.6%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:5.9%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 4</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 9</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
+    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:22.2%;background:var(--c-hardening,var(--accent))" title="Hardening 4"></span><span class="seg" style="width:55.6%;background:var(--c-bugfix,var(--accent))" title="Bug fix 10"></span><span class="seg" style="width:16.7%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:5.6%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 4</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 10</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
     <p class="hint">Open an entry to read its briefing.</p>
   </section>
 
