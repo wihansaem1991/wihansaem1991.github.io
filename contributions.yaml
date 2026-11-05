@@ -1575,9 +1575,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-05
     defect:
       en: >-
         `ks->key_src` holds the pre-master secret and the random values the peers exchange in key
@@ -1725,9 +1725,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-02
-    decided: null
+    decided: 2026-11-05
     defect:
       en: >-
         `init_key_ctx_bi()` and `tls_crypt_v2_init_server_key()` convert the key into a

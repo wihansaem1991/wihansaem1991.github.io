@@ -63,7 +63,13 @@
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
  },
  "OpenVPN/openvpn#2075": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "Steffan Karger",
+    "date": "2026-11-05",
+    "url": "https://gerrit.openvpn.net/c/openvpn/+/2075"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -73,10 +79,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-05",
+   "last_response": "2026-11-05",
    "opened": "2026-11-01",
-   "stage": "review"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2075"
@@ -120,7 +126,13 @@
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2077"
  },
  "OpenVPN/openvpn#2078": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "Steffan Karger",
+    "date": "2026-11-05",
+    "url": "https://gerrit.openvpn.net/c/openvpn/+/2078"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -130,10 +142,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-05",
+   "last_response": "2026-11-05",
    "opened": "2026-11-02",
-   "stage": "review"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2078"

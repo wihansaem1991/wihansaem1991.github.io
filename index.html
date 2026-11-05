@@ -112,7 +112,7 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">20</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
     <h3 class="chart-h">Landed by project</h3><div class="bars">
       <details class="bar">
         <summary>
@@ -166,6 +166,49 @@
       </details>
       <details class="bar">
         <summary>
+          <span class="bar-name">OpenVPN</span>
+          <span class="bar-track"><span class="bar-fill" style="width:83%"></span></span>
+          <span class="bar-n">5</span>
+        </summary>
+        <div class="bar-body">
+        <details class="entry" id="OpenVPN-openvpn-2079">
+          <summary>
+            <span class="line2">tls_crypt: Wipe the tls-crypt-v2 client key copies</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2079 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>tls_crypt_v2_init_client_key()</code> left a stack copy of the client key at every client start, and <code>tls_crypt_v2_write_client_key_file()</code> freed the key data and the wrapped key buffer without clearing them.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), matched to the project&#x27;s own precedents: <code>crypto_read_openvpn_key()</code> already clears the same stack copy and <code>do_close_free_key_schedule()</code> the same kind of buffer.</dd><dt>How it was found</dt><dd>A stack residue measurement and a freed-block scan with a marked test client key.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the stack copies and <code>buf_clear()</code> before <code>free_buf()</code>. Together with Gerrit 2078 the stack copies go from 2 to 0, and the two freed blocks from key generation disappear.</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">Gerrit 2079 ↗</a></dd></dl><blockquote>"Welcome hardening." — reviewer</blockquote></div>
+        </details>
+        <details class="entry" id="OpenVPN-openvpn-2078">
+          <summary>
+            <span class="line2">crypto: Wipe the struct key_parameters copies after use</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2078 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>init_key_ctx_bi()</code> and <code>tls_crypt_v2_init_server_key()</code> convert the key into a <code>struct key_parameters</code> on the stack and returned without clearing it. <code>init_key_ctx_bi()</code> sets up the data channel keys (when epoch keys are not used), tls-auth, tls-crypt and static keys, so cipher and HMAC keys stayed on the stack after every key setup.</dd><dt>Background</dt><dd>A reviewer&#x27;s question on Gerrit 2076 (&quot;Should we not also clear struct key_params?&quot;), followed through every function that fills that struct; <code>epoch_init_send_key()</code> and <code>epoch_init_recv_key()</code> already clear it.</dd><dt>How it was found</dt><dd>A stack residue measurement with a positive control: cipher and HMAC key bytes were found after <code>init_key_ctx_bi()</code> (2 and 2) and <code>tls_crypt_v2_init_server_key()</code> (1 and 1).</dd><dt>Fix</dt><dd>Clear the struct after use in both functions, as the epoch key functions do. The same measurement finds nothing afterwards.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2078" target="_blank" rel="noopener">Gerrit 2078 ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="OpenVPN-openvpn-2077">
+          <summary>
+            <span class="line2">crypto_openssl: Clear PEM decoded key data before freeing it</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2077 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>crypto_pem_decode()</code> decodes the tls-crypt-v2 client and server keys and the auth-token key, and freed the decoded key bytes with <code>OPENSSL_free()</code>, so they stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) in a project that builds with both OpenSSL and LibreSSL, so the clearing call has to exist in both.</dd><dt>How it was found</dt><dd>Scanning the blocks freed during the tls-crypt unit tests for the test key.</dd><dt>Fix</dt><dd><code>OPENSSL_cleanse()</code> and then <code>OPENSSL_free()</code>. The first patch set used <code>OPENSSL_clear_free()</code>, which LibreSSL does not have; the second builds with <code>--enable-werror</code> against LibreSSL 4.3.4 and OpenSSL 3.5.9, and the freed blocks holding key bytes go from 2 to 0.</dd><dt>Review</dt><dd>Approved by Steffan Karger, then Gert Doering found the LibreSSL build failure and suggested the two-line form; the second patch set does exactly that and waits for another look.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="OpenVPN-openvpn-2076">
+          <summary>
+            <span class="line2">auth_token: Wipe the server secret key after loading it</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2076 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>auth_token_init_secret()</code> reads the auth-token server key into a 2048-byte buffer, copies it into a <code>struct key</code> and then a <code>struct key_parameters</code> on the stack, and freed the buffer without clearing it, so three copies of the server key stayed in memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), checked against every copy a function makes: <code>tls_crypt_v2_init_server_key()</code> already clears its copy, this function did not.</dd><dt>How it was found</dt><dd>Scanning freed heap blocks for the key used by <code>test_auth_token</code>.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the <code>struct key</code> and the <code>struct key_parameters</code>, and <code>buf_clear()</code> before <code>free_buf()</code>. The second patch set added the <code>struct key_parameters</code> copy, which a reviewer pointed out; the same question led to a follow-up change for the other functions (Gerrit 2078).</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger on the second patch set.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — reviewer</blockquote></div>
+        </details>
+        <details class="entry" id="OpenVPN-openvpn-2075">
+          <summary>
+            <span class="line2">ssl: Wipe the key source material in key_state_free()</span>
+            <span class="line3">OpenVPN/openvpn Gerrit 2075 · Hardening</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>ks-&gt;key_src</code> holds the pre-master secret and the random values the peers exchange in key method 2. It is wiped once the data channel keys are generated, but when a key state is freed before that, for example because an <code>--auth-user-pass-verify</code> or client-connect script rejects the client, <code>key_state_free()</code> freed it with plain <code>free()</code> and the key material stayed in freed memory on both the server and the client.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP): key material has to be cleared when it is no longer needed, on the error paths as well as the normal one.</dd><dt>How it was found</dt><dd>A real server and client with an <code>LD_PRELOAD</code> scanner that checks every freed block for the key material: nothing on a normal connection, hits on both sides when an authentication or client-connect script rejects the client.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> before the free in <code>key_state_free()</code>. The same rejected connections then leave nothing behind.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2075" target="_blank" rel="noopener">Gerrit 2075 ↗</a></dd></dl></div>
+        </details></div>
+      </details>
+      <details class="bar">
+        <summary>
           <span class="bar-name">pkcs11-provider</span>
           <span class="bar-track"><span class="bar-fill" style="width:67%"></span></span>
           <span class="bar-n">4</span>
@@ -198,35 +241,6 @@
             <span class="line3">openssl-projects/pkcs11-provider #813 · Bug fix</span>
           </summary>
           <div class="body"><dl><dt>Problem</dt><dd>With a PKCS#11 token, <code>EVP_PKEY_derive()</code> asked the token for as many bytes as the caller&#x27;s buffer instead of the size of the shared secret. NSS softokn returned the P-256 secret left-padded with zeros, so a 64-byte buffer got 32 zero bytes before the secret and the two sides of an ECDH exchange no longer agreed.</dd><dt>Background</dt><dd>PKCS#11 and HSM integration: an ECDH derivation (<code>CKM_ECDH1_DERIVE</code> with <code>CKD_NULL</code>) takes its output length from <code>CKA_VALUE_LEN</code> in the key template, while OpenSSL&#x27;s <code>EVP_PKEY_derive()</code> treats the length as the buffer size and reports how many bytes it wrote.</dd><dt>How it was found</dt><dd>Differential testing: the same ECDH derivation through OpenSSL&#x27;s default provider and through pkcs11-provider on an NSS softokn token, with output buffers of several sizes.</dd><dt>Fix</dt><dd>Cap the requested length at the key size. The new regression test then exposed an older leak: deriving twice on one context overwrote the copy of the peer&#x27;s public point, which the Address Sanitizer job reported. That leak is fixed in the same pull request.</dd><dt>Review</dt><dd>The maintainer approved the change, then asked for the regression test to be restructured and for the Address Sanitizer failure to be fixed; both followed in new commits.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/openssl-projects/pkcs11-provider/pull/813" target="_blank" rel="noopener">#813 ↗</a> · <a href="https://github.com/openssl-projects/pkcs11-provider/pull/813/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
-        </details></div>
-      </details>
-      <details class="bar">
-        <summary>
-          <span class="bar-name">OpenVPN</span>
-          <span class="bar-track"><span class="bar-fill" style="width:50%"></span></span>
-          <span class="bar-n">3</span>
-        </summary>
-        <div class="bar-body">
-        <details class="entry" id="OpenVPN-openvpn-2079">
-          <summary>
-            <span class="line2">tls_crypt: Wipe the tls-crypt-v2 client key copies</span>
-            <span class="line3">OpenVPN/openvpn Gerrit 2079 · Hardening</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd><code>tls_crypt_v2_init_client_key()</code> left a stack copy of the client key at every client start, and <code>tls_crypt_v2_write_client_key_file()</code> freed the key data and the wrapped key buffer without clearing them.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), matched to the project&#x27;s own precedents: <code>crypto_read_openvpn_key()</code> already clears the same stack copy and <code>do_close_free_key_schedule()</code> the same kind of buffer.</dd><dt>How it was found</dt><dd>A stack residue measurement and a freed-block scan with a marked test client key.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the stack copies and <code>buf_clear()</code> before <code>free_buf()</code>. Together with Gerrit 2078 the stack copies go from 2 to 0, and the two freed blocks from key generation disappear.</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2079" target="_blank" rel="noopener">Gerrit 2079 ↗</a></dd></dl><blockquote>"Welcome hardening." — reviewer</blockquote></div>
-        </details>
-        <details class="entry" id="OpenVPN-openvpn-2077">
-          <summary>
-            <span class="line2">crypto_openssl: Clear PEM decoded key data before freeing it</span>
-            <span class="line3">OpenVPN/openvpn Gerrit 2077 · Hardening</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd><code>crypto_pem_decode()</code> decodes the tls-crypt-v2 client and server keys and the auth-token key, and freed the decoded key bytes with <code>OPENSSL_free()</code>, so they stayed in freed memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) in a project that builds with both OpenSSL and LibreSSL, so the clearing call has to exist in both.</dd><dt>How it was found</dt><dd>Scanning the blocks freed during the tls-crypt unit tests for the test key.</dd><dt>Fix</dt><dd><code>OPENSSL_cleanse()</code> and then <code>OPENSSL_free()</code>. The first patch set used <code>OPENSSL_clear_free()</code>, which LibreSSL does not have; the second builds with <code>--enable-werror</code> against LibreSSL 4.3.4 and OpenSSL 3.5.9, and the freed blocks holding key bytes go from 2 to 0.</dd><dt>Review</dt><dd>Approved by Steffan Karger, then Gert Doering found the LibreSSL build failure and suggested the two-line form; the second patch set does exactly that and waits for another look.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2077" target="_blank" rel="noopener">Gerrit 2077 ↗</a></dd></dl></div>
-        </details>
-        <details class="entry" id="OpenVPN-openvpn-2076">
-          <summary>
-            <span class="line2">auth_token: Wipe the server secret key after loading it</span>
-            <span class="line3">OpenVPN/openvpn Gerrit 2076 · Hardening</span>
-          </summary>
-          <div class="body"><dl><dt>Problem</dt><dd><code>auth_token_init_secret()</code> reads the auth-token server key into a 2048-byte buffer, copies it into a <code>struct key</code> and then a <code>struct key_parameters</code> on the stack, and freed the buffer without clearing it, so three copies of the server key stayed in memory.</dd><dt>Background</dt><dd>Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP), checked against every copy a function makes: <code>tls_crypt_v2_init_server_key()</code> already clears its copy, this function did not.</dd><dt>How it was found</dt><dd>Scanning freed heap blocks for the key used by <code>test_auth_token</code>.</dd><dt>Fix</dt><dd><code>secure_memzero()</code> on the <code>struct key</code> and the <code>struct key_parameters</code>, and <code>buf_clear()</code> before <code>free_buf()</code>. The second patch set added the <code>struct key_parameters</code> copy, which a reviewer pointed out; the same question led to a follow-up change for the other functions (Gerrit 2078).</dd><dt>Review</dt><dd>Approved (Code-Review +2) by Steffan Karger on the second patch set.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://gerrit.openvpn.net/c/openvpn/+/2076" target="_blank" rel="noopener">Gerrit 2076 ↗</a></dd></dl><blockquote>"Clearing key data we no longer use is a good practice we should do more consistently." — reviewer</blockquote></div>
         </details></div>
       </details>
       <details class="bar">
@@ -296,7 +310,7 @@
           <div class="body"><dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
         </details></div>
       </details></div>
-    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:22.2%;background:var(--c-hardening,var(--accent))" title="Hardening 4"></span><span class="seg" style="width:55.6%;background:var(--c-bugfix,var(--accent))" title="Bug fix 10"></span><span class="seg" style="width:16.7%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:5.6%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 4</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 10</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
+    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:30.0%;background:var(--c-hardening,var(--accent))" title="Hardening 6"></span><span class="seg" style="width:50.0%;background:var(--c-bugfix,var(--accent))" title="Bug fix 10"></span><span class="seg" style="width:15.0%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:5.0%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 10</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
     <p class="hint">Open an entry to read its briefing.</p>
   </section>
 
