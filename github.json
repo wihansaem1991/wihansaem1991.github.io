@@ -377,22 +377,31 @@
   "url": "https://github.com/latchset/kryoptic/pull/566"
  },
  "latchset/kryoptic#573": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "simo5",
+    "date": "2026-11-04",
+    "url": "https://github.com/latchset/kryoptic/pull/573#pullrequestreview-5777441826"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 0,
+    "pass": 69,
     "pending": 0
    },
-   "ci_waiting": 8,
+   "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-04",
+   "first_response": "2026-11-04",
+   "last_response": "2026-11-04",
    "opened": "2026-11-03",
-   "stage": "ci_approval"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "5b3c81c377e2b18b49aa1b86fb69479b21a47aba",
+   "url": "https://github.com/latchset/kryoptic/commit/5b3c81c377e2b18b49aa1b86fb69479b21a47aba"
+  },
   "url": "https://github.com/latchset/kryoptic/pull/573"
  },
  "mitmproxy/mitmproxy#8548": {
@@ -755,6 +764,25 @@
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33524"
+ },
+ "openssl/openssl#33545": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 95,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-04",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33545"
  },
  "randombit/botan#6082": {
   "approvals": [],

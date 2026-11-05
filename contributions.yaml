@@ -1120,9 +1120,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-04
-    decided: null
+    decided: 2026-11-04
     defect:
       en: >-
         When `C_DecryptUpdate` was called two or more times with chunks longer than the 16-byte tag,
