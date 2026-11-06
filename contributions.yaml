@@ -216,6 +216,59 @@ entries:
 
   - project: OpenSSL
     repo: openssl/openssl
+    pr: 33570
+    title:
+      en: Clear the decrypted private key DER before freeing it
+      ko: "복호한 개인키 DER을 해제하기 전에 지우기"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-06
+    decided: null
+    defect:
+      en: >-
+        The DER private key decoders in the default provider free buffers that hold private key
+        material with plain `OPENSSL_free()`. `ossl_epki2pki_der_decode()` decrypts an
+        EncryptedPrivateKeyInfo into `new_der`, the whole PrivateKeyInfo, and `der2key_decode()`
+        reads the PrivateKeyInfo into `der`; both free it uncleared. Loading a password-protected
+        PKCS#8 key, or a plain PrivateKeyInfo DER (every private key load through this path), leaves
+        the key readable in freed heap.
+      ko: >-
+        기본 provider의 DER 개인키 디코더가 개인키가 든 버퍼를 `OPENSSL_free()`로 그냥 풉니다.
+        `ossl_epki2pki_der_decode()`는 EncryptedPrivateKeyInfo를 복호해 PrivateKeyInfo 전체인 `new_der`에
+        담고, `der2key_decode()`는 PrivateKeyInfo를 `der`로 읽는데, 둘 다 지우지 않고 해제합니다. 비밀번호가 걸린
+        PKCS#8 키나 평범한 PrivateKeyInfo DER(이 경로로 들어오는 모든 개인키 로드)을 읽으면 키가 해제된 힙에 그대로
+        남습니다.
+    background:
+      en: >-
+        Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) on the provider decode paths. The keymgmt
+        export paths already clear exported key material with `OPENSSL_clear_free()`, so the decoders
+        follow the same pattern reviewers accepted in #33430 and #33444.
+      ko: >-
+        제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 provider 디코드 경로에 적용했습니다. keymgmt export
+        경로는 이미 `OPENSSL_clear_free()`로 내보낸 키를 지우므로, 디코더도 #33430·#33444에서 리뷰어가 받아들인
+        방식을 따랐습니다.
+    found_by:
+      en: >-
+        A freed-block measurement program that loads an encrypted PKCS#8 key through `OSSL_DECODER`
+        and searches freed heap for a window of the RSA private exponent.
+      ko: >-
+        암호화 PKCS#8 키를 `OSSL_DECODER`로 읽고, 해제된 힙에서 RSA 개인 지수의 한 구간을 찾는 해제 블록 측정
+        프로그램으로 찾았습니다.
+    fix:
+      en: >-
+        Clear both buffers with `OPENSSL_clear_free()`, reusing the lengths already tracked
+        (`der_len`, `new_der_len`); `new_der_len` is hoisted to function scope. Before the fix the key
+        is found in the blocks freed at decode_epki2pki.c and decode_der2key.c; after the fix the
+        search is clean. `test_encoder_decoder`, `test_encoder_decoder_legacy`, and `test_pkcs8` pass.
+      ko: >-
+        두 버퍼를 이미 추적 중인 길이(`der_len`·`new_der_len`)로 `OPENSSL_clear_free()`로 지우고, `new_der_len`은
+        함수 범위로 올렸습니다. 수정 전에는 decode_epki2pki.c·decode_der2key.c가 해제한 블록에서 키가 나오고, 수정
+        뒤에는 깨끗합니다. `test_encoder_decoder`·`test_encoder_decoder_legacy`·`test_pkcs8` 통과.
+
+  - project: OpenSSL
+    repo: openssl/openssl
     pr: 33430
     title:
       en: Clear the `EVP_ENCODE_CTX` when freeing it
