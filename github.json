@@ -787,6 +787,25 @@
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33545"
  },
+ "openssl/openssl#33570": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 95,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-06",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33570"
+ },
  "randombit/botan#6082": {
   "approvals": [],
   "live": {
