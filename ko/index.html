@@ -350,19 +350,19 @@
     </details>
     <details class="entry" id="VR-4">
       <summary>
-        <span class="line1"><b>취약점 보고 VR-4</b> <span class="badge vuln">취약점</span></span>
-        <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
+        <span class="line1"><b>p11-kit</b> <span class="badge vuln">취약점</span></span>
+        <span class="line2">PKCS#11 중첩 속성 디코딩 시 버퍼 오버플로 (RPC 클라이언트)</span>
         <span class="line3">제출 2026-11-01 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
       </summary>
-      <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
+      <div class="body"><dl><dt>문제</dt><dd>p11-kit의 PKCS#11 RPC 클라이언트가 중첩 속성 배열이 담긴 응답을 디코딩할 때, 인코딩된 길이를 그대로 믿고 대상 버퍼 밖으로 쓸 수 있었습니다.</dd><dt>배경 지식</dt><dd>p11-kit은 자체 RPC 형식으로 프로세스 사이에 PKCS#11 호출을 주고받기 때문에, 응답 디코더가 읽어 들이는 모든 길이를 경계 검사해야 합니다. PKCS#11·HSM 경험을 썼습니다.</dd><dt>찾은 방법</dt><dd>RPC 응답 디코딩 경로를 읽고 p11-kit 비공개 보안 경로로 보고했습니다.</dd><dt>수정</dt><dd>메인테이너는 보안 문제가 아닌 버그로 분류하고(SECURITY.md상 RPC 클라이언트와 서버는 한 신뢰 경계 안) 중첩 속성 길이를 경계 검사하는 수정을 공개 PR #797로 2026-11-06 머지했습니다. Hansaem Wi가 보고자이자 공동 작성자로 올라갔습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/p11-glue/p11-kit/pull/797" target="_blank" rel="noopener">Advisory ↗</a></dd></dl></div>
     </details>
     <details class="entry" id="VR-5">
       <summary>
-        <span class="line1"><b>취약점 보고 VR-5</b> <span class="badge vuln">취약점</span></span>
-        <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
+        <span class="line1"><b>p11-kit</b> <span class="badge vuln">취약점</span></span>
+        <span class="line2">PKCS#11 RPC 클라이언트와 서버 사이 잘못된 메모리 관리</span>
         <span class="line3">제출 2026-11-01 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
       </summary>
-      <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
+      <div class="body"><dl><dt>문제</dt><dd>PKCS#11 RPC 클라이언트가 C_DeriveKey2(CKM_IBM_KYBER·CKM_IBM_BTC_DERIVE)를 처리하며 서버와 공유하는 메모리를 잘못 관리해 use-after-free가 생겼습니다.</dd><dt>배경 지식</dt><dd>위와 같은 RPC 전송 경로입니다. 유도 메커니즘은 키 재료를 돌려주는데 그 수명이 클라이언트·서버 분리와 맞아야 합니다. PKCS#11·양자내성 KEM 경험을 썼습니다.</dd><dt>찾은 방법</dt><dd>p11-kit 비공개 보안 경로로 보고했습니다.</dd><dt>수정</dt><dd>같은 신뢰 경계 근거로 버그로 분류됐고, 메인테이너의 수정은 공개 PR #796으로 아직 머지 대기입니다. Hansaem Wi가 보고자로 올라갔습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/p11-glue/p11-kit/pull/796" target="_blank" rel="noopener">Advisory ↗</a></dd></dl></div>
     </details>
     <details class="entry" id="VR-6">
       <summary>

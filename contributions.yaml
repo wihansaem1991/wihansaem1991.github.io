@@ -2058,24 +2058,90 @@ vulnerabilities:
     cvss: null
 
   - label: VR-4
-    public: false
+    public: true
+    project: p11-kit
     submitted: 2026-11-01
     channel:
       en: GitHub private vulnerability report
       ko: GitHub 비공개 취약점 보고
-    status: triage
+    status: public_pr
     cve: null
     cvss: null
+    advisory: https://github.com/p11-glue/p11-kit/pull/797
+    title:
+      en: Buffer overflow when decoding nested PKCS#11 attributes (RPC client)
+      ko: PKCS#11 중첩 속성 디코딩 시 버퍼 오버플로 (RPC 클라이언트)
+    defect:
+      en: >-
+        p11-kit's PKCS#11 RPC client, decoding a reply that carries a nested attribute array,
+        trusted the encoded length and could write past the destination buffer.
+      ko: >-
+        p11-kit의 PKCS#11 RPC 클라이언트가 중첩 속성 배열이 담긴 응답을 디코딩할 때, 인코딩된 길이를
+        그대로 믿고 대상 버퍼 밖으로 쓸 수 있었습니다.
+    background:
+      en: >-
+        p11-kit forwards PKCS#11 calls between processes over its own RPC format, so the reply
+        decoder has to bound every length it reads. This drew on PKCS#11 and HSM work.
+      ko: >-
+        p11-kit은 자체 RPC 형식으로 프로세스 사이에 PKCS#11 호출을 주고받기 때문에, 응답 디코더가 읽어
+        들이는 모든 길이를 경계 검사해야 합니다. PKCS#11·HSM 경험을 썼습니다.
+    found_by:
+      en: >-
+        Reported through p11-kit's private security channel after reading the RPC reply-decoding
+        path.
+      ko: >-
+        RPC 응답 디코딩 경로를 읽고 p11-kit 비공개 보안 경로로 보고했습니다.
+    fix:
+      en: >-
+        The maintainer classified it as a bug rather than a security issue (the RPC client and
+        server sit inside one trust boundary per SECURITY.md) and merged the fix as public pull
+        request #797 on 2026-11-06, bounding the nested-attribute length. Hansaem Wi is credited
+        as reporter and co-author.
+      ko: >-
+        메인테이너는 보안 문제가 아닌 버그로 분류하고(SECURITY.md상 RPC 클라이언트와 서버는 한 신뢰
+        경계 안) 중첩 속성 길이를 경계 검사하는 수정을 공개 PR #797로 2026-11-06 머지했습니다. Hansaem
+        Wi가 보고자이자 공동 작성자로 올라갔습니다.
 
   - label: VR-5
-    public: false
+    public: true
+    project: p11-kit
     submitted: 2026-11-01
     channel:
       en: GitHub private vulnerability report
       ko: GitHub 비공개 취약점 보고
-    status: triage
+    status: public_pr
     cve: null
     cvss: null
+    advisory: https://github.com/p11-glue/p11-kit/pull/796
+    title:
+      en: Incorrect memory management between the PKCS#11 RPC client and server
+      ko: PKCS#11 RPC 클라이언트와 서버 사이 잘못된 메모리 관리
+    defect:
+      en: >-
+        The PKCS#11 RPC client mismanaged memory shared with the server while handling
+        C_DeriveKey2 (CKM_IBM_KYBER / CKM_IBM_BTC_DERIVE), leading to a use-after-free.
+      ko: >-
+        PKCS#11 RPC 클라이언트가 C_DeriveKey2(CKM_IBM_KYBER·CKM_IBM_BTC_DERIVE)를 처리하며 서버와
+        공유하는 메모리를 잘못 관리해 use-after-free가 생겼습니다.
+    background:
+      en: >-
+        The same RPC transport as above; derive mechanisms return key material whose lifetime has
+        to match the client/server split. This drew on PKCS#11 and post-quantum KEM work.
+      ko: >-
+        위와 같은 RPC 전송 경로입니다. 유도 메커니즘은 키 재료를 돌려주는데 그 수명이 클라이언트·서버
+        분리와 맞아야 합니다. PKCS#11·양자내성 KEM 경험을 썼습니다.
+    found_by:
+      en: >-
+        Reported through p11-kit's private security channel.
+      ko: >-
+        p11-kit 비공개 보안 경로로 보고했습니다.
+    fix:
+      en: >-
+        Classified as a bug under the same trust-boundary reasoning; the maintainer's fix is public
+        pull request #796, open and awaiting merge. Hansaem Wi is credited as reporter.
+      ko: >-
+        같은 신뢰 경계 근거로 버그로 분류됐고, 메인테이너의 수정은 공개 PR #796으로 아직 머지 대기입니다.
+        Hansaem Wi가 보고자로 올라갔습니다.
 
   - label: VR-6
     public: false

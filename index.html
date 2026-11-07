@@ -350,19 +350,19 @@
     </details>
     <details class="entry" id="VR-4">
       <summary>
-        <span class="line1"><b>Vulnerability report VR-4</b> <span class="badge vuln">Vulnerability</span></span>
-        <span class="line2">Project and details withheld until disclosure</span>
+        <span class="line1"><b>p11-kit</b> <span class="badge vuln">Vulnerability</span></span>
+        <span class="line2">Buffer overflow when decoding nested PKCS#11 attributes (RPC client)</span>
         <span class="line3">submitted 2026-11-01 · GitHub private vulnerability report · CVE none yet</span>
       </summary>
-      <div class="body"><p class="none">Reported through the project's private channel. Details follow once the project publishes a fix.</p></div>
+      <div class="body"><dl><dt>Problem</dt><dd>p11-kit&#x27;s PKCS#11 RPC client, decoding a reply that carries a nested attribute array, trusted the encoded length and could write past the destination buffer.</dd><dt>Background</dt><dd>p11-kit forwards PKCS#11 calls between processes over its own RPC format, so the reply decoder has to bound every length it reads. This drew on PKCS#11 and HSM work.</dd><dt>How it was found</dt><dd>Reported through p11-kit&#x27;s private security channel after reading the RPC reply-decoding path.</dd><dt>Fix</dt><dd>The maintainer classified it as a bug rather than a security issue (the RPC client and server sit inside one trust boundary per SECURITY.md) and merged the fix as public pull request #797 on 2026-11-06, bounding the nested-attribute length. Hansaem Wi is credited as reporter and co-author.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/p11-glue/p11-kit/pull/797" target="_blank" rel="noopener">Advisory ↗</a></dd></dl></div>
     </details>
     <details class="entry" id="VR-5">
       <summary>
-        <span class="line1"><b>Vulnerability report VR-5</b> <span class="badge vuln">Vulnerability</span></span>
-        <span class="line2">Project and details withheld until disclosure</span>
+        <span class="line1"><b>p11-kit</b> <span class="badge vuln">Vulnerability</span></span>
+        <span class="line2">Incorrect memory management between the PKCS#11 RPC client and server</span>
         <span class="line3">submitted 2026-11-01 · GitHub private vulnerability report · CVE none yet</span>
       </summary>
-      <div class="body"><p class="none">Reported through the project's private channel. Details follow once the project publishes a fix.</p></div>
+      <div class="body"><dl><dt>Problem</dt><dd>The PKCS#11 RPC client mismanaged memory shared with the server while handling C_DeriveKey2 (CKM_IBM_KYBER / CKM_IBM_BTC_DERIVE), leading to a use-after-free.</dd><dt>Background</dt><dd>The same RPC transport as above; derive mechanisms return key material whose lifetime has to match the client/server split. This drew on PKCS#11 and post-quantum KEM work.</dd><dt>How it was found</dt><dd>Reported through p11-kit&#x27;s private security channel.</dd><dt>Fix</dt><dd>Classified as a bug under the same trust-boundary reasoning; the maintainer&#x27;s fix is public pull request #796, open and awaiting merge. Hansaem Wi is credited as reporter.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/p11-glue/p11-kit/pull/796" target="_blank" rel="noopener">Advisory ↗</a></dd></dl></div>
     </details>
     <details class="entry" id="VR-6">
       <summary>
