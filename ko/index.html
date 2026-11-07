@@ -350,19 +350,19 @@
     </details>
     <details class="entry" id="VR-4">
       <summary>
-        <span class="line1"><b>취약점 보고 VR-4</b> <span class="badge vuln">취약점</span></span>
-        <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
+        <span class="line1"><b>p11-kit</b> <span class="badge vuln">취약점</span></span>
+        <span class="line2">PKCS#11 중첩 속성 디코딩 시 버퍼 오버플로 (RPC 클라이언트)</span>
         <span class="line3">제출 2026-11-01 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
       </summary>
-      <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
+      <div class="body"><dl><dt>문제</dt><dd>p11-kit의 PKCS#11 RPC 클라이언트가 중첩 속성 배열이 담긴 응답을 디코딩할 때, 인코딩된 길이를 그대로 믿고 대상 버퍼 밖으로 쓸 수 있었습니다.</dd><dt>배경 지식</dt><dd>p11-kit은 자체 RPC 형식으로 프로세스 사이에 PKCS#11 호출을 주고받기 때문에, 응답 디코더가 읽어 들이는 모든 길이를 경계 검사해야 합니다. PKCS#11·HSM 경험을 썼습니다.</dd><dt>찾은 방법</dt><dd>RPC 응답 디코딩 경로를 읽고 p11-kit 비공개 보안 경로로 보고했습니다.</dd><dt>수정</dt><dd>메인테이너는 보안 문제가 아닌 버그로 분류하고(SECURITY.md상 RPC 클라이언트와 서버는 한 신뢰 경계 안) 중첩 속성 길이를 경계 검사하는 수정을 공개 PR #797로 2026-11-06 머지했습니다. Hansaem Wi가 보고자이자 공동 작성자로 올라갔습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/p11-glue/p11-kit/pull/797" target="_blank" rel="noopener">Advisory ↗</a></dd></dl></div>
     </details>
     <details class="entry" id="VR-5">
       <summary>
-        <span class="line1"><b>취약점 보고 VR-5</b> <span class="badge vuln">취약점</span></span>
-        <span class="line2">공개 전까지 프로젝트·내용 비공개</span>
+        <span class="line1"><b>p11-kit</b> <span class="badge vuln">취약점</span></span>
+        <span class="line2">PKCS#11 RPC 클라이언트와 서버 사이 잘못된 메모리 관리</span>
         <span class="line3">제출 2026-11-01 · GitHub 비공개 취약점 보고 · CVE 아직 없음</span>
       </summary>
-      <div class="body"><p class="none">프로젝트의 비공개 경로로 보고했습니다. 프로젝트가 수정을 공개하면 내용을 채웁니다.</p></div>
+      <div class="body"><dl><dt>문제</dt><dd>PKCS#11 RPC 클라이언트가 C_DeriveKey2(CKM_IBM_KYBER·CKM_IBM_BTC_DERIVE)를 처리하며 서버와 공유하는 메모리를 잘못 관리해 use-after-free가 생겼습니다.</dd><dt>배경 지식</dt><dd>위와 같은 RPC 전송 경로입니다. 유도 메커니즘은 키 재료를 돌려주는데 그 수명이 클라이언트·서버 분리와 맞아야 합니다. PKCS#11·양자내성 KEM 경험을 썼습니다.</dd><dt>찾은 방법</dt><dd>p11-kit 비공개 보안 경로로 보고했습니다.</dd><dt>수정</dt><dd>같은 신뢰 경계 근거로 버그로 분류됐고, 메인테이너의 수정은 공개 PR #796으로 아직 머지 대기입니다. Hansaem Wi가 보고자로 올라갔습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/p11-glue/p11-kit/pull/796" target="_blank" rel="noopener">Advisory ↗</a></dd></dl></div>
     </details>
     <details class="entry" id="VR-6">
       <summary>
@@ -402,7 +402,7 @@
     <summary><b>분석 중인 저장소</b> <span class="fold-n">18</span></summary>
     <div class="fold-body"><p class="hint">지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었습니다.</p><div class="chips"><a class="chip" href="https://github.com/openssl/openssl" target="_blank" rel="noopener" title="가장 널리 쓰이는 C TLS·암호 라이브러리 · 보는 것: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)">OpenSSL<span class="chip-n">10</span></a><a class="chip" href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener" title="OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider · 보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조">pkcs11-provider<span class="chip-n">4</span></a><a class="chip" href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener" title="OpenVPN 본체(C), 패치는 Gerrit으로 제출 · 보는 것: 지우지 않고 해제하는 키 재료">OpenVPN<span class="chip-n">5</span></a><a class="chip" href="https://github.com/randombit/botan" target="_blank" rel="noopener" title="양자내성 알고리즘이 많은 C++ 암호 라이브러리 · 보는 것: 양자내성 키·서명 길이 입력 검증">Botan<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener" title="상수 시간 큰 정수 연산 Rust 라이브러리 · 보는 것: 문자열·바이트 변환 경계값">crypto-bigint<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener" title="순수 Rust RSA 구현 · 보는 것: 시험이 돌리지 않는 Wycheproof 벡터">RustCrypto RSA<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/AEADs" target="_blank" rel="noopener" title="Rust 인증 암호 모음(AES-GCM·ChaCha20-Poly1305·CCM·EAX 등) · 보는 것: 시험이 돌리지 않는 Wycheproof 벡터, 위조 태그 거부">RustCrypto AEADs<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener" title="Rust 서명 알고리즘 모음(ML-DSA 포함) · 보는 것: 시험이 건너뛰는 Wycheproof 벡터">RustCrypto signatures<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/liboqs" target="_blank" rel="noopener" title="양자내성 암호 C 라이브러리(ML-KEM·ML-DSA·SLH-DSA 등) · 보는 것: 서명 검증에 Wycheproof 벡터·잘못된 길이 넣기">liboqs<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/oqs-provider" target="_blank" rel="noopener" title="OpenSSL 3에 양자내성 알고리즘을 붙이는 provider · 보는 것: 지우지 않고 해제하는 개인키 사본">oqs-provider<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/TF-PSA-Crypto" target="_blank" rel="noopener" title="Mbed TLS에서 떼어 낸 PSA 암호 API 구현 · 보는 것: 지우지 않고 해제하는 큰 수 임시 버퍼">TF-PSA-Crypto<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/mbedtls" target="_blank" rel="noopener" title="임베디드용 TLS·X.509 라이브러리 · 보는 것: X.509 확장 해석">Mbed TLS<span class="chip-n">1</span></a><a class="chip" href="https://github.com/mitmproxy/mitmproxy" target="_blank" rel="noopener" title="HTTPS 통신을 풀어 보는 프록시(Python) · 보는 것: 인증서·설정 처리">mitmproxy<span class="chip-n">1</span></a><a class="chip" href="https://github.com/tpm2-software/tpm2-tss" target="_blank" rel="noopener" title="TPM 2.0 소프트웨어 스택(TCG TSS 2.0, C) · 보는 것: 마샬링(MU) 함수의 인자 처리">tpm2-tss<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener" title="Rust용 DER·PEM·X.509 등 형식 크레이트 모음 · 보는 것: 잘못된 DER 값 해석">RustCrypto formats<span class="chip-n">2</span></a><a class="chip" href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener" title="스마트카드 도구와 PKCS#11 모듈 · 보는 것: PKCS#11 모듈의 빠진 기능(가상 카드로 시험)">OpenSC<span class="chip-n">1</span></a><a class="chip" href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener" title="안드로이드용 OpenVPN 앱 · 보는 것: 가져온 설정 파일 해석">OpenVPN for Android<span class="chip-n">4</span></a><a class="chip" href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener" title="OpenSSL을 쓰는 Rust PKCS#11 소프트웨어 토큰 · 보는 것: Wycheproof 벡터를 PKCS#11 API로 넣어 결과와 반환 코드를 함께 확인">Kryoptic<span class="chip-n">2</span></a></div></div>
   </details>
-  <footer>2026-11-06 갱신. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
+  <footer>2026-11-07 갱신. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
 <script>
 (() => {
