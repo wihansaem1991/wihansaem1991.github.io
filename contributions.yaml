@@ -1864,6 +1864,50 @@ entries:
     quote_ko: >-
       반가운 강화입니다.
 
+  - project: Kryoptic
+    repo: latchset/kryoptic
+    pr: 579
+    title:
+      en: Return CKR_SIGNATURE_LEN_RANGE for a wrong-length EdDSA signature
+      ko: 길이가 틀린 EdDSA 서명에 CKR_SIGNATURE_LEN_RANGE 돌려주기
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-08
+    defect:
+      en: >-
+        `C_VerifySignatureInit` takes the signature to verify as an input, but for EdDSA it was handed
+        straight to the signature context with no length check, so a wrong-length signature was only
+        rejected later, when `C_VerifySignature` failed with `CKR_FUNCTION_FAILED`.
+      ko: >-
+        `C_VerifySignatureInit`는 검증할 서명을 입력으로 받는데, EdDSA에서는 길이 검사 없이 서명을 그대로 넘겨
+        길이가 틀린 서명이 나중에 `C_VerifySignature`가 `CKR_FUNCTION_FAILED`로 실패할 때에야 거부됐습니다.
+    background:
+      en: >-
+        PKCS#11 signals a signature whose length is wrong with `CKR_SIGNATURE_LEN_RANGE`. Kryoptic's
+        ECDSA, RSA, ML-DSA, SLH-DSA, HMAC and CMAC already apply that check at init; EdDSA (64 bytes
+        for Ed25519, 114 for Ed448) was the only mechanism missing it.
+      ko: >-
+        PKCS#11은 길이가 틀린 서명을 `CKR_SIGNATURE_LEN_RANGE`로 알립니다. Kryoptic의 ECDSA·RSA·ML-DSA·
+        SLH-DSA·HMAC·CMAC는 이미 init에서 그 검사를 하는데, EdDSA(Ed25519 64바이트, Ed448 114바이트)만 빠져
+        있었습니다.
+    found_by:
+      en: >-
+        Wycheproof ed25519/ed448 verification vectors carrying wrong-length signatures, run through the
+        VerifySignature API: the mismatched lengths were accepted at init instead of being rejected.
+      ko: >-
+        길이가 틀린 서명이 든 Wycheproof ed25519·ed448 검증 벡터를 VerifySignature API에 넣어 찾았습니다. 틀린
+        길이가 init에서 거부되지 않고 받아들여졌습니다.
+    fix:
+      en: >-
+        Compare the supplied signature length against the expected output length before setting it on
+        the context, mirroring the existing ECDSA check, and extend the EdDSA test to reject a
+        wrong-length signature for both curves.
+      ko: >-
+        서명을 컨텍스트에 넣기 전에 기대 길이와 대조합니다(기존 ECDSA 검사와 같은 방식). EdDSA 시험에 두 곡선의 길이
+        오류 서명 케이스를 더했고, 수정을 되돌리면 실패합니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # `link` replaces the GitHub address (OpenVPN: the Gerrit query); `status` is shown only when the
