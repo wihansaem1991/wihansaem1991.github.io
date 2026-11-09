@@ -769,10 +769,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-09",
+   "last_response": "2026-11-09",
    "opened": "2026-11-02",
-   "stage": "review"
+   "stage": "changes"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33477"
@@ -945,13 +945,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-09",
    "first_response": "2026-11-04",
    "last_response": "2026-11-04",
    "opened": "2026-11-01",
-   "stage": "approved"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "859bfea20735f98bd62d9a3c80f8ea40adc952b5",
+   "url": "https://github.com/tpm2-software/tpm2-tss/commit/859bfea20735f98bd62d9a3c80f8ea40adc952b5"
+  },
   "url": "https://github.com/tpm2-software/tpm2-tss/pull/3198"
  }
 }
