@@ -1873,7 +1873,7 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-08
     defect:
       en: >-

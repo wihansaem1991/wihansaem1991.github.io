@@ -112,7 +112,7 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">21</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">22</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
     <h3 class="chart-h">프로젝트별 반영 기여</h3><div class="bars">
       <details class="bar">
         <summary>
@@ -246,10 +246,17 @@
       <details class="bar">
         <summary>
           <span class="bar-name">Kryoptic</span>
-          <span class="bar-track"><span class="bar-fill" style="width:33%"></span></span>
-          <span class="bar-n">2</span>
+          <span class="bar-track"><span class="bar-fill" style="width:50%"></span></span>
+          <span class="bar-n">3</span>
         </summary>
         <div class="bar-body">
+        <details class="entry" id="latchset-kryoptic-579">
+          <summary>
+            <span class="line2">길이가 틀린 EdDSA 서명에 CKR_SIGNATURE_LEN_RANGE 돌려주기</span>
+            <span class="line3">latchset/kryoptic #579 · 버그 수정</span>
+          </summary>
+          <div class="body"><dl><dt>문제</dt><dd><code>C_VerifySignatureInit</code>는 검증할 서명을 입력으로 받는데, EdDSA에서는 길이 검사 없이 서명을 그대로 넘겨 길이가 틀린 서명이 나중에 <code>C_VerifySignature</code>가 <code>CKR_FUNCTION_FAILED</code>로 실패할 때에야 거부됐습니다.</dd><dt>배경 지식</dt><dd>PKCS#11은 길이가 틀린 서명을 <code>CKR_SIGNATURE_LEN_RANGE</code>로 알립니다. Kryoptic의 ECDSA·RSA·ML-DSA· SLH-DSA·HMAC·CMAC는 이미 init에서 그 검사를 하는데, EdDSA(Ed25519 64바이트, Ed448 114바이트)만 빠져 있었습니다.</dd><dt>찾은 방법</dt><dd>길이가 틀린 서명이 든 Wycheproof ed25519·ed448 검증 벡터를 VerifySignature API에 넣어 찾았습니다. 틀린 길이가 init에서 거부되지 않고 받아들여졌습니다.</dd><dt>수정</dt><dd>서명을 컨텍스트에 넣기 전에 기대 길이와 대조합니다(기존 ECDSA 검사와 같은 방식). EdDSA 시험에 두 곡선의 길이 오류 서명 케이스를 더했고, 수정을 되돌리면 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/579" target="_blank" rel="noopener">#579 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/579/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
+        </details>
         <details class="entry" id="latchset-kryoptic-573">
           <summary>
             <span class="line2">ChaCha20-Poly1305를 큰 조각으로 나눠 복호할 때 앞부분이 빠지는 문제 고치기</span>
@@ -317,7 +324,7 @@
           <div class="body"><dl><dt>문제</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code>·<code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code>가 디버그 로그를 찍으려고 <code>*offset</code>을 확인 없이 읽었습니다. 같은 파일의 다른 함수는 모두 NULL offset을 받는데, 이 둘은 널 포인터를 읽었습니다.</dd><dt>배경 지식</dt><dd>tpm2-tss는 마샬링(MU) 함수를 C 매크로로 찍어 내고, 매크로마다 로그에 <code>offset ? *offset : 0xffff</code>를 씁니다. 기본 로그 수준에서 <code>LOG_DEBUG()</code>는 그냥 함수 호출이라 디버그 로그가 꺼져 있어도 인자를 계산합니다.</dd><dt>찾은 방법</dt><dd>MU 함수에 NULL offset을 넘겨 UndefinedBehaviorSanitizer로 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>TPMS_MARSHAL_0</code>·<code>TPMS_UNMARSHAL_0</code>도 다른 매크로처럼 <code>offset ? *offset : 0xffff</code>를 씁니다. 수정을 되돌리면 새 단위 시험이 UBSan 보고로 멈추고, 고친 뒤 <code>TPMS-marshal</code> 시험 12개가 모두 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
         </details></div>
       </details></div>
-    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:28.6%;background:var(--c-hardening,var(--accent))" title="보안 강화 6"></span><span class="seg" style="width:52.4%;background:var(--c-bugfix,var(--accent))" title="버그 수정 11"></span><span class="seg" style="width:14.3%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:4.8%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 11</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span></div>
+    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:27.3%;background:var(--c-hardening,var(--accent))" title="보안 강화 6"></span><span class="seg" style="width:54.5%;background:var(--c-bugfix,var(--accent))" title="버그 수정 12"></span><span class="seg" style="width:13.6%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:4.5%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 12</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span></div>
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
   </section>
 
