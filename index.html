@@ -112,7 +112,7 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">21</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">22</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
     <h3 class="chart-h">Landed by project</h3><div class="bars">
       <details class="bar">
         <summary>
@@ -246,10 +246,17 @@
       <details class="bar">
         <summary>
           <span class="bar-name">Kryoptic</span>
-          <span class="bar-track"><span class="bar-fill" style="width:33%"></span></span>
-          <span class="bar-n">2</span>
+          <span class="bar-track"><span class="bar-fill" style="width:50%"></span></span>
+          <span class="bar-n">3</span>
         </summary>
         <div class="bar-body">
+        <details class="entry" id="latchset-kryoptic-579">
+          <summary>
+            <span class="line2">Return CKR_SIGNATURE_LEN_RANGE for a wrong-length EdDSA signature</span>
+            <span class="line3">latchset/kryoptic #579 · Bug fix</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd><code>C_VerifySignatureInit</code> takes the signature to verify as an input, but for EdDSA it was handed straight to the signature context with no length check, so a wrong-length signature was only rejected later, when <code>C_VerifySignature</code> failed with <code>CKR_FUNCTION_FAILED</code>.</dd><dt>Background</dt><dd>PKCS#11 signals a signature whose length is wrong with <code>CKR_SIGNATURE_LEN_RANGE</code>. Kryoptic&#x27;s ECDSA, RSA, ML-DSA, SLH-DSA, HMAC and CMAC already apply that check at init; EdDSA (64 bytes for Ed25519, 114 for Ed448) was the only mechanism missing it.</dd><dt>How it was found</dt><dd>Wycheproof ed25519/ed448 verification vectors carrying wrong-length signatures, run through the VerifySignature API: the mismatched lengths were accepted at init instead of being rejected.</dd><dt>Fix</dt><dd>Compare the supplied signature length against the expected output length before setting it on the context, mirroring the existing ECDSA check, and extend the EdDSA test to reject a wrong-length signature for both curves.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/latchset/kryoptic/pull/579" target="_blank" rel="noopener">#579 ↗</a> · <a href="https://github.com/latchset/kryoptic/pull/579/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details>
         <details class="entry" id="latchset-kryoptic-573">
           <summary>
             <span class="line2">Fix multi-part ChaCha20-Poly1305 decryption of large chunks</span>
@@ -317,7 +324,7 @@
           <div class="body"><dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
         </details></div>
       </details></div>
-    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:28.6%;background:var(--c-hardening,var(--accent))" title="Hardening 6"></span><span class="seg" style="width:52.4%;background:var(--c-bugfix,var(--accent))" title="Bug fix 11"></span><span class="seg" style="width:14.3%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:4.8%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 11</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
+    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:27.3%;background:var(--c-hardening,var(--accent))" title="Hardening 6"></span><span class="seg" style="width:54.5%;background:var(--c-bugfix,var(--accent))" title="Bug fix 12"></span><span class="seg" style="width:13.6%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:4.5%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 12</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
     <p class="hint">Open an entry to read its briefing.</p>
   </section>
 
