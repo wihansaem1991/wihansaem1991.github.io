@@ -1402,9 +1402,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-01
-    decided: 2026-11-04
+    decided: 2026-11-09
     defect:
       en: >-
         `Tss2_MU_TPMS_EMPTY_Marshal()` and `Tss2_MU_TPMS_EMPTY_Unmarshal()` read `*offset` for a
@@ -2193,7 +2193,7 @@ vulnerabilities:
     channel:
       en: GitHub private vulnerability report
       ko: GitHub 비공개 취약점 보고
-    status: triage
+    status: accepted
     cve: null
     cvss: null
 
