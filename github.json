@@ -762,8 +762,8 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 0,
-    "pass": 95,
+    "fail": 1,
+    "pass": 94,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -772,7 +772,7 @@
    "first_response": "2026-11-09",
    "last_response": "2026-11-09",
    "opened": "2026-11-02",
-   "stage": "changes"
+   "stage": "rereview"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33477"
@@ -826,8 +826,8 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-09",
+   "last_response": "2026-11-09",
    "opened": "2026-11-06",
    "stage": "review"
   },
