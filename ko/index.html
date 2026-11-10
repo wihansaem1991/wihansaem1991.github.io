@@ -112,13 +112,13 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">22</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">23</div><div class="kpi-l">반영된 기여</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">기여한 프로젝트</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">취약점 보고</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">분석 중인 저장소</div></div></div>
     <h3 class="chart-h">프로젝트별 반영 기여</h3><div class="bars">
       <details class="bar">
         <summary>
           <span class="bar-name">RustCrypto</span>
           <span class="bar-track"><span class="bar-fill" style="width:100%"></span></span>
-          <span class="bar-n">6</span>
+          <span class="bar-n">7</span>
         </summary>
         <div class="bar-body">
         <details class="entry" id="RustCrypto-AEADs-894">
@@ -134,6 +134,13 @@
             <span class="line3">RustCrypto/RSA #740 · 시험 보강</span>
           </summary>
           <div class="body"><dl><dt>문제</dt><dd><code>rsa</code> 크레이트의 Wycheproof 시험은 PKCS#1 v1.5·PSS 서명만 돌렸습니다. OAEP 패딩 검사 세 가지(첫 바이트 0, 구분자 0x01 앞의 0 아닌 바이트, 구분자 없음) 중 하나를 빼도 시험이 모두 통과했습니다.</dd><dt>배경 지식</dt><dd>RSA-OAEP(RFC 8017) 복호화는 잘못된 패딩을 어느 검사에서 걸렸는지 드러내지 않고 거부해야 합니다. Wycheproof OAEP 파일에 바로 그런 잘못된 암호문이 들어 있습니다.</dd><dt>찾은 방법</dt><dd>변이 시험으로 찾았습니다. 패딩 검사를 하나씩 빼고 기존 시험을 돌린 뒤, 같은 변경을 Wycheproof OAEP 벡터로 다시 돌렸습니다.</dd><dt>수정</dt><dd>새 시험 <code>test_rsa_oaep_decrypt</code>가 22개 파일의 벡터 1,098개를 돌립니다. 세 변이 모두 그중 21개 파일에서 실패합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">#740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="RustCrypto-crypto-bigint-1383">
+          <summary>
+            <span class="line2">BoxedUint: from_*e_slice가 정밀도 위 비트를 버린다고 문서 고침</span>
+            <span class="line3">RustCrypto/crypto-bigint #1383 · 문서 수정</span>
+          </summary>
+          <div class="body"><dl><dt>문제</dt><dd><code>BoxedUint::from_be_slice</code>·<code>from_le_slice</code> 문서는 값이 <code>bits_precision</code>보다 넓으면 <code>DecodeError::Precision</code>을 돌려준다고 적었습니다. #1266 뒤로 두 함수는 그 비트를 지우고 <code>Ok</code>를 돌려주고, 그 PR이 시험도 그렇게 바꿨습니다.</dd><dt>배경 지식</dt><dd>고정 정밀도 정수 타입은 정밀도보다 넓은 입력을 거부할지, RFC 6979 <code>bits2int</code>처럼 잘라 받을지 밝혀야 합니다. 비밀값을 읽는 호출자가 그 약속에 기댑니다.</dd><dt>찾은 방법</dt><dd>문서에 적힌 오류마다 실제 코드 경로와 맞춰 보고, <code>git log -S</code>로 어긋난 시점을 #1266까지 거슬러 찾았습니다.</dd><dt>수정</dt><dd>잘라 받는 동작을 적고 오류는 <code>DecodeError::InputSize</code>만 남겼습니다. 메인테이너가 옛 오류를 되살리기를 원하면 그쪽으로 바꾸겠다고 PR에 적었습니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">#1383 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1383/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
         </details>
         <details class="entry" id="RustCrypto-crypto-bigint-1382">
           <summary>
@@ -167,7 +174,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">OpenVPN</span>
-          <span class="bar-track"><span class="bar-fill" style="width:83%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:71%"></span></span>
           <span class="bar-n">5</span>
         </summary>
         <div class="bar-body">
@@ -210,7 +217,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">pkcs11-provider</span>
-          <span class="bar-track"><span class="bar-fill" style="width:67%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:57%"></span></span>
           <span class="bar-n">4</span>
         </summary>
         <div class="bar-body">
@@ -246,7 +253,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">Kryoptic</span>
-          <span class="bar-track"><span class="bar-fill" style="width:50%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:43%"></span></span>
           <span class="bar-n">3</span>
         </summary>
         <div class="bar-body">
@@ -275,7 +282,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">OpenSSL</span>
-          <span class="bar-track"><span class="bar-fill" style="width:33%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:29%"></span></span>
           <span class="bar-n">2</span>
         </summary>
         <div class="bar-body">
@@ -297,7 +304,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">OpenSC</span>
-          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:14%"></span></span>
           <span class="bar-n">1</span>
         </summary>
         <div class="bar-body">
@@ -312,7 +319,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">tpm2-tss</span>
-          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:14%"></span></span>
           <span class="bar-n">1</span>
         </summary>
         <div class="bar-body">
@@ -324,7 +331,7 @@
           <div class="body"><dl><dt>문제</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code>·<code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code>가 디버그 로그를 찍으려고 <code>*offset</code>을 확인 없이 읽었습니다. 같은 파일의 다른 함수는 모두 NULL offset을 받는데, 이 둘은 널 포인터를 읽었습니다.</dd><dt>배경 지식</dt><dd>tpm2-tss는 마샬링(MU) 함수를 C 매크로로 찍어 내고, 매크로마다 로그에 <code>offset ? *offset : 0xffff</code>를 씁니다. 기본 로그 수준에서 <code>LOG_DEBUG()</code>는 그냥 함수 호출이라 디버그 로그가 꺼져 있어도 인자를 계산합니다.</dd><dt>찾은 방법</dt><dd>MU 함수에 NULL offset을 넘겨 UndefinedBehaviorSanitizer로 돌려 찾았습니다.</dd><dt>수정</dt><dd><code>TPMS_MARSHAL_0</code>·<code>TPMS_UNMARSHAL_0</code>도 다른 매크로처럼 <code>offset ? *offset : 0xffff</code>를 씁니다. 수정을 되돌리면 새 단위 시험이 UBSan 보고로 멈추고, 고친 뒤 <code>TPMS-marshal</code> 시험 12개가 모두 통과합니다.</dd><dt>증빙</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">바뀐 코드 ↗</a></dd></dl></div>
         </details></div>
       </details></div>
-    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:27.3%;background:var(--c-hardening,var(--accent))" title="보안 강화 6"></span><span class="seg" style="width:54.5%;background:var(--c-bugfix,var(--accent))" title="버그 수정 12"></span><span class="seg" style="width:13.6%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:4.5%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 12</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span></div>
+    <h3 class="chart-h">종류별 기여</h3><div class="stack"><span class="seg" style="width:26.1%;background:var(--c-hardening,var(--accent))" title="보안 강화 6"></span><span class="seg" style="width:52.2%;background:var(--c-bugfix,var(--accent))" title="버그 수정 12"></span><span class="seg" style="width:13.0%;background:var(--c-test,var(--accent))" title="시험 보강 3"></span><span class="seg" style="width:4.3%;background:var(--c-cleanup,var(--accent))" title="코드 정리 1"></span><span class="seg" style="width:4.3%;background:var(--c-docs,var(--accent))" title="문서 수정 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>보안 강화 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>버그 수정 12</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>시험 보강 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>코드 정리 1</span><span class="lg"><span class="sw" style="background:var(--c-docs,var(--accent))"></span>문서 수정 1</span></div>
     <p class="hint">항목을 누르면 브리핑이 펼쳐집니다.</p>
   </section>
 
@@ -409,7 +416,7 @@
     <summary><b>분석 중인 저장소</b> <span class="fold-n">18</span></summary>
     <div class="fold-body"><p class="hint">지금 결함을 찾고 있는 저장소입니다. 프로젝트가 무엇인지, 그 안에서 무엇을 보는지 적었습니다.</p><div class="chips"><a class="chip" href="https://github.com/openssl/openssl" target="_blank" rel="noopener" title="가장 널리 쓰이는 C TLS·암호 라이브러리 · 보는 것: 해제된 메모리에 남는 비밀값(할당 함수를 가로채 측정)">OpenSSL<span class="chip-n">10</span></a><a class="chip" href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener" title="OpenSSL 3에서 PKCS#11 토큰·HSM을 쓰게 하는 provider · 보는 것: 서명·키 유도·ECDH의 출력 버퍼 길이 규약, OpenSSL 기본 provider와 결과 대조">pkcs11-provider<span class="chip-n">4</span></a><a class="chip" href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener" title="OpenVPN 본체(C), 패치는 Gerrit으로 제출 · 보는 것: 지우지 않고 해제하는 키 재료">OpenVPN<span class="chip-n">5</span></a><a class="chip" href="https://github.com/randombit/botan" target="_blank" rel="noopener" title="양자내성 알고리즘이 많은 C++ 암호 라이브러리 · 보는 것: 양자내성 키·서명 길이 입력 검증">Botan<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener" title="상수 시간 큰 정수 연산 Rust 라이브러리 · 보는 것: 문자열·바이트 변환 경계값">crypto-bigint<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener" title="순수 Rust RSA 구현 · 보는 것: 시험이 돌리지 않는 Wycheproof 벡터">RustCrypto RSA<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/AEADs" target="_blank" rel="noopener" title="Rust 인증 암호 모음(AES-GCM·ChaCha20-Poly1305·CCM·EAX 등) · 보는 것: 시험이 돌리지 않는 Wycheproof 벡터, 위조 태그 거부">RustCrypto AEADs<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener" title="Rust 서명 알고리즘 모음(ML-DSA 포함) · 보는 것: 시험이 건너뛰는 Wycheproof 벡터">RustCrypto signatures<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/liboqs" target="_blank" rel="noopener" title="양자내성 암호 C 라이브러리(ML-KEM·ML-DSA·SLH-DSA 등) · 보는 것: 서명 검증에 Wycheproof 벡터·잘못된 길이 넣기">liboqs<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/oqs-provider" target="_blank" rel="noopener" title="OpenSSL 3에 양자내성 알고리즘을 붙이는 provider · 보는 것: 지우지 않고 해제하는 개인키 사본">oqs-provider<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/TF-PSA-Crypto" target="_blank" rel="noopener" title="Mbed TLS에서 떼어 낸 PSA 암호 API 구현 · 보는 것: 지우지 않고 해제하는 큰 수 임시 버퍼">TF-PSA-Crypto<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/mbedtls" target="_blank" rel="noopener" title="임베디드용 TLS·X.509 라이브러리 · 보는 것: X.509 확장 해석">Mbed TLS<span class="chip-n">1</span></a><a class="chip" href="https://github.com/mitmproxy/mitmproxy" target="_blank" rel="noopener" title="HTTPS 통신을 풀어 보는 프록시(Python) · 보는 것: 인증서·설정 처리">mitmproxy<span class="chip-n">1</span></a><a class="chip" href="https://github.com/tpm2-software/tpm2-tss" target="_blank" rel="noopener" title="TPM 2.0 소프트웨어 스택(TCG TSS 2.0, C) · 보는 것: 마샬링(MU) 함수의 인자 처리">tpm2-tss<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener" title="Rust용 DER·PEM·X.509 등 형식 크레이트 모음 · 보는 것: 잘못된 DER 값 해석">RustCrypto formats<span class="chip-n">2</span></a><a class="chip" href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener" title="스마트카드 도구와 PKCS#11 모듈 · 보는 것: PKCS#11 모듈의 빠진 기능(가상 카드로 시험)">OpenSC<span class="chip-n">1</span></a><a class="chip" href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener" title="안드로이드용 OpenVPN 앱 · 보는 것: 가져온 설정 파일 해석">OpenVPN for Android<span class="chip-n">4</span></a><a class="chip" href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener" title="OpenSSL을 쓰는 Rust PKCS#11 소프트웨어 토큰 · 보는 것: Wycheproof 벡터를 PKCS#11 API로 넣어 결과와 반환 코드를 함께 확인">Kryoptic<span class="chip-n">3</span></a></div></div>
   </details>
-  <footer>2026-11-10 갱신. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
+  <footer>2026-11-11 갱신. 비공개 취약점 보고는 프로젝트가 공개하기 전까지 이름을 가립니다. Claude Code의 도움을 받아 작업했고, 모든 변경은 직접 재현·시험했으며 커밋에 AI 도움을 밝혔습니다.</footer>
 </main>
 <script>
 (() => {

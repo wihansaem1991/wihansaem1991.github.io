@@ -1446,9 +1446,9 @@ entries:
     type: docs
     cve: null
     cvss: null
-    status: open
+    status: merged
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-10
     defect:
       en: >-
         The docs of `BoxedUint::from_be_slice` and `from_le_slice` promised

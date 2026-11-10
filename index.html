@@ -112,13 +112,13 @@
   </header>
 
   <section class="stats" id="stats">
-    <div class="kpis"><div class="kpi"><div class="kpi-n">22</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
+    <div class="kpis"><div class="kpi"><div class="kpi-n">23</div><div class="kpi-l">Landed</div></div><div class="kpi"><div class="kpi-n">7</div><div class="kpi-l">Projects</div></div><div class="kpi"><div class="kpi-n">9</div><div class="kpi-l">Vulnerability reports</div></div><div class="kpi"><div class="kpi-n">18</div><div class="kpi-l">Repositories I audit</div></div></div>
     <h3 class="chart-h">Landed by project</h3><div class="bars">
       <details class="bar">
         <summary>
           <span class="bar-name">RustCrypto</span>
           <span class="bar-track"><span class="bar-fill" style="width:100%"></span></span>
-          <span class="bar-n">6</span>
+          <span class="bar-n">7</span>
         </summary>
         <div class="bar-body">
         <details class="entry" id="RustCrypto-AEADs-894">
@@ -134,6 +134,13 @@
             <span class="line3">RustCrypto/RSA #740 · Test coverage</span>
           </summary>
           <div class="body"><dl><dt>Problem</dt><dd>The <code>rsa</code> crate&#x27;s Wycheproof tests covered only PKCS#1 v1.5 and PSS signatures. Removing any one of three OAEP padding checks (leading zero byte, non-zero bytes before the 0x01 separator, missing separator) left the whole test suite green.</dd><dt>Background</dt><dd>RSA-OAEP (RFC 8017) decryption must reject malformed padding without revealing which check failed; Wycheproof&#x27;s OAEP files contain exactly those malformed ciphertexts.</dd><dt>How it was found</dt><dd>Mutation testing: each padding check was removed in turn and the existing suite run, then the same change was run against the Wycheproof OAEP vectors.</dd><dt>Fix</dt><dd><code>test_rsa_oaep_decrypt</code> runs 1098 vectors from 22 files; each of the three mutations makes 21 of them fail.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/RSA/pull/740" target="_blank" rel="noopener">#740 ↗</a> · <a href="https://github.com/RustCrypto/RSA/pull/740/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
+        </details>
+        <details class="entry" id="RustCrypto-crypto-bigint-1383">
+          <summary>
+            <span class="line2">BoxedUint: document that from_*e_slice drops bits above the precision</span>
+            <span class="line3">RustCrypto/crypto-bigint #1383 · Documentation</span>
+          </summary>
+          <div class="body"><dl><dt>Problem</dt><dd>The docs of <code>BoxedUint::from_be_slice</code> and <code>from_le_slice</code> promised <code>DecodeError::Precision</code> for a value wider than <code>bits_precision</code>. Since #1266 both functions mask those bits off and return <code>Ok</code>, and that PR changed the test to expect it.</dd><dt>Background</dt><dd>A fixed-precision integer type has to say what happens to input wider than its precision: reject it or truncate it, as RFC 6979 <code>bits2int</code> does. Callers decoding secret values rely on that answer.</dd><dt>How it was found</dt><dd>Comparing each documented error with the code path, then tracing the change back to #1266 with <code>git log -S</code>.</dd><dt>Fix</dt><dd>Describe the truncation and list only <code>DecodeError::InputSize</code>. The PR offers to restore the old error instead if the maintainers prefer it.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/RustCrypto/crypto-bigint/pull/1383" target="_blank" rel="noopener">#1383 ↗</a> · <a href="https://github.com/RustCrypto/crypto-bigint/pull/1383/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
         </details>
         <details class="entry" id="RustCrypto-crypto-bigint-1382">
           <summary>
@@ -167,7 +174,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">OpenVPN</span>
-          <span class="bar-track"><span class="bar-fill" style="width:83%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:71%"></span></span>
           <span class="bar-n">5</span>
         </summary>
         <div class="bar-body">
@@ -210,7 +217,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">pkcs11-provider</span>
-          <span class="bar-track"><span class="bar-fill" style="width:67%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:57%"></span></span>
           <span class="bar-n">4</span>
         </summary>
         <div class="bar-body">
@@ -246,7 +253,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">Kryoptic</span>
-          <span class="bar-track"><span class="bar-fill" style="width:50%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:43%"></span></span>
           <span class="bar-n">3</span>
         </summary>
         <div class="bar-body">
@@ -275,7 +282,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">OpenSSL</span>
-          <span class="bar-track"><span class="bar-fill" style="width:33%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:29%"></span></span>
           <span class="bar-n">2</span>
         </summary>
         <div class="bar-body">
@@ -297,7 +304,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">OpenSC</span>
-          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:14%"></span></span>
           <span class="bar-n">1</span>
         </summary>
         <div class="bar-body">
@@ -312,7 +319,7 @@
       <details class="bar">
         <summary>
           <span class="bar-name">tpm2-tss</span>
-          <span class="bar-track"><span class="bar-fill" style="width:17%"></span></span>
+          <span class="bar-track"><span class="bar-fill" style="width:14%"></span></span>
           <span class="bar-n">1</span>
         </summary>
         <div class="bar-body">
@@ -324,7 +331,7 @@
           <div class="body"><dl><dt>Problem</dt><dd><code>Tss2_MU_TPMS_EMPTY_Marshal()</code> and <code>Tss2_MU_TPMS_EMPTY_Unmarshal()</code> read <code>*offset</code> for a debug log line without checking it. Every other function in the file accepts a NULL offset; these two read through a NULL pointer.</dd><dt>Background</dt><dd>tpm2-tss builds its marshalling (MU) functions from C macros, and each macro logs <code>offset ? *offset : 0xffff</code>. At the default log level <code>LOG_DEBUG()</code> is a plain function call, so its arguments are evaluated even when debug logging is off.</dd><dt>How it was found</dt><dd>Calling the MU functions with a NULL offset under UndefinedBehaviorSanitizer.</dd><dt>Fix</dt><dd><code>TPMS_MARSHAL_0</code> and <code>TPMS_UNMARSHAL_0</code> log <code>offset ? *offset : 0xffff</code> like the other macros. A new unit test stops with the UBSan report when the fix is reverted; <code>TPMS-marshal</code> passes 12/12.</dd><dt>Evidence</dt><dd class="evidence"><a href="https://github.com/tpm2-software/tpm2-tss/pull/3198" target="_blank" rel="noopener">#3198 ↗</a> · <a href="https://github.com/tpm2-software/tpm2-tss/pull/3198/files" target="_blank" rel="noopener">Changed files ↗</a></dd></dl></div>
         </details></div>
       </details></div>
-    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:27.3%;background:var(--c-hardening,var(--accent))" title="Hardening 6"></span><span class="seg" style="width:54.5%;background:var(--c-bugfix,var(--accent))" title="Bug fix 12"></span><span class="seg" style="width:13.6%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:4.5%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 12</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span></div>
+    <h3 class="chart-h">By type</h3><div class="stack"><span class="seg" style="width:26.1%;background:var(--c-hardening,var(--accent))" title="Hardening 6"></span><span class="seg" style="width:52.2%;background:var(--c-bugfix,var(--accent))" title="Bug fix 12"></span><span class="seg" style="width:13.0%;background:var(--c-test,var(--accent))" title="Test coverage 3"></span><span class="seg" style="width:4.3%;background:var(--c-cleanup,var(--accent))" title="Cleanup 1"></span><span class="seg" style="width:4.3%;background:var(--c-docs,var(--accent))" title="Documentation 1"></span></div><div class="legend"><span class="lg"><span class="sw" style="background:var(--c-hardening,var(--accent))"></span>Hardening 6</span><span class="lg"><span class="sw" style="background:var(--c-bugfix,var(--accent))"></span>Bug fix 12</span><span class="lg"><span class="sw" style="background:var(--c-test,var(--accent))"></span>Test coverage 3</span><span class="lg"><span class="sw" style="background:var(--c-cleanup,var(--accent))"></span>Cleanup 1</span><span class="lg"><span class="sw" style="background:var(--c-docs,var(--accent))"></span>Documentation 1</span></div>
     <p class="hint">Open an entry to read its briefing.</p>
   </section>
 
@@ -409,7 +416,7 @@
     <summary><b>Repositories I audit</b> <span class="fold-n">18</span></summary>
     <div class="fold-body"><p class="hint">Repositories I am auditing now: what each project is and what I look at there.</p><div class="chips"><a class="chip" href="https://github.com/openssl/openssl" target="_blank" rel="noopener" title="The most widely deployed TLS and cryptography library, in C · Looking at: Secrets left in freed memory, measured by hooking the allocator">OpenSSL<span class="chip-n">10</span></a><a class="chip" href="https://github.com/openssl-projects/pkcs11-provider" target="_blank" rel="noopener" title="OpenSSL 3 provider for PKCS#11 tokens and HSMs · Looking at: Output-buffer length rules of signing, key derivation and ECDH, compared with OpenSSL&#x27;s default provider">pkcs11-provider<span class="chip-n">4</span></a><a class="chip" href="https://gerrit.openvpn.net/q/change:2075+OR+change:2076+OR+change:2077+OR+change:2078+OR+change:2079" target="_blank" rel="noopener" title="OpenVPN itself, in C; patches go through Gerrit · Looking at: Key material freed without being cleared">OpenVPN<span class="chip-n">5</span></a><a class="chip" href="https://github.com/randombit/botan" target="_blank" rel="noopener" title="C++ cryptography library with many post-quantum algorithms · Looking at: Input validation of post-quantum key and signature sizes">Botan<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/crypto-bigint" target="_blank" rel="noopener" title="Constant-time big-integer arithmetic for Rust · Looking at: Edge cases of string and byte conversion">crypto-bigint<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/RSA" target="_blank" rel="noopener" title="RSA in pure Rust · Looking at: Wycheproof test vectors the test suite does not run">RustCrypto RSA<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/AEADs" target="_blank" rel="noopener" title="Authenticated encryption for Rust (AES-GCM, ChaCha20-Poly1305, CCM, EAX and more) · Looking at: Wycheproof vectors the test suite does not run, rejection of forged tags">RustCrypto AEADs<span class="chip-n">2</span></a><a class="chip" href="https://github.com/RustCrypto/signatures" target="_blank" rel="noopener" title="Signature algorithms for Rust, ML-DSA included · Looking at: Wycheproof test vectors the test suite skips">RustCrypto signatures<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/liboqs" target="_blank" rel="noopener" title="C library of post-quantum algorithms (ML-KEM, ML-DSA, SLH-DSA and more) · Looking at: Signature verification with Wycheproof vectors and wrong lengths">liboqs<span class="chip-n">1</span></a><a class="chip" href="https://github.com/open-quantum-safe/oqs-provider" target="_blank" rel="noopener" title="OpenSSL 3 provider that adds post-quantum algorithms · Looking at: Private-key copies freed without being cleared">oqs-provider<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/TF-PSA-Crypto" target="_blank" rel="noopener" title="The PSA Crypto API implementation split out of Mbed TLS · Looking at: Big-number temporaries freed without being cleared">TF-PSA-Crypto<span class="chip-n">1</span></a><a class="chip" href="https://github.com/Mbed-TLS/mbedtls" target="_blank" rel="noopener" title="TLS and X.509 library for embedded devices · Looking at: X.509 extension parsing">Mbed TLS<span class="chip-n">1</span></a><a class="chip" href="https://github.com/mitmproxy/mitmproxy" target="_blank" rel="noopener" title="Interactive HTTPS proxy, in Python · Looking at: Certificate and configuration handling">mitmproxy<span class="chip-n">1</span></a><a class="chip" href="https://github.com/tpm2-software/tpm2-tss" target="_blank" rel="noopener" title="TPM 2.0 software stack (TCG TSS 2.0) in C · Looking at: Argument handling in the marshalling (MU) functions">tpm2-tss<span class="chip-n">1</span></a><a class="chip" href="https://github.com/RustCrypto/formats" target="_blank" rel="noopener" title="DER, PEM, X.509 and other format crates for Rust · Looking at: Decoding of malformed DER values">RustCrypto formats<span class="chip-n">2</span></a><a class="chip" href="https://github.com/OpenSC/OpenSC" target="_blank" rel="noopener" title="Smart card tools and PKCS#11 module · Looking at: Gaps in the PKCS#11 module, tested on a virtual card">OpenSC<span class="chip-n">1</span></a><a class="chip" href="https://github.com/schwabe/ics-openvpn" target="_blank" rel="noopener" title="The OpenVPN client app for Android · Looking at: Parsing of imported configuration files">OpenVPN for Android<span class="chip-n">4</span></a><a class="chip" href="https://github.com/latchset/kryoptic" target="_blank" rel="noopener" title="PKCS#11 software token in Rust, backed by OpenSSL · Looking at: Wycheproof vectors run through the PKCS#11 API, checking both results and return codes">Kryoptic<span class="chip-n">3</span></a></div></div>
   </details>
-  <footer>Updated 2026-11-10. Private vulnerability reports stay unnamed until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
+  <footer>Updated 2026-11-11. Private vulnerability reports stay unnamed until the project discloses them. Development was assisted by Claude Code; every change was reproduced and tested, and AI assistance is disclosed in each commit.</footer>
 </main>
 <script>
 (() => {

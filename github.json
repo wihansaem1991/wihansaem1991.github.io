@@ -3,7 +3,7 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 0,
+    "fail": 1,
     "pass": 1,
     "pending": 0
    },
@@ -23,7 +23,7 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 2,
+    "pass": 4,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -255,7 +255,13 @@
   "url": "https://github.com/RustCrypto/crypto-bigint/pull/1382"
  },
  "RustCrypto/crypto-bigint#1383": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "tarcieri",
+    "date": "2026-11-10",
+    "url": "https://github.com/RustCrypto/crypto-bigint/pull/1383#pullrequestreview-5845449073"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -264,13 +270,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-10",
+   "first_response": "2026-11-10",
+   "last_response": "2026-11-10",
    "opened": "2026-11-01",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "52aefdf1fdf456eaddeeb2efd604ad26129b1d0f",
+   "url": "https://github.com/RustCrypto/crypto-bigint/commit/52aefdf1fdf456eaddeeb2efd604ad26129b1d0f"
+  },
   "url": "https://github.com/RustCrypto/crypto-bigint/pull/1383"
  },
  "RustCrypto/formats#2501": {
@@ -807,10 +816,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-10",
+   "last_response": "2026-11-10",
    "opened": "2026-11-04",
-   "stage": "review"
+   "stage": "changes"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33545"
