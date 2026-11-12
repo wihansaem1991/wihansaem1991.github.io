@@ -1402,9 +1402,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-01
-    decided: null
+    decided: 2026-11-12
     defect:
       en: >-
         The modular inverse routine freed its work buffer without clearing it. After
@@ -1623,9 +1623,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-01
-    decided: 2026-11-04
+    decided: 2026-11-12
     defect:
       en: >-
         OpenSC's PKCS#11 module could verify signatures with a public key but not encrypt with one:

@@ -5,12 +5,17 @@
     "by": "mpg",
     "date": "2026-11-12",
     "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960#pullrequestreview-5873655896"
+   },
+   {
+    "by": "bensze01",
+    "date": "2026-11-12",
+    "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960#pullrequestreview-5875600275"
    }
   ],
   "live": {
    "checks": {
-    "fail": 0,
-    "pass": 1,
+    "fail": 1,
+    "pass": 2,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -19,7 +24,7 @@
    "first_response": "2026-11-12",
    "last_response": "2026-11-12",
    "opened": "2026-10-31",
-   "stage": "approved_pending"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960"
@@ -47,17 +52,17 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 0,
+    "fail": 1,
     "pass": 2,
     "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-12",
+   "last_response": "2026-11-12",
    "opened": "2026-11-12",
-   "stage": "review"
+   "stage": "changes"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11058"
@@ -78,13 +83,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-12",
    "first_response": "2026-11-03",
    "last_response": "2026-11-04",
    "opened": "2026-11-01",
-   "stage": "approved"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "4c103516a8e58c26b4fe9a8fed1559bed122c24d",
+   "url": "https://github.com/OpenSC/OpenSC/commit/4c103516a8e58c26b4fe9a8fed1559bed122c24d"
+  },
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
  },
  "OpenVPN/openvpn#2075": {
