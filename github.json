@@ -1,11 +1,17 @@
 {
  "Mbed-TLS/TF-PSA-Crypto#960": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "mpg",
+    "date": "2026-11-12",
+    "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960#pullrequestreview-5873655896"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 2,
-    "pending": 1
+    "pass": 1,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
@@ -13,7 +19,7 @@
    "first_response": "2026-11-12",
    "last_response": "2026-11-12",
    "opened": "2026-10-31",
-   "stage": "changes"
+   "stage": "approved_pending"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960"
@@ -36,6 +42,25 @@
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11036"
+ },
+ "Mbed-TLS/mbedtls#11058": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 2,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-12",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/Mbed-TLS/mbedtls/pull/11058"
  },
  "OpenSC/OpenSC#3917": {
   "approvals": [
