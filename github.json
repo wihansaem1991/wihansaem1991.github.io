@@ -810,7 +810,7 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 95,
+    "pass": 96,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -819,7 +819,7 @@
    "first_response": "2026-11-10",
    "last_response": "2026-11-10",
    "opened": "2026-11-04",
-   "stage": "changes"
+   "stage": "rereview"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33545"
