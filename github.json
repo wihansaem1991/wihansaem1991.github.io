@@ -3,17 +3,17 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 1,
-    "pass": 1,
-    "pending": 0
+    "fail": 0,
+    "pass": 2,
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-12",
+   "last_response": "2026-11-12",
    "opened": "2026-10-31",
-   "stage": "review"
+   "stage": "changes"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960"
