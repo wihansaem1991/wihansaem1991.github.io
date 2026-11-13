@@ -14,9 +14,9 @@
   ],
   "live": {
    "checks": {
-    "fail": 1,
+    "fail": 0,
     "pass": 2,
-    "pending": 0
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
@@ -30,20 +30,26 @@
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960"
  },
  "Mbed-TLS/TF-PSA-Crypto#975": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "bensze01",
+    "date": "2026-11-13",
+    "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/975#pullrequestreview-5885626607"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 1,
-    "pending": 0
+    "pass": 2,
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-13",
+   "last_response": "2026-11-13",
    "opened": "2026-11-13",
-   "stage": "review"
+   "stage": "approved_pending"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/975"
@@ -87,20 +93,26 @@
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11058"
  },
  "Mbed-TLS/mbedtls#11061": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "bensze01",
+    "date": "2026-11-13",
+    "url": "https://github.com/Mbed-TLS/mbedtls/pull/11061#pullrequestreview-5885638255"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 2,
-    "pending": 0
+    "pass": 3,
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-13",
+   "last_response": "2026-11-13",
    "opened": "2026-11-13",
-   "stage": "review"
+   "stage": "approved_pending"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11061"
