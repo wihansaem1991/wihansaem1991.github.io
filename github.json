@@ -145,6 +145,25 @@
   },
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
  },
+ "OpenSC/OpenSC#3949": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 3,
+    "pass": 12,
+    "pending": 35
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-13",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/OpenSC/OpenSC/pull/3949"
+ },
  "OpenVPN/openvpn#2075": {
   "approvals": [],
   "live": {
