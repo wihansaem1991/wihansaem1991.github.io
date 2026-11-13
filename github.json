@@ -79,7 +79,7 @@
    "checks": {
     "fail": 0,
     "pass": 2,
-    "pending": 0
+    "pending": 1
    },
    "ci_waiting": 0,
    "draft": false,
@@ -149,9 +149,9 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 3,
-    "pass": 12,
-    "pending": 35
+    "fail": 9,
+    "pass": 58,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
