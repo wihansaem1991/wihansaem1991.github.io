@@ -1747,6 +1747,46 @@ entries:
         고쳤습니다. 두 메커니즘 모두 카드 왕복이 맞고, CI 방식 p11test 결과가 고친 기준 파일과 차이 없이
         같습니다.
 
+  - project: OpenSC
+    repo: OpenSC/OpenSC
+    pr: 3949
+    title:
+      en: "pkcs11: Encrypt with RSA-OAEP public keys in software"
+      ko: "pkcs11: RSA-OAEP 공개키 암호화를 소프트웨어로 지원"
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-13
+    decided: null
+    defect:
+      en: >-
+        After #3917 the PKCS#11 module could encrypt with an RSA public key using PKCS#1 v1.5 or raw RSA,
+        but not with OAEP: C_EncryptInit returned CKR_MECHANISM_INVALID for CKM_RSA_PKCS_OAEP.
+      ko: >-
+        #3917 이후 PKCS#11 모듈은 RSA 공개키로 PKCS#1 v1.5·raw RSA 암호화는 했지만 OAEP는 못 했습니다.
+        CKM_RSA_PKCS_OAEP로 C_EncryptInit을 부르면 CKR_MECHANISM_INVALID가 났습니다.
+    background:
+      en: >-
+        PKCS#11 CK_RSA_PKCS_OAEP_PARAMS (hash, MGF1 hash, label) and RFC 8017 RSAES-OAEP, including the
+        message length limit k - 2hLen - 2.
+      ko: >-
+        PKCS#11 CK_RSA_PKCS_OAEP_PARAMS(해시·MGF1 해시·레이블)와 RFC 8017 RSAES-OAEP, 그리고 메시지 길이
+        한도 k - 2hLen - 2를 썼습니다.
+    found_by:
+      en: >-
+        Follow-up the maintainer agreed to in the #3917 review.
+      ko: >-
+        #3917 리뷰에서 메인테이너와 합의한 후속 작업입니다.
+    fix:
+      en: >-
+        Accept CKM_RSA_PKCS_OAEP in the software encryption path and advertise CKF_ENCRYPT on the OAEP
+        mechanism. On the pico-hsm emulator, public-key OAEP output decrypts on the card for SHA-256/384,
+        and a wrong label is rejected.
+      ko: >-
+        소프트웨어 암호화 경로에 CKM_RSA_PKCS_OAEP를 받고 OAEP 기법에 CKF_ENCRYPT를 켰습니다. pico-hsm
+        에뮬레이터에서 공개키 OAEP 암호문이 카드에서 SHA-256/384로 복호되고, 틀린 레이블은 거부됩니다.
+
   - project: OpenVPN
     repo: OpenVPN/openvpn
     pr: 2075
