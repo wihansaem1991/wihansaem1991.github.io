@@ -1436,6 +1436,92 @@ entries:
         모듈러 거듭제곱 코드처럼 `mbedtls_mpi_zeroize_and_free()`로 해제합니다. 두 측정값이 모두 0이 됐고,
         `bignum`·`rsa` 시험 묶음도 통과합니다.
 
+  - project: TF-PSA-Crypto
+    repo: Mbed-TLS/TF-PSA-Crypto
+    pr: 975
+    title:
+      en: "[Backport 1.1] Zeroize the temporary buffer in mbedtls_mpi_gcd_modinv_odd()"
+      ko: "[1.1 백포트] mbedtls_mpi_gcd_modinv_odd() 임시 버퍼 소거"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-13
+    decided: null
+    defect:
+      en: >-
+        The modular inverse routine freed its work buffer without clearing it. After
+        `mbedtls_mpi_inv_mod()` the inverse stayed in freed heap memory, and after 2048-bit RSA key
+        generation the private CRT coefficient QP did.
+      ko: >-
+        모듈러 역원 함수가 작업 버퍼를 지우지 않고 해제했습니다. `mbedtls_mpi_inv_mod()` 뒤에는 역원이,
+        2048비트 RSA 키 생성 뒤에는 개인키의 CRT 계수 QP가 해제된 힙 메모리에 남았습니다.
+    background:
+      en: >-
+        Cryptographic module validation: critical security parameters must be zeroized when no longer
+        needed (ISO/IEC 19790 and its Korean counterpart used in KCMVP), and RSA-CRT private keys
+        include QP = q^-1 mod p.
+      ko: >-
+        암호모듈 검증 지식을 썼습니다. 핵심 보안 매개변수는 더 쓰지 않으면 소거해야 하고(ISO/IEC 19790, KCMVP가
+        쓰는 국내 규격), RSA-CRT 개인키에는 QP = q^-1 mod p가 들어 있습니다.
+    found_by:
+      en: >-
+        Measurement on aarch64 Linux: `free()` was intercepted and every freed block searched for the
+        known values, with a control build that disables zeroization to prove the harness finds them.
+      ko: >-
+        aarch64 리눅스에서 측정으로 찾았습니다. `free()`를 가로채 해제되는 블록마다 알려진 값을 찾았고, 소거를
+        끈 대조 빌드로 측정이 실제로 잡는지 먼저 확인했습니다.
+    fix:
+      en: >-
+        Release the buffer with `mbedtls_mpi_zeroize_and_free()`, as the modular exponentiation code
+        already does. Both measurements drop to 0; the `bignum` and `rsa` test suites pass.
+      ko: >-
+        모듈러 거듭제곱 코드처럼 `mbedtls_mpi_zeroize_and_free()`로 해제합니다. 두 측정값이 모두 0이 됐고,
+        `bignum`·`rsa` 시험 묶음도 통과합니다.
+
+  - project: Mbed TLS
+    repo: Mbed-TLS/mbedtls
+    pr: 11061
+    title:
+      en: "[Backport 3.6] Zeroize the temporary buffer in mbedtls_mpi_gcd_modinv_odd()"
+      ko: "[3.6 백포트] mbedtls_mpi_gcd_modinv_odd() 임시 버퍼 소거"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-13
+    decided: null
+    defect:
+      en: >-
+        The modular inverse routine freed its work buffer without clearing it. After
+        `mbedtls_mpi_inv_mod()` the inverse stayed in freed heap memory, and after 2048-bit RSA key
+        generation the private CRT coefficient QP did.
+      ko: >-
+        모듈러 역원 함수가 작업 버퍼를 지우지 않고 해제했습니다. `mbedtls_mpi_inv_mod()` 뒤에는 역원이,
+        2048비트 RSA 키 생성 뒤에는 개인키의 CRT 계수 QP가 해제된 힙 메모리에 남았습니다.
+    background:
+      en: >-
+        Cryptographic module validation: critical security parameters must be zeroized when no longer
+        needed (ISO/IEC 19790 and its Korean counterpart used in KCMVP), and RSA-CRT private keys
+        include QP = q^-1 mod p.
+      ko: >-
+        암호모듈 검증 지식을 썼습니다. 핵심 보안 매개변수는 더 쓰지 않으면 소거해야 하고(ISO/IEC 19790, KCMVP가
+        쓰는 국내 규격), RSA-CRT 개인키에는 QP = q^-1 mod p가 들어 있습니다.
+    found_by:
+      en: >-
+        Measurement on aarch64 Linux: `free()` was intercepted and every freed block searched for the
+        known values, with a control build that disables zeroization to prove the harness finds them.
+      ko: >-
+        aarch64 리눅스에서 측정으로 찾았습니다. `free()`를 가로채 해제되는 블록마다 알려진 값을 찾았고, 소거를
+        끈 대조 빌드로 측정이 실제로 잡는지 먼저 확인했습니다.
+    fix:
+      en: >-
+        Release the buffer with `mbedtls_mpi_zeroize_and_free()`, as the modular exponentiation code
+        already does. Both measurements drop to 0; the `bignum` and `rsa` test suites pass.
+      ko: >-
+        모듈러 거듭제곱 코드처럼 `mbedtls_mpi_zeroize_and_free()`로 해제합니다. 두 측정값이 모두 0이 됐고,
+        `bignum`·`rsa` 시험 묶음도 통과합니다.
+
   - project: tpm2-tss
     repo: tpm2-software/tpm2-tss
     pr: 3198
