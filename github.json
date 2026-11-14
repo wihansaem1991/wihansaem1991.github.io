@@ -156,8 +156,8 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-14",
+   "last_response": "2026-11-14",
    "opened": "2026-11-13",
    "stage": "review"
   },
