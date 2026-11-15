@@ -241,13 +241,7 @@
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2078"
  },
  "OpenVPN/openvpn#2079": {
-  "approvals": [
-   {
-    "by": "Steffan Karger",
-    "date": "2026-11-02",
-    "url": "https://gerrit.openvpn.net/c/openvpn/+/2079"
-   }
-  ],
+  "approvals": [],
   "live": {
    "checks": {
     "fail": 0,
@@ -256,11 +250,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-15",
    "first_response": "2026-11-02",
-   "last_response": "2026-11-02",
+   "last_response": "2026-11-15",
    "opened": "2026-11-02",
-   "stage": "approved"
+   "stage": "merged"
   },
   "merge": null,
   "url": "https://gerrit.openvpn.net/c/openvpn/+/2079"

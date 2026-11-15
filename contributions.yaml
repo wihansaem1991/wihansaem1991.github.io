@@ -1992,9 +1992,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-02
-    decided: 2026-11-02
+    decided: 2026-11-15
     defect:
       en: >-
         `tls_crypt_v2_init_client_key()` left a stack copy of the client key at every client start,
