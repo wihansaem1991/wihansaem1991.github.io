@@ -117,6 +117,25 @@
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11061"
  },
+ "Mbed-TLS/mbedtls#11077": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 2,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-16",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/Mbed-TLS/mbedtls/pull/11077"
+ },
  "OpenSC/OpenSC#3917": {
   "approvals": [
    {
