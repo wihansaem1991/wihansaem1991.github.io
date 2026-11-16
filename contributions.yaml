@@ -2174,6 +2174,48 @@ entries:
         서명을 컨텍스트에 넣기 전에 기대 길이와 대조합니다(기존 ECDSA 검사와 같은 방식). EdDSA 시험에 두 곡선의 길이
         오류 서명 케이스를 더했고, 수정을 되돌리면 실패합니다.
 
+  - project: Kryoptic
+    repo: latchset/kryoptic
+    pr: 585
+    title:
+      en: Allow C_EncryptFinal right after init for ChaCha20-Poly1305
+      ko: ChaCha20-Poly1305에서 init 직후 C_EncryptFinal 허용
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-16
+    defect:
+      en: >-
+        For `CKM_CHACHA20_POLY1305`, calling `C_EncryptFinal` right after `C_EncryptInit` (an empty
+        message, whose only output is the tag over the AAD) failed with `CKR_OPERATION_NOT_INITIALIZED`,
+        while a one-shot `C_Encrypt` of the same empty message worked.
+      ko: >-
+        `CKM_CHACHA20_POLY1305`에서 `C_EncryptInit` 바로 뒤에 `C_EncryptFinal`을 부르면(평문이 비어 출력이 AAD에
+        대한 태그뿐인 메시지) `CKR_OPERATION_NOT_INITIALIZED`로 실패했습니다. 같은 빈 메시지를 한 번에 암호화하는
+        `C_Encrypt`는 됐습니다.
+    background:
+      en: >-
+        An AEAD message may have an empty plaintext and still authenticate its associated data, so the
+        multi-part API has to produce the tag without any update call. Kryoptic's AES GCM, CCM and CBC_PAD
+        already accept that sequence; ChaCha20-Poly1305 was the AEAD left out.
+      ko: >-
+        AEAD 메시지는 평문이 비어도 덧붙인 데이터(AAD)를 인증하므로, 나눠 부르는 API도 갱신 호출 없이 태그를 내야
+        합니다. Kryoptic의 AES GCM·CCM·CBC_PAD는 이미 그 순서를 받는데 ChaCha20-Poly1305만 빠져 있었습니다.
+    found_by:
+      en: >-
+        Wycheproof ChaCha20-Poly1305 vectors with an empty message (tcId 2 and 3) run through the
+        multi-part encryption API.
+      ko: >-
+        빈 메시지가 든 Wycheproof ChaCha20-Poly1305 벡터(tcId 2·3)를 나눠 부르는 암호화 API에 넣어 찾았습니다.
+    fix:
+      en: >-
+        Accept the initialized state in `encrypt_final` for ChaCha20-Poly1305, and extend the multi-part
+        test to check that init followed by final returns the same tag as a one-shot encryption.
+      ko: >-
+        ChaCha20-Poly1305의 `encrypt_final`이 init 직후 상태를 받게 했습니다. 나눠 부르는 시험에 init 뒤 바로
+        final을 불러 한 번에 암호화한 결과와 같은 태그가 나오는지 확인하는 단언을 더했고, 수정을 되돌리면 실패합니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # `link` replaces the GitHub address (OpenVPN: the Gerrit query); `status` is shown only when the
