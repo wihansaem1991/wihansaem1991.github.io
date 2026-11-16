@@ -673,6 +673,52 @@ entries:
         「supported_versions 없음」으로 처리합니다. 새 ssl-opt.sh 시험은 수정이 없으면 실패하고,
         `test_suite_ssl`은 916/916입니다.
 
+  - project: Mbed TLS
+    repo: Mbed-TLS/mbedtls
+    pr: 11077
+    title:
+      en: Check the CN when a non-critical subjectAltName has no host names
+      ko: 호스트 이름이 없는 비critical SAN이면 CN으로 호스트 이름을 검증
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-16
+    decided: null
+    defect:
+      en: >-
+        Hostname verification ignored the subject CN whenever a subjectAltName extension was present, so a
+        certificate whose SAN only held an email address failed with CN_MISMATCH even though its CN was the
+        hostname.
+      ko: >-
+        호스트 이름 검증이 subjectAltName 확장이 있기만 하면 subject CN을 보지 않았습니다. 그래서 SAN에
+        이메일 주소만 있고 CN이 호스트 이름인 인증서도 CN_MISMATCH로 실패했습니다.
+    background:
+      en: >-
+        X.509 9.3.2.1 and 7.2.1: a critical SAN must be processed and allows an empty subject; a
+        non-critical one leaves the subject name in force. RFC 6125 6.4.4: use the CN only when the SAN has
+        no DNS, IP or URI identifiers.
+      ko: >-
+        X.509 9.3.2.1·7.2.1절: critical SAN은 반드시 처리해야 하고 빈 subject를 허용하지만, 비critical이면
+        subject 이름이 그대로 유효합니다. RFC 6125 6.4.4절: SAN에 DNS·IP·URI 식별자가 없을 때만 CN을 씁니다.
+    found_by:
+      en: >-
+        Issue #10095, where a maintainer set the direction and listed five test cases. Reproduced with test
+        certificates for each case.
+      ko: >-
+        메인테이너가 방향과 시험 다섯 경우를 정해 둔 이슈 #10095에서 시작했습니다. 경우마다 시험 인증서를
+        만들어 재현했습니다.
+    fix:
+      en: >-
+        Record whether the SAN is critical while parsing, fall back to the CN only for a non-critical SAN
+        without host identifiers, and reject an empty subject unless the SAN is critical and the certificate
+        is an end entity. Eight new tests (three fail without the fix); x509parse, x509write and ssl suites
+        pass.
+      ko: >-
+        파싱할 때 SAN의 critical 여부를 남기고, 호스트 식별자가 없는 비critical SAN일 때만 CN으로
+        넘어가며, 빈 subject는 critical SAN을 가진 최종 인증서일 때만 받도록 고쳤습니다. 새 시험 8건(수정을
+        빼면 3건 실패), x509parse·x509write·ssl 시험이 모두 통과합니다.
+
   - project: mitmproxy
     repo: mitmproxy/mitmproxy
     pr: 8548
