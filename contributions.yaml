@@ -1542,9 +1542,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-13
-    decided: null
+    decided: 2026-11-16
     defect:
       en: >-
         The modular inverse routine freed its work buffer without clearing it. After
@@ -1585,9 +1585,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-13
-    decided: null
+    decided: 2026-11-16
     defect:
       en: >-
         The modular inverse routine freed its work buffer without clearing it. After

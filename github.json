@@ -35,6 +35,11 @@
     "by": "bensze01",
     "date": "2026-11-13",
     "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/975#pullrequestreview-5885626607"
+   },
+   {
+    "by": "mpg",
+    "date": "2026-11-16",
+    "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/975#pullrequestreview-5917664991"
    }
   ],
   "live": {
@@ -47,9 +52,9 @@
    "draft": false,
    "ended": null,
    "first_response": "2026-11-13",
-   "last_response": "2026-11-13",
+   "last_response": "2026-11-16",
    "opened": "2026-11-13",
-   "stage": "approved_pending"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/975"
@@ -98,6 +103,11 @@
     "by": "bensze01",
     "date": "2026-11-13",
     "url": "https://github.com/Mbed-TLS/mbedtls/pull/11061#pullrequestreview-5885638255"
+   },
+   {
+    "by": "mpg",
+    "date": "2026-11-16",
+    "url": "https://github.com/Mbed-TLS/mbedtls/pull/11061#pullrequestreview-5917675589"
    }
   ],
   "live": {
@@ -110,9 +120,9 @@
    "draft": false,
    "ended": null,
    "first_response": "2026-11-13",
-   "last_response": "2026-11-13",
+   "last_response": "2026-11-16",
    "opened": "2026-11-13",
-   "stage": "approved_pending"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11061"
@@ -957,6 +967,25 @@
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33570"
+ },
+ "openssl/openssl#33757": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 0,
+    "pass": 96,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-16",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33757"
  },
  "randombit/botan#6082": {
   "approvals": [],
