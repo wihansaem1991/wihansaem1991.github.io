@@ -20,13 +20,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-16",
    "first_response": "2026-11-12",
    "last_response": "2026-11-12",
    "opened": "2026-10-31",
-   "stage": "approved"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "d97ac50624bbe55c096e3ebc9366385b27fcdbb6",
+   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/commit/d97ac50624bbe55c096e3ebc9366385b27fcdbb6"
+  },
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/960"
  },
  "Mbed-TLS/TF-PSA-Crypto#975": {
@@ -50,13 +53,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-16",
    "first_response": "2026-11-13",
    "last_response": "2026-11-16",
    "opened": "2026-11-13",
-   "stage": "approved"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "2e17ae86702affb4d2c22c1082de8e92aa804255",
+   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/commit/2e17ae86702affb4d2c22c1082de8e92aa804255"
+  },
   "url": "https://github.com/Mbed-TLS/TF-PSA-Crypto/pull/975"
  },
  "Mbed-TLS/mbedtls#11036": {
@@ -118,13 +124,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-16",
    "first_response": "2026-11-13",
    "last_response": "2026-11-16",
    "opened": "2026-11-13",
-   "stage": "approved"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "8fd18609b0fae22cd0749213dece51ba8922f72e",
+   "url": "https://github.com/Mbed-TLS/mbedtls/commit/8fd18609b0fae22cd0749213dece51ba8922f72e"
+  },
   "url": "https://github.com/Mbed-TLS/mbedtls/pull/11061"
  },
  "Mbed-TLS/mbedtls#11077": {
@@ -132,7 +141,7 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 2,
+    "pass": 3,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -568,6 +577,34 @@
    "url": "https://github.com/latchset/kryoptic/commit/c4229fe7e0d593a62c1bb3c19476e36c794f4312"
   },
   "url": "https://github.com/latchset/kryoptic/pull/579"
+ },
+ "latchset/kryoptic#585": {
+  "approvals": [
+   {
+    "by": "simo5",
+    "date": "2026-11-16",
+    "url": "https://github.com/latchset/kryoptic/pull/585#pullrequestreview-5925897097"
+   }
+  ],
+  "live": {
+   "checks": {
+    "fail": 1,
+    "pass": 68,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": "2026-11-16",
+   "first_response": "2026-11-16",
+   "last_response": "2026-11-16",
+   "opened": "2026-11-16",
+   "stage": "merged"
+  },
+  "merge": {
+   "sha": "4aa6c2b61e441fd48be12d2a7a59288cf2ec8545",
+   "url": "https://github.com/latchset/kryoptic/commit/4aa6c2b61e441fd48be12d2a7a59288cf2ec8545"
+  },
+  "url": "https://github.com/latchset/kryoptic/pull/585"
  },
  "mitmproxy/mitmproxy#8548": {
   "approvals": [],
