@@ -269,6 +269,57 @@ entries:
 
   - project: OpenSSL
     repo: openssl/openssl
+    pr: 33757
+    title:
+      en: Clear the exported private key params in legacy export_to methods
+      ko: "legacy 키 내보내기에서 개인키 매개변수 배열을 해제 전에 지우기"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-16
+    decided: null
+    defect:
+      en: >-
+        When a legacy key is used with a provider other than the default one, the RSA, DSA, DH, EC
+        and ECX `export_to` methods serialise the private key into an `OSSL_PARAM` array with
+        `OSSL_PARAM_BLD_to_param()` and free it with `OSSL_PARAM_free()`, which clears only the
+        secure block. A legacy key built from plain BIGNUMs has its private components in the main
+        block, so they stay in freed heap each time the key is exported, e.g. to the FIPS provider
+        or a PKCS#11/HSM provider.
+      ko: >-
+        legacy 키를 default가 아닌 provider로 넘기면 RSA·DSA·DH·EC·ECX의 `export_to`가 개인키를
+        `OSSL_PARAM_BLD_to_param()`으로 매개변수 배열에 담고 `OSSL_PARAM_free()`로 풉니다. 이 함수는 secure
+        메모리 쪽만 지웁니다. 평범한 BIGNUM으로 만든 legacy 키는 개인키가 일반 메모리 쪽에 들어가서, FIPS나
+        PKCS#11·HSM provider로 내보낼 때마다 해제된 힙에 남습니다.
+    background:
+      en: >-
+        Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) on the legacy-to-provider bridge. The
+        provider key management export functions already free the same kind of array with
+        `OSSL_PARAM_clear_free()`.
+      ko: >-
+        제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 legacy 키가 provider로 넘어가는 경로에 적용했습니다.
+        provider keymgmt의 export는 같은 배열을 이미 `OSSL_PARAM_clear_free()`로 풉니다.
+    found_by:
+      en: >-
+        Static review of the legacy `export_to` methods against the provider export paths, then a
+        freed-block measurement that exports a legacy RSA key to the fake-rsa test provider and
+        searches freed heap for the private exponent.
+      ko: >-
+        legacy `export_to`를 provider export 경로와 대조해 찾고, legacy RSA 키를 시험용 가짜 RSA provider로
+        내보내며 해제된 힙에서 개인 지수를 찾는 측정으로 확인했습니다.
+    fix:
+      en: >-
+        Free the array with `OSSL_PARAM_clear_free()` in all five methods. A new
+        `test_legacy_export_cleanse` in `provider_pkey_test` fails without the change and passes with
+        it; related recipes pass and a `--strict-warnings enable-fips` build is clean.
+      ko: >-
+        다섯 함수 모두 `OSSL_PARAM_clear_free()`로 풀게 했습니다. `provider_pkey_test`에 넣은
+        `test_legacy_export_cleanse`는 수정 전 실패, 수정 뒤 통과하고, 관련 시험과 `--strict-warnings enable-fips`
+        빌드도 통과합니다.
+
+  - project: OpenSSL
+    repo: openssl/openssl
     pr: 33430
     title:
       en: Clear the `EVP_ENCODE_CTX` when freeing it
