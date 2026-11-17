@@ -2216,6 +2216,50 @@ entries:
         ChaCha20-Poly1305의 `encrypt_final`이 init 직후 상태를 받게 했습니다. 나눠 부르는 시험에 init 뒤 바로
         final을 불러 한 번에 암호화한 결과와 같은 태그가 나오는지 확인하는 단언을 더했고, 수정을 되돌리면 실패합니다.
 
+  - project: Kryoptic
+    repo: latchset/kryoptic
+    pr: 587
+    title:
+      en: Reject AES-GCM IVs longer than OpenSSL supports
+      ko: OpenSSL이 받지 않는 긴 AES-GCM IV를 매개변수 오류로 거부
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-17
+    defect:
+      en: >-
+        `CKM_AES_GCM` accepted any IV length up to 2^32-1 bytes, but OpenSSL refuses GCM IVs longer than 128
+        bytes. For such an IV, `C_EncryptInit` and `C_DecryptInit` failed while setting up the cipher and
+        returned `CKR_DEVICE_ERROR`, which reports a broken token instead of an unsupported parameter.
+      ko: >-
+        `CKM_AES_GCM`은 IV를 2^32-1바이트까지 다 받았지만 OpenSSL은 128바이트보다 긴 GCM IV를 거부합니다. 그런 IV를
+        주면 `C_EncryptInit`·`C_DecryptInit`이 암호 준비 중에 실패해 `CKR_DEVICE_ERROR`를 돌려줬습니다. 이 코드는
+        「지원하지 않는 매개변수」가 아니라 「토큰 고장」을 뜻합니다.
+    background:
+      en: >-
+        PKCS#11 allows GCM IVs of 1 to 2^32-1 bytes and lets a token refuse lengths it cannot handle with
+        `CKR_MECHANISM_PARAM_INVALID`. OpenSSL's GCM limit is `GCM_IV_MAX_SIZE` (1024 bits). Kryoptic already
+        restricts tag lengths OpenSSL does not support in the same way.
+      ko: >-
+        PKCS#11은 GCM IV를 1~2^32-1바이트로 허용하고, 토큰이 처리하지 못하는 길이는 `CKR_MECHANISM_PARAM_INVALID`로
+        거부하게 합니다. OpenSSL의 GCM 상한은 `GCM_IV_MAX_SIZE`(1024비트)입니다. Kryoptic은 OpenSSL이 받지 않는
+        태그 길이를 이미 같은 방식으로 막고 있었습니다.
+    found_by:
+      en: >-
+        Wycheproof `aes_gcm_test.json` run through the PKCS#11 interface: the three valid vectors with a 257-byte
+        IV (tcId 268, 272, 276) failed with `CKR_DEVICE_ERROR`; all other vectors matched.
+      ko: >-
+        Wycheproof `aes_gcm_test.json`을 PKCS#11 인터페이스로 돌려 찾았습니다. IV가 257바이트인 정상 벡터 세 개(tcId
+        268·272·276)가 `CKR_DEVICE_ERROR`로 실패했고, 나머지 벡터는 모두 맞았습니다.
+    fix:
+      en: >-
+        Refuse IVs longer than 128 bytes with `CKR_MECHANISM_PARAM_INVALID` in both the single-part and the
+        message-based GCM parameter checks, with a test that fails when the change is reverted.
+      ko: >-
+        단건 GCM과 메시지 방식 GCM의 매개변수 검사 두 곳에서 128바이트보다 긴 IV를 `CKR_MECHANISM_PARAM_INVALID`로
+        거부했습니다. 수정을 되돌리면 실패하는 시험을 붙였습니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # `link` replaces the GitHub address (OpenVPN: the Gerrit query); `status` is shown only when the
