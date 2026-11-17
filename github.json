@@ -617,10 +617,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-17",
+   "last_response": "2026-11-17",
    "opened": "2026-11-17",
-   "stage": "review"
+   "stage": "changes"
   },
   "merge": null,
   "url": "https://github.com/latchset/kryoptic/pull/587"
@@ -1042,6 +1042,25 @@
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33757"
+ },
+ "openssl/openssl#33799": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 24,
+    "pass": 72,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-17",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/openssl/openssl/pull/33799"
  },
  "randombit/botan#6082": {
   "approvals": [],
