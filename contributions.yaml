@@ -269,6 +269,55 @@ entries:
 
   - project: OpenSSL
     repo: openssl/openssl
+    pr: 33799
+    title:
+      en: "dsa: clear the old private key in DSA_set0_key()"
+      ko: "`DSA_set0_key()`가 바꾸는 이전 개인키를 해제 전에 지우기"
+    type: hardening
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-18
+    decided: null
+    defect:
+      en: >-
+        `DSA_set0_key()` frees the private key it replaces with `BN_free()`. Unless the BIGNUM has
+        `BN_FLG_SECURE` set, `BN_free()` frees the limb array without clearing it, so a DSA private
+        key built from plain BIGNUMs stays in freed heap after it is replaced. `DSA_free()` and the
+        other legacy private key setters (`DH_set0_key()`, `RSA_set0_key()`,
+        `EC_KEY_set_private_key()`) already use `BN_clear_free()`.
+      ko: >-
+        `DSA_set0_key()`는 바꿔 끼우는 이전 개인키를 `BN_free()`로 풉니다. BIGNUM에 `BN_FLG_SECURE`가 없으면
+        `BN_free()`는 숫자 배열을 지우지 않고 풀어서, 평범한 BIGNUM으로 만든 DSA 개인키가 교체 뒤 해제된 힙에
+        남습니다. `DSA_free()`와 다른 legacy 개인키 setter(`DH_set0_key()`·`RSA_set0_key()`·
+        `EC_KEY_set_private_key()`)는 이미 `BN_clear_free()`를 씁니다.
+    background:
+      en: >-
+        Zeroisation (ISO/IEC 19790, FIPS 140-3, KCMVP) of a replaced private key. `dsa_lib.c` is in
+        `$COMMON`, so the FIPS provider gets the same change.
+      ko: >-
+        제로화 요건(ISO/IEC 19790, FIPS 140-3·KCMVP)을 교체되는 개인키에 적용했습니다. `dsa_lib.c`는
+        `$COMMON`에 들어 있어 FIPS provider에도 같은 수정이 들어갑니다.
+    found_by:
+      en: >-
+        Comparing every legacy private key setter against its free function, then a freed-block
+        measurement that replaces a non-secure DSA private key and finds the old key in the block
+        freed at bn_lib.c.
+      ko: >-
+        legacy 개인키 setter를 모두 해제 함수와 대조해 찾고, secure가 아닌 DSA 개인키를 바꿔 끼우며 bn_lib.c가
+        해제한 블록에서 이전 키가 나오는 것을 측정으로 확인했습니다.
+    fix:
+      en: >-
+        Free the old private key with `BN_clear_free()` (one line). A new `test_dsa_set0_key_clear` in
+        `dsatest` fails without the change and passes with it; `test_dsa`, `test_dsaparam`,
+        `test_gendsa` and `test_internal_asn1_dsa` pass and a `--strict-warnings` build is clean.
+      ko: >-
+        이전 개인키를 `BN_clear_free()`로 풀게 했습니다(한 줄). `dsatest`에 넣은 `test_dsa_set0_key_clear`는
+        수정 전 실패, 수정 뒤 통과하고, `test_dsa`·`test_dsaparam`·`test_gendsa`·`test_internal_asn1_dsa`와
+        `--strict-warnings` 빌드도 통과합니다.
+
+  - project: OpenSSL
+    repo: openssl/openssl
     pr: 33757
     title:
       en: Clear the exported private key params in legacy export_to methods
