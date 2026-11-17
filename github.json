@@ -606,6 +606,25 @@
   },
   "url": "https://github.com/latchset/kryoptic/pull/585"
  },
+ "latchset/kryoptic#587": {
+  "approvals": [],
+  "live": {
+   "checks": {
+    "fail": 1,
+    "pass": 68,
+    "pending": 0
+   },
+   "ci_waiting": 0,
+   "draft": false,
+   "ended": null,
+   "first_response": null,
+   "last_response": null,
+   "opened": "2026-11-17",
+   "stage": "review"
+  },
+  "merge": null,
+  "url": "https://github.com/latchset/kryoptic/pull/587"
+ },
  "mitmproxy/mitmproxy#8548": {
   "approvals": [],
   "live": {
