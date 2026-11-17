@@ -64,7 +64,22 @@ UI = {
         "draft": "draft", "none_yet": "none yet", "private": "Project and details withheld until disclosure",
         "dt": {"cve": "CVE", "defect": "Problem", "background": "Background", "found_by": "How it was found",
                "fix": "Fix", "review": "Review", "evidence": "Evidence"},
-        "ev": {"pr": "Pull request", "files": "Changed files", "approved_by": "Approved by", "merge": "Merge commit"},
+        "ev": {"pr": "Pull request", "files": "Changed files", "approved_by": "Approved by", "merge": "Merge commit",
+               "landed": "Landed commit", "fix_pr": "Fix pull request"},
+        "verify_title": "Check it yourself",
+        "verify_hint": ("Every contribution on this page is on the public record. These pages list them on "
+                        "GitHub and Gerrit, no sign-in needed."),
+        "verify_links": [("Merged pull requests on GitHub",
+                          "https://github.com/search?q=author%3Awihansaem1991+is%3Apr+is%3Amerged&type=pullrequests"),
+                         ("Commits in project repositories",
+                          "https://github.com/search?q=author%3Awihansaem1991&type=commits"),
+                         ("Merged changes on OpenVPN Gerrit",
+                          "https://gerrit.openvpn.net/q/owner:wihansaem1991+status:merged"),
+                         ("GitHub profile", "https://github.com/wihansaem1991")],
+        "verify_note": ("OpenSSL commits accepted changes by hand, so those pull requests show as closed on "
+                        "GitHub; the landed commits are linked below. p11-kit's maintainer wrote the fixes for "
+                        "two reports and credited me in the commits."),
+        "verify_list": "Every landed contribution, with links",
         "submitted": "submitted", "reviewer": "reviewer", "empty": "Nothing submitted yet.",
         "no_cve": "No vulnerability reports yet.",
         "live": "Stages read from GitHub just now ({t}).",
@@ -107,7 +122,21 @@ UI = {
         "draft": "초안", "none_yet": "아직 없음", "private": "공개 전까지 프로젝트·내용 비공개",
         "dt": {"cve": "CVE", "defect": "문제", "background": "배경 지식", "found_by": "찾은 방법",
                "fix": "수정", "review": "리뷰", "evidence": "증빙"},
-        "ev": {"pr": "PR 원문", "files": "바뀐 코드", "approved_by": "승인한 리뷰어", "merge": "머지 커밋"},
+        "ev": {"pr": "PR 원문", "files": "바뀐 코드", "approved_by": "승인한 리뷰어", "merge": "머지 커밋",
+               "landed": "반영 커밋", "fix_pr": "수정 PR"},
+        "verify_title": "직접 확인하기",
+        "verify_hint": "이 페이지의 기여는 모두 공개 기록으로 남아 있습니다. 아래 링크는 로그인 없이 GitHub·Gerrit에서 열립니다.",
+        "verify_links": [("GitHub에서 머지된 PR",
+                          "https://github.com/search?q=author%3Awihansaem1991+is%3Apr+is%3Amerged&type=pullrequests"),
+                         ("프로젝트 저장소에 들어간 커밋",
+                          "https://github.com/search?q=author%3Awihansaem1991&type=commits"),
+                         ("OpenVPN Gerrit에서 반영된 변경",
+                          "https://gerrit.openvpn.net/q/owner:wihansaem1991+status:merged"),
+                         ("GitHub 프로필", "https://github.com/wihansaem1991")],
+        "verify_note": ("OpenSSL은 PR을 머지하지 않고 커밋을 직접 넣기 때문에 GitHub에서 PR이 「닫힘」으로 보입니다. "
+                        "반영된 커밋은 아래에 링크했습니다. p11-kit 보고 두 건은 메인테이너가 수정 커밋을 쓰고 "
+                        "커밋에 저를 크레딧으로 넣었습니다."),
+        "verify_list": "반영된 기여별 확인 링크",
         "submitted": "제출", "reviewer": "리뷰어", "empty": "아직 제출한 PR이 없습니다.",
         "no_cve": "아직 취약점 보고가 없습니다.",
         "live": "GitHub에서 방금 단계를 다시 읽었습니다({t}).",
@@ -136,6 +165,31 @@ def ext(url, label):
 
 def key(e):
     return f'{e["repo"]}#{e["pr"]}'
+
+
+def commit_links(item, repo):
+    """Links to the commits a change landed as: the `commits:` list in contributions.yaml (changes a
+    maintainer committed by hand, Gerrit changes, maintainer-written fixes that credit me)."""
+    out = []
+    for c in item.get("commits") or []:
+        url = f'https://github.com/{c.get("repo") or repo}/commit/{c["sha"]}'
+        label = f'{html.escape(str(c.get("branch") or ""))} {c["sha"][:10]}'.strip()
+        credit = f' ({html.escape(str(c["credit"]))})' if c.get("credit") else ""
+        out.append(ext(url, label) + credit)
+    return out
+
+
+def landed_links(e, ev):
+    """Where a landed contribution is in the project: its commits, else the merge commit from GitHub."""
+    links = commit_links(e, e["repo"])
+    merge = (ev.get(key(e)) or {}).get("merge")
+    if not links and merge:
+        links = [ext(merge["url"], merge["sha"][:10])]
+    return links
+
+
+def approver_links(e, ev):
+    return [ext(a["url"], html.escape(a["by"])) for a in (ev.get(key(e)) or {}).get("approvals") or []]
 
 
 def pr_url(e):
@@ -272,6 +326,9 @@ def vuln_entry(v, lang):
         keys = ["defect", "background", "found_by", "fix"]
         dl = "".join(f'<dt>{t["dt"][k]}</dt><dd>{text(pick(v[k], lang))}</dd>' for k in keys if v.get(k))
         links = [ext(v["advisory"], "Advisory")] if v.get("advisory") else []
+        if v.get("fix_pr") and v.get("repo"):
+            links.append(ext(f'https://github.com/{v["repo"]}/pull/{v["fix_pr"]}', f'{t["ev"]["fix_pr"]} #{v["fix_pr"]}'))
+            links += [f'{t["ev"]["landed"]} {c}' for c in commit_links(v, v["repo"])]
         if v.get("cve"):
             links.append(cve_cell(v["cve"], v.get("cvss")))
         body = f'<dl>{dl}<dt>{t["dt"]["evidence"]}</dt><dd class="evidence">{" · ".join(links) or "—"}</dd></dl>'
@@ -304,7 +361,7 @@ def repo_chip(r, lang, entries):
             f'title="{html.escape(tip)}">{text(r["project"])}{n}</a>')
 
 
-def win_entry(e, lang):
+def win_entry(e, lang, ev):
     """One landed contribution, as what it fixed — no review stage, no open-for-N-days facts."""
     t = UI[lang]
     url = pr_url(e)
@@ -312,8 +369,12 @@ def win_entry(e, lang):
     dl = "".join(
         f'<dt>{t["dt"][k]}</dt><dd>{cve_cell(e.get("cve"), e.get("cvss")) if k == "cve" else text(pick(e[k], lang))}</dd>'
         for k in keys if k == "cve" or e.get(k))
-    files = "" if e.get("gerrit") else f' · {ext(url + "/files", t["ev"]["files"])}'
-    dl += f'<dt>{t["dt"]["evidence"]}</dt><dd class="evidence">{ext(url, pr_label(e))}{files}</dd>'
+    parts = [ext(url, pr_label(e))] + ([] if e.get("gerrit") else [ext(url + "/files", t["ev"]["files"])])
+    parts += [f'{t["ev"]["landed"]} {c}' for c in landed_links(e, ev)]
+    appr = approver_links(e, ev)
+    if appr:
+        parts.append(f'{t["ev"]["approved_by"]}: {", ".join(appr)}')
+    dl += f'<dt>{t["dt"]["evidence"]}</dt><dd class="evidence">{" · ".join(parts)}</dd>'
     quote = ""
     if e.get("quote"):
         quote = f'<blockquote>"{text(e["quote"])}" — {t["reviewer"]}'
@@ -355,7 +416,7 @@ def proj_bars(data, lang, ev):
     for proj, es in order:
         es = sorted(es, key=lambda e: (e["repo"], -_pr_key(e)))
         pct = round(len(es) / mx * 100)
-        body = "".join(win_entry(e, lang) for e in es)
+        body = "".join(win_entry(e, lang, ev) for e in es)
         rows.append(f"""
       <details class="bar">
         <summary>
@@ -411,6 +472,45 @@ def stats_section(data, lang, ev):
   </section>"""
 
 
+def verify_block(data, lang, ev):
+    """Links anyone can open to check the contributions: searches over GitHub and Gerrit, then one
+    line per landed contribution (and per disclosed report fixed in public) with its pull request,
+    landed commits and approvers. The list is folded so the page stays short."""
+    t = UI[lang]
+    won = [e for e in (data.get("entries") or []) if landed(e, ev)]
+    groups = {}
+    for e in won:
+        groups.setdefault(str(e["project"]), []).append(e)
+    order = sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0].lower()))
+    rows = []
+    for proj, es in order:
+        for e in sorted(es, key=lambda e: (e["repo"], -_pr_key(e))):
+            parts = [ext(pr_url(e), pr_label(e))] + [f'{t["ev"]["landed"]} {c}' for c in landed_links(e, ev)]
+            appr = approver_links(e, ev)
+            if appr:
+                parts.append(f'{t["ev"]["approved_by"]}: {", ".join(appr)}')
+            rows.append(f'<li><b>{text(proj)}</b> <a href="#{anchor(e)}">{text(pick(e["title"], lang))}</a>'
+                        f'<span class="vl">{" · ".join(parts)}</span></li>')
+    for v in data.get("vulnerabilities") or []:
+        if v.get("public") and v.get("fix_pr") and v.get("repo"):
+            parts = ([ext(f'https://github.com/{v["repo"]}/pull/{v["fix_pr"]}', f'{t["ev"]["fix_pr"]} #{v["fix_pr"]}')]
+                     + [f'{t["ev"]["landed"]} {c}' for c in commit_links(v, v["repo"])])
+            rows.append(f'<li><b>{text(v.get("project"))}</b> <a href="#{html.escape(v["label"])}">'
+                        f'{text(pick(v.get("title"), lang))}</a><span class="vl">{" · ".join(parts)}</span></li>')
+    links = "".join(f"<li>{ext(u, html.escape(l))}</li>" for l, u in t["verify_links"])
+    return f"""
+  <section class="verify" id="verify">
+    <h3 class="chart-h">{t["verify_title"]}</h3>
+    <p class="hint">{t["verify_hint"]}</p>
+    <ul class="vlinks">{links}</ul>
+    <p class="hint">{html.escape(t["verify_note"])}</p>
+    <details class="fold" id="verify-list">
+      <summary><b>{t["verify_list"]}</b> <span class="fold-n">{len(rows)}</span></summary>
+      <div class="fold-body"><ol class="vlist">{"".join(rows)}</ol></div>
+    </details>
+  </section>"""
+
+
 def vulns_block(data, lang):
     """Vulnerability reports, folded away by default so the page stays short; the headline count is
     in the overview. Open to read each report (named only once a project discloses it)."""
@@ -450,6 +550,7 @@ def render(data, lang, tmpl, ev, today):
         "switch": t["switch"],
         "tags": "".join(f"<li>{html.escape(a)}</li>" for a in pick(owner["areas"], lang)),
         "stats": stats_section(data, lang, ev),
+        "verify": verify_block(data, lang, ev),
         "vulns": vulns_block(data, lang),
         "repos": repos_block(data, lang, entries),
         "footer": html.escape(t["footer"].format(d=today.isoformat())),

@@ -32,6 +32,11 @@ entries:
     status: approved
     submitted: 2026-10-29
     decided: 2026-10-30
+    commits:
+      - {branch: master, sha: aad00a888ccb47ec49afeb7545f2dddf9397fbb5}
+      - {branch: openssl-4.1, sha: f20b8c2aca7eac4cd0bb9465f0a6b9f55ce6455c}
+      - {branch: openssl-4.0, sha: 4b75a02e094621e31f1e960139081da348ad33b1}
+      - {branch: openssl-3.6, sha: 47785f5a096929788c2be5ef28dc0880212e04e0}
     branches: [master, "3.6", "4.0", "4.1"]
     defect:
       en: >-
@@ -517,6 +522,8 @@ entries:
     status: approved
     submitted: 2026-11-02
     decided: 2026-11-03
+    commits:
+      - {branch: master, sha: a1c7d645d527d4db8b28f375dc3282f71d0c3e45}
     defect:
       en: >-
         `kdf_pbkdf1_derive_skey()` allocated the key buffer with `OPENSSL_zalloc()`, but nothing
@@ -1946,6 +1953,8 @@ entries:
     status: merged
     submitted: 2026-11-01
     decided: 2026-11-05
+    commits:
+      - {branch: master, sha: da6659452a34b5c94b20f55cbeb96b9ba70885ad}
     defect:
       en: >-
         `ks->key_src` holds the pre-master secret and the random values the peers exchange in key
@@ -1994,6 +2003,8 @@ entries:
     status: merged
     submitted: 2026-11-01
     decided: 2026-11-03
+    commits:
+      - {branch: master, sha: eb47f700d852cd5c740d549fbf835ed63781bf10}
     defect:
       en: >-
         `auth_token_init_secret()` reads the auth-token server key into a 2048-byte buffer, copies it
@@ -2046,6 +2057,8 @@ entries:
     status: merged
     submitted: 2026-11-01
     decided: 2026-11-02
+    commits:
+      - {branch: master, sha: 21c8a682755c425c0830d25cc33643545d479514}
     defect:
       en: >-
         `crypto_pem_decode()` decodes the tls-crypt-v2 client and server keys and the auth-token key,
@@ -2096,6 +2109,8 @@ entries:
     status: merged
     submitted: 2026-11-02
     decided: 2026-11-05
+    commits:
+      - {branch: master, sha: 09fd5ac8e4f679a58b02ed2f883ebf4a4d7205a7}
     defect:
       en: >-
         `init_key_ctx_bi()` and `tls_crypt_v2_init_server_key()` convert the key into a
@@ -2141,6 +2156,8 @@ entries:
     status: merged
     submitted: 2026-11-02
     decided: 2026-11-15
+    commits:
+      - {branch: master, sha: 583f6fdc22c9b4ca9521b401210afb83cf8978aa}
     defect:
       en: >-
         `tls_crypt_v2_init_client_key()` left a stack copy of the client key at every client start,
@@ -2512,7 +2529,10 @@ vulnerabilities:
     status: public_pr
     cve: null
     cvss: null
-    advisory: https://github.com/p11-glue/p11-kit/pull/797
+    repo: p11-glue/p11-kit
+    fix_pr: 797
+    commits:
+      - {branch: master, sha: 8efcebe690a8dc5a4a08d2bd921c2d9f8c333b10, credit: Reported-by · Co-authored-by}
     title:
       en: Buffer overflow when decoding nested PKCS#11 attributes (RPC client)
       ko: PKCS#11 중첩 속성 디코딩 시 버퍼 오버플로 (RPC 클라이언트)
@@ -2557,7 +2577,11 @@ vulnerabilities:
     status: public_pr
     cve: null
     cvss: null
-    advisory: https://github.com/p11-glue/p11-kit/pull/796
+    repo: p11-glue/p11-kit
+    fix_pr: 796
+    commits:
+      - {branch: master, sha: 7b6ded5f76ab132d2f8c24cf3c761bc531c6f6a6, credit: Reported-by}
+      - {branch: master, sha: 6c4bda02043779f2efb027b3a18fcc72963d7b73, credit: Reported-by}
     title:
       en: Incorrect memory management between the PKCS#11 RPC client and server
       ko: PKCS#11 RPC 클라이언트와 서버 사이 잘못된 메모리 관리
@@ -2583,9 +2607,9 @@ vulnerabilities:
     fix:
       en: >-
         Classified as a bug under the same trust-boundary reasoning; the maintainer's fix is public
-        pull request #796, open and awaiting merge. Hansaem Wi is credited as reporter.
+        pull request #796, merged on 2026-11-09. Hansaem Wi is credited as reporter.
       ko: >-
-        같은 신뢰 경계 근거로 버그로 분류됐고, 메인테이너의 수정은 공개 PR #796으로 아직 머지 대기입니다.
+        같은 신뢰 경계 근거로 버그로 분류됐고, 메인테이너의 수정은 공개 PR #796으로 2026-11-09 머지됐습니다.
         Hansaem Wi가 보고자로 올라갔습니다.
 
   - label: VR-6
