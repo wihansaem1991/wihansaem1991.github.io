@@ -611,8 +611,8 @@
   "live": {
    "checks": {
     "fail": 1,
-    "pass": 68,
-    "pending": 0
+    "pass": 3,
+    "pending": 65
    },
    "ci_waiting": 0,
    "draft": false,
@@ -620,7 +620,7 @@
    "first_response": "2026-11-17",
    "last_response": "2026-11-17",
    "opened": "2026-11-17",
-   "stage": "changes"
+   "stage": "rereview"
   },
   "merge": null,
   "url": "https://github.com/latchset/kryoptic/pull/587"
