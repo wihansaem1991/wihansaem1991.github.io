@@ -195,7 +195,7 @@
    "draft": false,
    "ended": null,
    "first_response": "2026-11-14",
-   "last_response": "2026-11-14",
+   "last_response": "2026-11-18",
    "opened": "2026-11-13",
    "stage": "review"
   },
@@ -612,6 +612,11 @@
     "by": "Jakuje",
     "date": "2026-11-18",
     "url": "https://github.com/latchset/kryoptic/pull/587#pullrequestreview-5953520193"
+   },
+   {
+    "by": "simo5",
+    "date": "2026-11-18",
+    "url": "https://github.com/latchset/kryoptic/pull/587#pullrequestreview-5959225395"
    }
   ],
   "live": {
@@ -622,13 +627,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-18",
    "first_response": "2026-11-17",
    "last_response": "2026-11-18",
    "opened": "2026-11-17",
-   "stage": "rereview"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "df788daa755f895a52e81e3faf0760905a2669f8",
+   "url": "https://github.com/latchset/kryoptic/commit/df788daa755f895a52e81e3faf0760905a2669f8"
+  },
   "url": "https://github.com/latchset/kryoptic/pull/587"
  },
  "mitmproxy/mitmproxy#8548": {
