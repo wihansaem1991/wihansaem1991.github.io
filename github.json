@@ -607,18 +607,24 @@
   "url": "https://github.com/latchset/kryoptic/pull/585"
  },
  "latchset/kryoptic#587": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "Jakuje",
+    "date": "2026-11-18",
+    "url": "https://github.com/latchset/kryoptic/pull/587#pullrequestreview-5953520193"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 1,
-    "pass": 3,
-    "pending": 65
+    "pass": 68,
+    "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": "2026-11-17",
-   "last_response": "2026-11-17",
+   "last_response": "2026-11-18",
    "opened": "2026-11-17",
    "stage": "rereview"
   },
@@ -960,7 +966,7 @@
    "draft": false,
    "ended": null,
    "first_response": "2026-11-09",
-   "last_response": "2026-11-09",
+   "last_response": "2026-11-18",
    "opened": "2026-11-02",
    "stage": "rereview"
   },
