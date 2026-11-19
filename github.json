@@ -140,8 +140,8 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 0,
-    "pass": 3,
+    "fail": 1,
+    "pass": 1,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -187,8 +187,8 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 1,
-    "pass": 68,
+    "fail": 10,
+    "pass": 42,
     "pending": 0
    },
    "ci_waiting": 0,
