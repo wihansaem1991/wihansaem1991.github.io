@@ -76,8 +76,8 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-19",
+   "last_response": "2026-11-19",
    "opened": "2026-10-30",
    "stage": "review"
   },
@@ -96,7 +96,7 @@
    "draft": false,
    "ended": null,
    "first_response": "2026-11-12",
-   "last_response": "2026-11-12",
+   "last_response": "2026-11-19",
    "opened": "2026-11-12",
    "stage": "rereview"
   },
@@ -147,8 +147,8 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-19",
+   "last_response": "2026-11-19",
    "opened": "2026-11-16",
    "stage": "review"
   },
