@@ -2326,6 +2326,51 @@ entries:
         단건 GCM과 메시지 방식 GCM의 매개변수 검사 두 곳에서 128바이트보다 긴 IV를 `CKR_MECHANISM_PARAM_INVALID`로
         거부했습니다. 수정을 되돌리면 실패하는 시험을 붙였습니다.
 
+  - project: Kryoptic
+    repo: latchset/kryoptic
+    pr: 595
+    title:
+      en: Return PKCS#11 error codes for invalid ML-KEM and ML-DSA input
+      ko: 잘못된 ML-KEM·ML-DSA 입력에 맞는 PKCS#11 오류 코드 돌려주기
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-20
+    defect:
+      en: >-
+        Every invalid ML-KEM or ML-DSA input was rejected with `CKR_DEVICE_ERROR`, which reports a broken token.
+        An ML-KEM encapsulation key with an unreduced coefficient was even accepted by `C_CreateObject` and only
+        failed later, on every `C_EncapsulateKey`.
+      ko: >-
+        잘못된 ML-KEM·ML-DSA 입력이 모두 「토큰 고장」을 뜻하는 `CKR_DEVICE_ERROR`로 거부됐습니다. 계수가 q로 축소되지
+        않은 ML-KEM 공개키는 `C_CreateObject`가 받아 두었다가 `C_EncapsulateKey`를 부를 때마다 실패했습니다.
+    background:
+      en: >-
+        FIPS 203 7.2 and 7.3 define the encapsulation-key modulus check and the decapsulation-key hash check.
+        PKCS#11 3.2 4.1.1 says an invalid attribute value on object creation fails with
+        `CKR_ATTRIBUTE_VALUE_INVALID`, and 5.18.9 lists `CKR_WRAPPED_KEY_LEN_RANGE` for `C_DecapsulateKey`.
+      ko: >-
+        FIPS 203 7.2·7.3은 공개키(ek) 모듈러 검사와 개인키(dk) 해시 검사를 정합니다. PKCS#11 3.2 4.1.1은 객체를 만들 때
+        속성 값이 잘못되면 `CKR_ATTRIBUTE_VALUE_INVALID`로 실패하게 하고, 5.18.9는 `C_DecapsulateKey` 반환값에
+        `CKR_WRAPPED_KEY_LEN_RANGE`를 둡니다.
+    found_by:
+      en: >-
+        All 21 Wycheproof ML-KEM and ML-DSA files (2,863 vectors) run through the PKCS#11 interface: no wrong
+        results, but 66 rejections returned `CKR_DEVICE_ERROR`.
+      ko: >-
+        Wycheproof ML-KEM·ML-DSA 파일 21개(2,863건)를 PKCS#11 인터페이스로 돌려 찾았습니다. 틀린 결과는 없었지만
+        거부 66건이 `CKR_DEVICE_ERROR`였습니다.
+    fix:
+      en: >-
+        Validate the ML-KEM public key in the existing import check, map backend-rejected private keys to
+        `CKR_ATTRIBUTE_VALUE_INVALID`, and check the ciphertext length before decapsulating. Two tests fail when
+        the change is reverted; after it, no Wycheproof vector returns `CKR_DEVICE_ERROR`.
+      ko: >-
+        기존 공개키 가져오기 검사 안에서 ML-KEM 공개키를 검증하고, 백엔드가 거부한 개인키는
+        `CKR_ATTRIBUTE_VALUE_INVALID`로, 역캡슐화 전에 암호문 길이를 검사하게 했습니다. 수정을 되돌리면 실패하는 시험
+        두 개를 붙였고, 수정 뒤에는 `CKR_DEVICE_ERROR`를 내는 Wycheproof 벡터가 없습니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # `link` replaces the GitHub address (OpenVPN: the Gerrit query); `status` is shown only when the
