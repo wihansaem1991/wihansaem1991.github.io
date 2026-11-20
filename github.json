@@ -184,20 +184,26 @@
   "url": "https://github.com/OpenSC/OpenSC/pull/3917"
  },
  "OpenSC/OpenSC#3949": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "Jakuje",
+    "date": "2026-11-20",
+    "url": "https://github.com/OpenSC/OpenSC/pull/3949#pullrequestreview-5991250916"
+   }
+  ],
   "live": {
    "checks": {
-    "fail": 10,
-    "pass": 42,
+    "fail": 1,
+    "pass": 68,
     "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": "2026-11-14",
-   "last_response": "2026-11-19",
+   "last_response": "2026-11-20",
    "opened": "2026-11-13",
-   "stage": "review"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/OpenSC/OpenSC/pull/3949"
@@ -684,20 +690,26 @@
   "url": "https://github.com/open-quantum-safe/liboqs/pull/2665"
  },
  "open-quantum-safe/oqs-provider#861": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "RodriM11",
+    "date": "2026-11-20",
+    "url": "https://github.com/open-quantum-safe/oqs-provider/pull/861#pullrequestreview-5990559437"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 2,
+    "pass": 25,
     "pending": 0
    },
-   "ci_waiting": 5,
+   "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": "2026-11-03",
-   "last_response": "2026-11-08",
+   "last_response": "2026-11-20",
    "opened": "2026-10-29",
-   "stage": "ci_approval"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/open-quantum-safe/oqs-provider/pull/861"
@@ -1061,8 +1073,8 @@
   "approvals": [],
   "live": {
    "checks": {
-    "fail": 24,
-    "pass": 72,
+    "fail": 0,
+    "pass": 96,
     "pending": 0
    },
    "ci_waiting": 0,

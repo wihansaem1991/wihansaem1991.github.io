@@ -600,9 +600,9 @@ entries:
     type: hardening
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-10-29
-    decided: null
+    decided: 2026-11-20
     defect:
       en: >-
         When post-quantum private keys were encoded to or decoded from PKCS#8 DER, and when they were
@@ -1909,9 +1909,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-11-13
-    decided: null
+    decided: 2026-11-20
     defect:
       en: >-
         After #3917 the PKCS#11 module could encrypt with an RSA public key using PKCS#1 v1.5 or raw RSA,
