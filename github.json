@@ -70,14 +70,14 @@
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 4,
+    "pass": 2,
     "pending": 0
    },
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
    "first_response": "2026-11-19",
-   "last_response": "2026-11-19",
+   "last_response": "2026-11-21",
    "opened": "2026-10-30",
    "stage": "review"
   },
@@ -723,17 +723,11 @@
   "url": "https://github.com/open-quantum-safe/liboqs/pull/2665"
  },
  "open-quantum-safe/oqs-provider#861": {
-  "approvals": [
-   {
-    "by": "RodriM11",
-    "date": "2026-11-20",
-    "url": "https://github.com/open-quantum-safe/oqs-provider/pull/861#pullrequestreview-5990559437"
-   }
-  ],
+  "approvals": [],
   "live": {
    "checks": {
     "fail": 0,
-    "pass": 25,
+    "pass": 20,
     "pending": 0
    },
    "ci_waiting": 0,
@@ -742,7 +736,7 @@
    "first_response": "2026-11-03",
    "last_response": "2026-11-20",
    "opened": "2026-10-29",
-   "stage": "approved"
+   "stage": "review"
   },
   "merge": null,
   "url": "https://github.com/open-quantum-safe/oqs-provider/pull/861"
