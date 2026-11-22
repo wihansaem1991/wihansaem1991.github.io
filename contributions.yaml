@@ -2371,6 +2371,52 @@ entries:
         `CKR_ATTRIBUTE_VALUE_INVALID`로, 역캡슐화 전에 암호문 길이를 검사하게 했습니다. 수정을 되돌리면 실패하는 시험
         두 개를 붙였고, 수정 뒤에는 `CKR_DEVICE_ERROR`를 내는 Wycheproof 벡터가 없습니다.
 
+  - project: Kryoptic
+    repo: latchset/kryoptic
+    pr: 597
+    title:
+      en: Fix multi-part AES-CCM and AES-CBC-PAD decryption with a length query
+      ko: 길이를 먼저 묻는 다중 파트 AES-CCM·AES-CBC-PAD 복호화 고치기
+    type: bugfix
+    cve: null
+    cvss: null
+    status: open
+    submitted: 2026-11-22
+    defect:
+      en: >-
+        A caller that sized its `C_DecryptUpdate` buffer with a NULL-buffer query, as PKCS#11 expects, could
+        not finish a multi-part decryption. For AES-CCM the query and the call disagreed on the output size.
+        For AES-CBC-PAD a first part shorter than one block ended in `CKR_DEVICE_ERROR`.
+      ko: >-
+        PKCS#11 관례대로 출력 버퍼 없이 길이를 먼저 묻고 `C_DecryptUpdate`를 부르면, 여러 번 나눠 복호화를 끝낼 수
+        없었습니다. AES-CCM은 길이 질의와 실제 호출이 출력 크기를 다르게 셌고, AES-CBC-PAD는 첫 조각이 한 블록보다
+        짧으면 `CKR_DEVICE_ERROR`로 끝났습니다.
+    background:
+      en: >-
+        PKCS#11 3.2 5.2 output-length convention: a NULL output buffer returns the length the next call needs.
+        CCM (NIST SP 800-38C) can release plaintext only after the tag is checked, and OpenSSL holds back the last
+        full block in padded CBC decryption.
+      ko: >-
+        PKCS#11 3.2 5.2의 출력 길이 관례(출력 버퍼가 NULL이면 다음 호출에 필요한 길이를 돌려줌)를 썼습니다. CCM(NIST
+        SP 800-38C)은 태그를 확인한 뒤에만 평문을 내놓을 수 있고, OpenSSL은 패딩 CBC 복호에서 마지막 온전한 블록을
+        붙잡아 둔다는 점도 썼습니다.
+    found_by:
+      en: >-
+        Wycheproof AES vectors run through `C_DecryptUpdate` in two parts: all 405 valid CCM vectors and all 72
+        valid CBC-PAD vectors with a short first part failed, while single-part decryption was correct.
+      ko: >-
+        Wycheproof AES 벡터를 `C_DecryptUpdate` 두 번으로 나눠 넣어 찾았습니다. 한 번에 복호하면 맞는데, 유효한 CCM
+        벡터 405개 전부와 첫 조각이 짧은 CBC-PAD 유효 벡터 72개 전부가 실패했습니다.
+    fix:
+      en: >-
+        Make the CCM length query return the plaintext length that `decrypt_update()` asks for, and accept no
+        output for the buffered CBC-PAD block. Two tests fail when their fix is reverted; afterwards the Wycheproof
+        AEAD vectors give 0 mismatches in single-part and multi-part mode.
+      ko: >-
+        CCM 길이 질의가 `decrypt_update()`가 요구하는 평문 길이를 돌려주게 하고, 버퍼에 모은 CBC-PAD 블록은 출력이 없어도
+        받게 했습니다. 각 수정을 되돌리면 실패하는 시험 두 개를 붙였고, 수정 뒤 Wycheproof AEAD 벡터는 한 번에
+        복호할 때와 나눠 복호할 때 모두 불일치 0입니다.
+
 # Repositories being audited now, shown in the "Repositories" tab in this order. about: what the
 # project is; focus: what I look at there. The pull request counts per stage come from `entries`.
 # `link` replaces the GitHub address (OpenVPN: the Gerrit query); `status` is shown only when the
