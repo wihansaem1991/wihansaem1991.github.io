@@ -1909,9 +1909,9 @@ entries:
     type: bugfix
     cve: null
     cvss: null
-    status: approved
+    status: merged
     submitted: 2026-11-13
-    decided: 2026-11-20
+    decided: 2026-11-23
     defect:
       en: >-
         After #3917 the PKCS#11 module could encrypt with an RSA public key using PKCS#1 v1.5 or raw RSA,

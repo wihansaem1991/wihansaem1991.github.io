@@ -204,13 +204,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-23",
    "first_response": "2026-11-14",
-   "last_response": "2026-11-20",
+   "last_response": "2026-11-23",
    "opened": "2026-11-13",
-   "stage": "approved"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "91f10f8bc2a891ab9cdba4198e6f428ec0f3fb54",
+   "url": "https://github.com/OpenSC/OpenSC/commit/91f10f8bc2a891ab9cdba4198e6f428ec0f3fb54"
+  },
   "url": "https://github.com/OpenSC/OpenSC/pull/3949"
  },
  "OpenVPN/openvpn#2075": {
