@@ -1030,11 +1030,11 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
+   "ended": "2026-11-23",
    "first_response": "2026-11-09",
    "last_response": "2026-11-21",
    "opened": "2026-11-02",
-   "stage": "rereview"
+   "stage": "closed"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33477"
