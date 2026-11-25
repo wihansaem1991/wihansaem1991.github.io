@@ -682,7 +682,13 @@
   "url": "https://github.com/latchset/kryoptic/pull/595"
  },
  "latchset/kryoptic#597": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "simo5",
+    "date": "2026-11-24",
+    "url": "https://github.com/latchset/kryoptic/pull/597#pullrequestreview-6048026817"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -691,13 +697,16 @@
    },
    "ci_waiting": 0,
    "draft": false,
-   "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "ended": "2026-11-24",
+   "first_response": "2026-11-24",
+   "last_response": "2026-11-24",
    "opened": "2026-11-22",
-   "stage": "review"
+   "stage": "merged"
   },
-  "merge": null,
+  "merge": {
+   "sha": "bba3e5aea4fd51f0cc66c41cf3e5f488209535c2",
+   "url": "https://github.com/latchset/kryoptic/commit/bba3e5aea4fd51f0cc66c41cf3e5f488209535c2"
+  },
   "url": "https://github.com/latchset/kryoptic/pull/597"
  },
  "mitmproxy/mitmproxy#8548": {
