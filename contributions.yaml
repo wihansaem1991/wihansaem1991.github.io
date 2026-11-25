@@ -1134,9 +1134,9 @@ entries:
     type: test
     cve: null
     cvss: null
-    status: open
+    status: approved
     submitted: 2026-10-31
-    decided: null
+    decided: 2026-11-02
     defect:
       en: >-
         liboqs's test harness rejected ML-DSA signatures of the wrong length, and contexts longer than

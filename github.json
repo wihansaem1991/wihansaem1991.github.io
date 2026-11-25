@@ -748,7 +748,7 @@
    "first_response": "2026-11-01",
    "last_response": "2026-11-02",
    "opened": "2026-10-31",
-   "stage": "approved_pending"
+   "stage": "approved"
   },
   "merge": null,
   "url": "https://github.com/open-quantum-safe/liboqs/pull/2665"
