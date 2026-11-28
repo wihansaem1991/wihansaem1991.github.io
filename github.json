@@ -885,7 +885,13 @@
   "url": "https://github.com/openssl-projects/pkcs11-provider/pull/816"
  },
  "openssl/openssl#33426": {
-  "approvals": [],
+  "approvals": [
+   {
+    "by": "fwh-dc",
+    "date": "2026-11-28",
+    "url": "https://github.com/openssl/openssl/pull/33426#pullrequestreview-6096646840"
+   }
+  ],
   "live": {
    "checks": {
     "fail": 0,
@@ -895,10 +901,10 @@
    "ci_waiting": 0,
    "draft": false,
    "ended": null,
-   "first_response": null,
-   "last_response": null,
+   "first_response": "2026-11-28",
+   "last_response": "2026-11-28",
    "opened": "2026-10-28",
-   "stage": "review"
+   "stage": "approved_pending"
   },
   "merge": null,
   "url": "https://github.com/openssl/openssl/pull/33426"
